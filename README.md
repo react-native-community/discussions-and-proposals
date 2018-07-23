@@ -35,3 +35,4 @@ Similarly to the main repository, this project has adopted a Code of Conduct tha
 - [ ] create templates for issues and PRs
 - [ ] migrate [For discussion](https://github.com/facebook/react-native/labels/For%20Discussion) issues from the main repo
 - [ ] complete and review the RFC process
+- [ ] add a dedicated folder for monthly meetings notes
