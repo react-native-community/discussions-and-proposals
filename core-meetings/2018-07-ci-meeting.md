@@ -1,6 +1,6 @@
-# Better CI, Testing, and Proposals: July 2018 Monthly Meeting
+# Better CI, Testing, and Proposals: July 2018 Core Meeting
 
-In case you missed [the release of 0.56](http://facebook.github.io/react-native/blog/2018/07/04/releasing-react-native-056), the teams behind React Native have been busy! Nevertheless, as stewards of React Native engineers worldwide, we've contemplated ways to improve alignment and visibility of the framework's direction, reason why we decided to bring back the monthly meetings, where community members and Facebook alike joined to discuss issues and propose responses.
+In case you missed [the release of 0.56](http://facebook.github.io/react-native/blog/2018/07/04/releasing-react-native-056), the teams behind React Native have been busy! Nevertheless, as stewards of React Native engineers worldwide, we've contemplated ways to improve alignment and visibility of the framework's direction, reason why we decided to bring back the monthly meetings (with an updated format), where community members and Facebook alike joined to discuss issues and propose responses.
 
 The community team is made up of volunteers who help maintain React Native, contribute to education materials, and improve the React Native developer's environment.
 
