@@ -24,6 +24,10 @@ The "RFC" (request for comments) process is intended to provide a consistent and
 
 It is inspired by the [React RFC repo](https://github.com/reactjs/rfcs), but today we don't expect for every substantial change to go through this process; however, we hope that this brings more awareness to the community.
 
+### Core Meetings
+
+The core team regularly meets to discuss ongoing problems with the goal of drafting solution proposals. The [core meetings](core-meetings/README.md) directory contains meeting notes and topics for this process.
+
 ## CoC
 
 Similarly to the main repository, this project has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://code.facebook.com/codeofconduct) so that you can understand what actions will and will not be tolerated.
@@ -35,4 +39,4 @@ Similarly to the main repository, this project has adopted a Code of Conduct tha
 - [ ] create templates for issues and PRs
 - [ ] migrate [For discussion](https://github.com/facebook/react-native/labels/For%20Discussion) issues from the main repo
 - [ ] complete and review the RFC process
-- [ ] add a dedicated folder for monthly meetings notes
+- [x] add a dedicated folder for monthly meetings notes
