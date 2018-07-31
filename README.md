@@ -26,7 +26,7 @@ It is inspired by the [React RFC repo](https://github.com/reactjs/rfcs), but tod
 
 ### Core Meetings
 
-The core team regularly meets to discuss ongoing problems with the goal of drafting solution proposals. The [core meetings](core-meetings/README.md) directory contains meeting notes and topics for this process.
+The top contributors regularly meet to discuss ongoing problems with the goal of drafting solution proposals. The [core meetings](core-meetings/README.md) directory contains meeting notes and topics for this process.
 
 ## CoC
 
