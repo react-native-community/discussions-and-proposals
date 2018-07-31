@@ -25,9 +25,11 @@ This would move it to an external package, like so:
 import { WebView } from '@infinitered/react-native-webview';
 ```
 
+(Where this third-party package will live is an open question. See below.)
+
 ## Motivation
 
-The current WebView implementation is (to my knowledge) not used by Facebook internally. This leads (understandably) to a lack of first-class support for this core API. By moving the component to a third party that is more invested in supporting it, there will be better support.
+The current WebView implementation is used by Facebook internally but not actively updated. This leads (understandably) to a lack of first-class support for this core API. By moving the component to a third party that is more invested in supporting it, there will be better support.
 
 Additionally, with this component no longer included in core, there will be an opening for alternative third party WebView implementations, should anyone else wish to provide one.
 
@@ -57,4 +59,6 @@ We will need to update the React Native documentation to point out that WebView 
 
 ## Unresolved questions
 
-None so far.
+There are a number of [WebView-related issues](https://github.com/facebook/react-native/search?q=webview&state=open&type=Issues) in the core React Native repo. We will need to have a plan to migrate those over to the new WebView repo.
+
+Additionally, we need to decide where this new repo will live. I am willing to host it under the `infinitered` organization (this motivates me more to keep it up to date and supported), but am open to other ideas such as `react-native-community`.
