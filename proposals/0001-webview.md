@@ -22,7 +22,7 @@ import { WebView } from 'react-native';
 This would move it to an external package, like so:
 
 ```jsx
-import { WebView } from '@infinitered/react-native-webview';
+import { WebView } from 'react-native-webview';
 ```
 
 (Where this third-party package will live is an open question. See below.)
