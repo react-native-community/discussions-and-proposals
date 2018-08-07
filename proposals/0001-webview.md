@@ -51,7 +51,7 @@ The primary alternative is to keep the WebView in core. There are also existing 
 
 ## Adoption strategy
 
-This is a breaking change and existing React Native authors who use WebView will need to update their apps to access one of the third party solutions. For most, it should be as simple as `yarn add @infinitered/react-native-webview` and update their import statements.
+This is a breaking change and existing React Native authors who use WebView will need to update their apps to access one of the third party solutions. For most, it should be as simple as `yarn add react-native-webview` and update their import statements.
 
 ## How we teach this
 
