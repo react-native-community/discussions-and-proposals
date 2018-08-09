@@ -8,7 +8,7 @@ This proposal discusses ways to speed up the way Native Modules are initialized 
 
 ## Motivation
 
-This section lists the problems with the current state. Though Android is use as the example, similar issues exist in iOS also. 
+This section lists the problems with the current state. Though Android is used as the example, similar issues exist in iOS also. 
 
 1. Native Modules are specified in [a package](https://github.com/facebook/react-native/blob/1e8f3b11027fe0a7514b4fc97d0798d3c64bc895/local-cli/link/__fixtures__/android/0.20/MainActivity.java#L37) and are eagerly initialized. The startup time of React Native increases with the number of Native Modules, even if some of those Native Modules are never used. Native Modules can be made lazy by using [LazyReactPackage](https://github.com/facebook/react-native/blob/42146a7a4ad992a3597e07ead3aafdc36d58ac26/ReactAndroid/src/main/java/com/facebook/react/LazyReactPackage.java) but this does not work in the Open Source repo since  work since the annotation processor called  [ReactModuleSpecProcessor](https://github.com/facebook/react-native/blob/42146a7a4ad992a3597e07ead3aafdc36d58ac26/ReactAndroid/src/main/java/com/facebook/react/module/processing/ReactModuleSpecProcessor.java) does not work with Gradle yet. Note that there was [a PR to solve this](https://github.com/facebook/react-native/pull/10084), but it was not merged.  
 
