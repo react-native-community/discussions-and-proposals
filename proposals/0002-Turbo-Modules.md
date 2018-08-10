@@ -3,7 +3,7 @@ _Its blazing fast_
 
 ## Summary
 
-React Native uses [Native Modules](https://facebook.github.io/react-native/docs/native-modules-ios) as a way for JavaScript  to invoke functions in Java/ObjC. Listed under the API section in the [React Native documentation](https://facebook.github.io/react-native/docs/0.56/getting-started), popular native modules include Geolocation, Device Information, Async Storage, etc.
+React Native uses [Native Modules](https://facebook.github.io/react-native/docs/native-modules-ios) as a way for JavaScript  to invoke functions in Java/ObjC. Listed under the API section in the [React Native documentation](https://facebook.github.io/react-native/docs/getting-started), popular native modules include Geolocation, Device Information, Async Storage, etc.
 This proposal discusses a new architecture to speed up the way Native Modules are initialized and invoked from JavaScript.
 
 ## Motivation
