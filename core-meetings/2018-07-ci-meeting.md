@@ -38,4 +38,6 @@ Community engagement was a recurring topic on the call. Most of the discussion f
 
 All of these proposals need a home, so we're creating a location and format for them. Our ambition is to bring these conversations into the public but not force a rigid process. We're working on this now.
 
-This month's topic was CI, but we covered much more. Expect to see many of these proposals soon in this repository, where we hope you will help us make React Native even better.
+---
+
+This month's topic was CI, but we are planning to cover much more. Expect to see many of these proposals soon in this repository, where we hope you will help us make React Native even better.
