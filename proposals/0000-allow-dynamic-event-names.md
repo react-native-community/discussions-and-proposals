@@ -2,7 +2,7 @@
 title: Allowing Dynamic Event Names in RCTEventEmitter
 author:
 - Michael Heins
-date: today
+date: August 22, 2018
 ---
 
 # RFC0000: Allowing Dynamic Event Names in RCTEventEmitter
