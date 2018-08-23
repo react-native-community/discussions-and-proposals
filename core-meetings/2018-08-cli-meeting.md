@@ -6,7 +6,7 @@ The community team is made up of volunteers who help maintain React Native, cont
 
 ## The core discussion
 
-This month, the group chose to discuss React Native's CLI tooling and its future.
+This time, the group chose to discuss React Native's CLI tooling and its future.
 
 This conversation is part of the greater effort to [slim down the core repository](https://github.com/react-native-community/discussions-and-proposals/issues/6), while ensuring the code health. In particular, the starting point of this meeting was the [proposal](https://github.com/react-native-community/discussions-and-proposals/pull/13) of moving the CLI out of the main repo by [@grabbou](https://github.com/grabbou).
 
@@ -36,4 +36,4 @@ Given that most of the group actually manually upgrades the files to ensure a sm
 
 ---
 
-This month's topic was CLI, but we are planning to cover much more. You can check both the issues and the PRs of this repository to see what conversations are ongoing, and we hope you will join us in making React Native even better!
+This time's topic was CLI, but we are planning to cover much more. You can check both the issues and the PRs of this repository to see what conversations are ongoing, and we hope you will join us in making React Native even better!

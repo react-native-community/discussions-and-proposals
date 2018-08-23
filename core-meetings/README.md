@@ -8,22 +8,23 @@ The topics listed below have ongoing meetings. Expect to see more notes and prop
 
 ### Continuous Integration
 
-*Lead by [@grabbou](https://twitter.com/grabbou)*
+_Lead by [@grabbou](https://twitter.com/grabbou)_
 
 Anything related to infrastructure and releasing React Native; state of PRs, current issues, and blockers from the CI point of view.
 
 ### ReasonML
 
-*Lead by [@grabbou](https://twitter.com/grabbou)*
+_Lead by [@grabbou](https://twitter.com/grabbou)_
 
 ReasonML is growing in popularity and there's numerous attempts to bring first class React Native support. Discussion on the approaches underway and direction of the project.
 
 ### CLI
 
-*Lead by [@grabbou](https://twitter.com/grabbou)*
+_Lead by [@grabbou](https://twitter.com/grabbou)_
 
 Everything related to the way we use command line to run React Native apps, linking, compiling, building and general developer experience.
 
 ## Meeting Notes
 
+- [2018-08 The CLI and its future](2018-08-cli-meeting.md)
 - [2018-07 Releases and Keeping CI green](2018-07-ci-meeting.md)
