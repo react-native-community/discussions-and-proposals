@@ -6,7 +6,7 @@ The community team is made up of volunteers who help maintain React Native, cont
 
 ## The core discussion
 
-This month, the group chose to discuss React Native's continuous integration tooling.
+This time, the group chose to discuss React Native's continuous integration tooling.
 
 The React Native repository has a complex [continuous integration suite](https://circleci.com/gh/facebook/react-native) that automatically tests pull requests and master to help guarantee quality. These tests are actually split into five separate suites, ranging from checking for Flow errors to iOS end to end testing. CI should give confidence that things are good when merging pull requests and making release candidates. Recently though, CI success has been a challenge. It's even caused slowdowns in making releases.
 
@@ -38,4 +38,6 @@ Community engagement was a recurring topic on the call. Most of the discussion f
 
 All of these proposals need a home, so we're creating a location and format for them. Our ambition is to bring these conversations into the public but not force a rigid process. We're working on this now.
 
-This month's topic was CI, but we covered much more. Expect to see many of these proposals soon in this repository, where we hope you will help us make React Native even better.
+---
+
+This time's topic was CI, but we are planning to cover much more. Expect to see many of these proposals soon in this repository, where we hope you will help us make React Native even better.
