@@ -6,11 +6,11 @@ Do you want to discuss an aspect of the framework?
 
 This repository is the right place to do so!
 
-## Introduction
+## Participate
 
-This repository was born by the desire of more transparency and a dedicated communication channels among members of the community.
+This repository was born by the desire of more transparency from the Core and Facebook teams, and a dedicated communication channels for all the members of the community.
 
-In order to do so, it has been decided to focus this repository to provide a safe environment to propose and generate interesting conversations related to the [main React Native](https://github.com/facebook/react-native) repository.
+In order to do so, it has been decided to focus this repository to provide a safe environment to generate interesting conversations related to the [main React Native](https://github.com/facebook/react-native) repository.
 
 ### Discussions
 
@@ -18,7 +18,7 @@ React Native is still a young framework, and its rapid release cycle leaves the 
 
 The issue section of this repository is open for anyone to propose a subject related to the React Native library that deserves a discussion.
 
-### RFCs
+### Proposals
 
 The "RFC" (request for comments) process is intended to provide a consistent and controlled path for new features to be proposed and championed to then enter the project.
 
