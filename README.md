@@ -31,12 +31,3 @@ The top contributors regularly meet to discuss ongoing problems with the goal of
 ## CoC
 
 Similarly to the main repository, this project has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://code.facebook.com/codeofconduct) so that you can understand what actions will and will not be tolerated.
-
-## TODO
-
-- [ ] better README (expand on the Discussion section, explain better why another repo)
-- [ ] create label system
-- [ ] create templates for issues and PRs
-- [ ] migrate [For discussion](https://github.com/facebook/react-native/labels/For%20Discussion) issues from the main repo
-- [ ] complete and review the RFC process
-- [x] add a dedicated folder for monthly meetings notes
