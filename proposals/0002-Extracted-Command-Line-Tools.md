@@ -5,7 +5,7 @@ author:
 date: 2018-08-10
 ---
 
-# RFC0000: Extract CLI from Core
+# RFC0003: Extract CLI from Core
 
 ## Summary
 
@@ -33,7 +33,13 @@ Extracting it out would be the first step to make React Native CLI agnostic, all
 
 ## Detailed design
 
-The goal of this proposal is to extract the CLI out of the React Native repository into a separate project, called `react-native-cli`, that would become a direct dependency of React Native. It is similar to the extraction process of `Metro`.
+The goal of this proposal is to extract the CLI out of the React Native repository into a separate project, called `react-native-cli`, that would become a direct dependency of React Native. It is similar to the extraction process of `Metro`. 
+
+That includes moving out two folders: 
+- `local-cli`, where business logic of the CLI and all available commands are located
+- `react-native-cli`, where global package for running `react-native init` lives
+
+Development of these two packages would take place under one repository.
 
 Since `metro` isn't required anywhere else outside of `local-cli` folder (where the business logic of the CLI is located), it would be removed from the React Native dependencies and become the depdendency of newly created `react-native-cli`.
 
