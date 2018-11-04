@@ -257,7 +257,7 @@ For example, the import for `DatePickerIOS` in `react-native` would look like:
 And `react-native-ios` would use Haste to import the module from `react-native`:
 
 ```js
-  get DatePickerIOS() {
+  get DatePicker() {
     return require('DatePickerIOS');
   },
 ```
