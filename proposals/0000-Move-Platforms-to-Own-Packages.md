@@ -23,10 +23,10 @@ Platform-specific components and APIs would be imported from the platform's modu
 
 ```js
 // iOS
-import {AlertIOS} from 'react-native-ios';
+import {Alert} from 'react-native-ios';
 
 // Android
-import {PermissionsAndroid} from 'react-native-android';
+import {Permissions} from 'react-native-android';
 ```
 
 ## Motivation
@@ -42,6 +42,8 @@ The process of re-organizing these modules will, I hope, also result in more com
 Platform-specific APIs could drop the platform suffix from their name. `PermissionsAndroid` could just be `Permissions` for example.
 
 React Native being a Yarn workspace might make it easier to make other modules that should be developed and released alongside the main project. It would be easier to make a more advanced RNTester app in-tree with its own set of dependencies, for example.
+
+(**UPDATE**: I am working on a pull request to set up a monorepo, so other proposals could benefit from it regardless of this proposal's progress)
 
 The IOS-only and Android-only files and folders at the top level of the repo could get organized into their respective packages.
 
@@ -133,33 +135,33 @@ The IOS-only and Android-only files and folders at the top level of the repo cou
 
  * `react-native-ios`
    * **Components**
-   * `DatePickerIOS`
+   * `DatePicker` (was `DatePickerIOS`)
    * `InputAccessoryView`
-   * `MaskedViewIOS`
-   * `PickerIOS`
-   * `ProgressViewIOS`
-   * `SegmentedControlIOS`
-   * `SnapshotViewIOS`
-   * `TabBarIOS`
+   * `MaskedView` (was `MaskedViewIOS`)
+   * `Picker` (was `PickerIOS`)
+   * `ProgressView` (was `ProgressViewIOS`)
+   * `SegmentedControl` (was `SegmentedControlIOS`)
+   * `SnapshotView` (was `SnapshotViewIOS`)
+   * `TabBar` (was `TabBarIOS`)
    * **APIs**
-   * `ActionSheetIOS`
-   * `AlertIOS`
-   * `ImagePickerIOS`
-   * `PushNotificationIOS`
-   * `StatusBarIOS`
-   * `VibrationIOS`
+   * `ActionSheet` (was `ActionSheetIOS`)
+   * `Alert` (was `AlertIOS`)
+   * `ImagePicker` (was `ImagePickerIOS`)
+   * `PushNotification` (was `PushNotificationIOS`)
+   * `StatusBar` (was `StatusBarIOS`)
+   * `Vibration` (was `VibrationIOS`)
 
  * `react-native-android`
    * **Components**
-   * `DrawerLayoutAndroid`
-   * `ProgressBarAndroid`
-   * `ToastAndroid`
-   * `ToolbarAndroid`
-   * `ViewPagerAndroid`
+   * `DrawerLayout` (was `DrawerLayoutAndroid`)
+   * `ProgressBar` (was `ProgressBarAndroid`)
+   * `Toast` (was `ToastAndroid`)
+   * `Toolbar` (was `ToolbarAndroid`)
+   * `ViewPager` (was `ViewPagerAndroid`)
    * **APIs**
-   * `DatePickerAndroid`
-   * `PermissionsAndroid`
-   * `TimePickerAndroid`
+   * `DatePicker` (was `DatePickerAndroid`)
+   * `Permissions` (was `PermissionsAndroid`)
+   * `TimePicker` (was `TimePickerAndroid`)
 
 
 ### Hypothetical project overview (non-exhaustive)
@@ -179,7 +181,6 @@ This is the *very basic* overview of what the GitHub repo could look like:
 -----📄 launchPackager.bat
 -----📄 launchPackager.command
 -----📄 packager.sh
-----📁 third-party/
 ----📁 tools/ (contains bzl build-defs)
 ---📁 react-native-ios/
 ----📁 Libraries/
@@ -246,7 +247,7 @@ For example, the import for `DatePickerIOS` in `react-native` would look like:
 
 ```js
   get DatePickerIOS() {
-    warnMoved('react-native-ios', 'DatePickerIOS');
+    warnMoved('DatePickerIOS', 'react-native-ios', 'DatePicker');
     return require('DatePickerIOS');
   },
 ```
@@ -261,13 +262,14 @@ And `react-native-ios` would use Haste to import the module from `react-native`:
   },
 ```
 
+Alternatively RNIOS and RNAndroid could be a `peerDependency` of React Native, and it would re-import the modules from the platform modules.
+
 Code-mods could be written to help with the transition. React and ReactDOM could be looked to as an example on how to do a transition like this as painlessly as possible.
 
 ## How we teach this
 
-A documentation page layout out where all these components are getting moved around to should be made. This page could also document where Slimmen'd modules got moved to.
+A documentation page laying out where all these components are getting moved around to should be made. This page could also document where Slimmen'd modules got moved to.
 
 ## Unresolved questions
 
- * After the platform-specific APIs are moved to the platform module, should the platform suffix be removed from the named export? (The filename may need to keep the suffix for now, to avoid Haste collisions)
  * Should `react-native init` auto-install `{ios,android}` by default? (I lean towards yes) If so, should there be a command line switch to not install them if the user wishes?
