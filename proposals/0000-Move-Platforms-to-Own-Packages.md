@@ -229,6 +229,8 @@ The native build scripts (gradle, BUCK, xcode, etc.) will all need to be updated
    > - `react-native-android`: `1.0.0`, `2.0.0`, `3.0.0`
    
    This will make React Native's future semver bump to `1.0.0` awkward, if not impossible. Unless it does what React did and jumps to version `60.0.0` or something like that. Or starts at version `4.0.0`, which seems kinda random. NPM also says that for various technical and security reasons, these versions can not be deleted and re-used. I've `npm deprecate`d them, which is the best I can do sadly.
+
+   Using other names like: `@react/ios` and `react-ios` are also possibilities, since the React and React Native projects might be converging more in the future.
  - While community modules that want to cover multiple versions of RN could use the "bridge" versions of the `{ios,android}` modules to ease the transition there are packages that are not maintained that would get broken by a split like this. This is also an issue for Slimmened modules as well.
  - Even with a codemod to ease the transition, I don't imagine that transitioning codebases over will be something that is trivial. Maybe more than 2 versions should be given as a grace period before everything moves over?
  - Old documentation and tutorials will need to be updated.
