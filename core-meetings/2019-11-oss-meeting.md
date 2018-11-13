@@ -17,16 +17,20 @@ During the discussion, the FB team also clarified a couple of points from their 
 
 - the internal FB team is _not_ migrating to React Native Open Source, they are simply changing _how_ they consume the React Native APIs. Which means that, internally, instead of writing `const View = require('View')` they will be writing `const {View} = require('react-native')`
 
-- the FB team is not foreseeing taking management or ownership of the release cycle, commending the community for how they have handled it so far
+- the FB team is not foreseeing taking management or ownership of the release cycle; this was motivated by a few reasons, such as:
+  - Wanting to generate more community participation.
+  - The community probably know more about this than FB: given that the releases is how the community consumes RN, they should have the power to decide the release cycle.
 
-The second and last part of the meeting was dedicated to the upcoming version 0.58 - it was clarified that the JSI that has landed on master should not directly affect developers consuming React Native, and an issue to facilitate the discussion about it will be open on this repo (but no blogpost should be expected).
+The second and last part of the meeting was dedicated to the upcoming version 0.58 - it was clarified that the JSI that has landed on master should not directly affect developers consuming React Native, and an issue to facilitate the discussion about it will be open on this repo (but no blog post should be expected).
 
 ### Actions that will be taken
 
 1. in patch level new releases, there won't be important dependencies upgrades (unless strictly necessary)
-2. for cherry pick requests, in case of complexities emerging during the release process, the author of the request will be asked to create a PR towards the branch
-3. the FB team will attempt to be more empathetic when landing commits like React syncs to prevent issues
-4. another maintenance meeting will happen before end of the year, and among other things we'll discuss about merging the two GitHub orgs React Community and React Native Community and we'll create a shared guideline for how to maintain repos in them
+2. a few tools to automate (at least partially) the release cycle will be tested and added to the process to reduce the workload on the maintainers
+3. the [Releases.md](https://github.com/facebook/react-native/blob/master/Releases.md) file will be updated to reflect the current set of steps necessary for a release
+4. for cherry pick requests, in case of complexities emerging during the release process, the author of the request will be asked to create a PR towards the branch
+5. the FB team will attempt to be more empathetic when landing commits like React syncs to prevent issues
+6. another maintenance meeting will happen before end of the year, and among other things we'll discuss about merging the two GitHub organizations React Community and React Native Community and we'll create a shared guideline for how to maintain repos in them
 
 ---
 
