@@ -25,14 +25,16 @@ During the discussion, the FB team also clarified a couple of points from their 
 
 The second and last part of the meeting was dedicated to the upcoming version 0.58 - it was clarified that the JSI that has landed on master should not directly affect developers consuming React Native, and an issue to facilitate the discussion about it will be open on this repo (but no blog post should be expected).
 
+During the meeting, the subject of having a single organization to host the React Native components & libraries maintained by the community was briefly touched (given that currently there are two main ones,React Community and React Native Community) - but there wasn't time left so this will be discussed in a future meeting.
+
 ### Actions that will be taken
 
 1. In patch level releases, from now on, there won't be important dependencies upgrades (unless strictly necessary)
-2. A few tools to automate (at least partially) the release cycle will be tested and added to the process to reduce the workload on the maintainers
+2. A few tools to automate (at least partially) the release cycle will be tested and added to the process to reduce the workload on the maintainers (you can contribute to this conversation [here](https://github.com/react-native-community/discussions-and-proposals/issues/53))
 3. The [Releases.md](https://github.com/facebook/react-native/blob/master/Releases.md) file will be updated to reflect the current set of steps necessary for a release
 4. For cherry pick requests, in case of complexities emerging during the release process, the author of the request will be asked to create a PR towards the branch
 5. The FB team will attempt to be more empathetic when landing commits like React syncs to prevent issues
-6. Another maintenance meeting will happen before end of the year, and among other things we'll discuss about merging the two GitHub organizations React Community and React Native Community and we'll create a shared guideline for how to maintain repos in them
+6. Another maintenance meeting will happen before end of the year, and among other things we'll discuss about a shared guideline for how to maintain repos owned by the community in order to help each other
 
 ---
 
