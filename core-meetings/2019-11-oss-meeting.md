@@ -25,7 +25,7 @@ During the discussion, the FB team also clarified a couple of points from their 
 
 The second and last part of the meeting was dedicated to the upcoming version 0.58 - it was clarified that the JSI that has landed on master should not directly affect developers consuming React Native, and an issue to facilitate the discussion about it will be open on this repo (but no blog post should be expected).
 
-During the meeting, the subject of having a single organization to host the React Native components & libraries maintained by the community was briefly touched (given that currently there are two main ones,React Community and React Native Community) - but there wasn't time left so this will be discussed in a future meeting.
+During the meeting, the subject of having a single organization to host the React Native components & libraries maintained by the community was briefly touched (given that currently there are two main ones, React Community and React Native Community) - but there wasn't time left so this will be discussed in a future meeting.
 
 ### Actions that will be taken
 
