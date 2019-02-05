@@ -2,7 +2,7 @@
 title: Improvements to accessibilityRole and accessibilityStates
 author:
 - Marc Mulcahy
-date: 2018-10-31
+date: 2019-02-06
 ---
 
 ## Summary
@@ -41,6 +41,7 @@ This proposal adds the following roles:
 - radiogroup
 - scrollbar
 - spinbutton
+- switch
 - tab
 - tablist
 - timer
@@ -54,6 +55,10 @@ This proposal adds the following states:
 - off
 - checked
 - unchecked
+- busy
+- expanded
+- collapsed
+- hasPopup
 
 ### Fallback Mechanism for Roles
 
@@ -61,7 +66,7 @@ There are several roles which don't have native analogs on a given platform. For
 
 #### Android
 
-The fallback mechanism is already in place on Android. For roles which don't have standard Android view analogs, the class name of the AccessibilityNodeInfo is set to an arbitrary value, and the roleDescription extra is set to a localized textual description of the role.
+The fallback mechanism is already in place on Android. For roles which don't have standard Android view analogs, the class name of the AccessibilityNodeInfo is set to the class name of the closest native Android view type, and the roleDescription extra is set to a localized textual description of the role.
 
 ### Fire OS
 
@@ -74,13 +79,21 @@ The role string should not be localized-- it should be one of the constants defi
 
 #### iOS
 
-For roles which don't have a corresponding iOS accessibilityTrait, we recommend appending a localized version of the role description to the accessibility label.
+For roles which don't have a corresponding iOS accessibilityTrait, we recommend appending a localized version of the role description to the accessibilityValue of the component.
 
 ### Additional States Implementation Notes
 
-Android has slightly more robust state support than does iOS. Both the new checked and on states will be exposed directly by setting the isCheckable and isChecked members of the corresponding AccessibilityNodeInfo.
+Android has slightly more robust state support than does iOS. The following states can be represented with Android'd standard accessibility API:
 
-on iOS, the solution is less clear. Unless a better solution is found, we propose to add a textual description of the state to the accessibilityLabel.
+- checked
+- unchecked
+- expanded
+- collapsed
+- hasPopup
+
+We will append a localized description of other states to the component's content description.
+
+on iOS, a localized description of states which do not have corresponding accessibilityTraits will be appended to the component's accessibilityValue.
 
 ## Drawbacks
 
@@ -94,7 +107,7 @@ The only alternative is to recommend that developers append the role and state i
 
 ## Adoption strategy
 
-We should document the roles as part of the official accessibility API documentation. Developers can then start using them if they choose.
+We should document the additional roles and states as part of the official accessibility API documentation. Developers can then start using them if they choose.
 
 ## How we teach this
 
@@ -103,4 +116,3 @@ The attempt with this proposal is to bring React Native accessibility support on
 ## Unresolved questions
 
 - Roles imply supported states and behaviors. For example, checkboxes imply the checked state, and the ability to be toggled. Radio groups typically only allow one child to be selected, etc. When a component specifies its role, should this programmatically require the developer to implement certain behaviors? Alternatively, what mechanisms exist to present warnings during compile time for missing behaviors?
-- How should components notify assistive technologies of state changes?
