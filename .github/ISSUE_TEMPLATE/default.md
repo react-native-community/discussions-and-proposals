@@ -1,3 +1,8 @@
+---
+name: 'Write a proposal ✍️'
+about: Start a new conversation about a broad topic for React Native
+---
+
 <!--
 Hello there!
 Thanks for deciding to start a conversation about React Native and how it could evolve for the better!
