@@ -38,12 +38,14 @@ It is currently not possible for react-native developers to describe size of lis
 
 ## Detailed design
 
+### P1 APIs:
 The following roles will be added to [accessibilityRole](https://facebook.github.io/react-native/docs/accessibility#accessibilityrole-ios-android) APIs:
 - **list** Used when element should be treated as a list
 - **listItem** Used when element should be treated as a list item
 
 FlatList, SectionList, VirtualizedList components will have `accessibilityRole = list` set by default. 
 
+### P2 APIs:
 The following new properties will be introduced to customize and describe details of the list/list items:
 - **accessibilitySetSize** 
 - **accessibilityPosInSet**
@@ -54,7 +56,7 @@ By default, these properties will be set with calculated size and position of ea
 
 ## Drawbacks
 
-FlatList tries to be a simple building block component and hence adding functionality to it can make it more complex. However, the APIs we are adding are ARIA based and have equivalents in all platforms. Lists are also some of the most common experiences in any app and hence the complexity this adds feels warranted.
+FlatList tries to be a simple building block component and hence adding a lot of functionality to it can make it more complex. However, the APIs we are adding are ARIA based and have equivalents in all platforms. Lists are also some of the most common experiences in any app and hence the complexity this adds feels warranted.
 
 ## Adoption strategy
 
