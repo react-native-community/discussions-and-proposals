@@ -9,50 +9,63 @@ date: 06/12/2019
 
 ## Summary
 
-This proposal adds new accessibility states and roles for supporting lists.
+This proposal adds new accessibility roles for supporting lists as well as new APIs for describing size of lists,nth item in the list etc.,
+
+This addresses Issues [2578](https://github.com/microsoft/react-native-windows/issues/2578) and [2579](https://github.com/microsoft/react-native-windows/issues/2579) from react-native-windows.
 
 ## Basic example
 
-It is currently not possible to describe size of lists, nth item in the list etc., With these new APIs, 
+React Native developers can now describe lists, listitems, size of lists, nth item in the list etc., to assistive technologies using simple code as shown below:
+
+```
+<FlatList
+  data={this.state.listdata}
+  accessibilityRole="list"
+  renderItem={({item}) =>
+     <View accessibilityRole="listItem" 
+           accessibilitySetSize ={this.state.listdata.count}
+           accessibilityPostInSet={item.id} >
+        <Text>{item.name}</Text>
+     </View>
+  }
+</FlatList>
+```
+
 
 ## Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
-
-Please focus on explaining the motivation so that if this RFC is not accepted, the motivation could be used to develop alternative solutions. In other words, enumerate the constraints you are trying to solve without coupling them too closely to the solution you have in mind.
+It is currently not possible for react-native developers to describe size of lists, nth item in the list etc., With these new APIs, react-native developers can provide more information on lists to assistive technologies which can then be more descriptive of list experiences. 
 
 ## Detailed design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
+The following roles will be added to [accessibilityRole](https://facebook.github.io/react-native/docs/accessibility#accessibilityrole-ios-android) APIs:
+- **list** Used when element should be treated as a list
+- **listItem** Used when element should be treated as a list item
+
+FlatList, SectionList, VirtualizedList components will have `accessibilityRole = list` set by default. 
+
+The following new properties will be introduced to customize and describe details of the list/list items:
+- **accessibilitySetSize** 
+- **accessibilityPosInSet**
+
+In keeping with the ARIA equivalents like [aria-setSize](https://accessibilityresources.org/aria-setsize) and [aria-posInSet](https://accessibilityresources.org/aria-posinset), these properties are marked on the members of a set, not the container element that collects the members of the set. When set, assistive technologies will call out "item X out of Y," when a member of a set with this property has accessibility focus. The assistive technologies would use X equal to the `acessibilityPosInSet` attribute and Y equal to the `accessibilitySetSize` attribute.
+
+By default, these properties will be set with calculated size and position of each item and the developer does not need to specify unless they are overriding the calculated values. These properties should be used in conjunction with each other.
 
 ## Drawbacks
 
-Why should we _not_ do this? Please consider:
-
-- implementation cost, both in term of code size and complexity
-- whether the proposed feature can be implemented in user space
-- the impact on teaching people React Native
-- integration of this feature with other existing and planned features
-- cost of migrating existing React Native applications (is it a breaking change?)
-
-There are tradeoffs to choosing any path. Attempt to identify them here.
-
-## Alternatives
-
-What other designs have been considered? Why did you select your approach?
+FlatList tries to be a simple building block component and hence adding functionality to it can make it more complex. However, the APIs we are adding are ARIA based and have equivalents in all platforms. Lists are also some of the most common experiences in any app and hence the complexity this adds feels warranted.
 
 ## Adoption strategy
 
-If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries?
+These APIs all have existing equivalents in ARIA, UIA and other native accessibility APIs. The naming of these has been matched to existing ARIA equivalents and hence will be familiar to React/Web developers.
+
+For Windows developers, these should be familiar as well - the UIA properties that describe these for accessibility tools are [PositionInSet](https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Xaml.Automation.AutomationProperties.PositionInSetProperty) and [SizeOfSet](https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Xaml.Automation.AutomationProperties.SizeOfSetProperty)
 
 ## How we teach this
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing React patterns?
-
-Would the acceptance of this proposal mean the React Native documentation must be re-organized or altered? Does it change how React Native is taught to new developers at any level?
-
-How should this feature be taught to existing React Native developers?
+We should add these to the existing [Accessibility documentation](https://facebook.github.io/react-native/docs/accessibility) in react-native. 
 
 ## Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still TBD?
+Can these values be set on any component? 
