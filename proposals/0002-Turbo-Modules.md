@@ -1,5 +1,5 @@
 # RFC0002: Turbo Modules ™ 
-_Its blazing fast_
+_It's blazing fast_
 
 ## Summary
 
