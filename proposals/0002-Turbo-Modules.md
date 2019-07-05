@@ -42,12 +42,12 @@ When the JavaScript code like `require('NativeModule').DeviceInfoModule` is call
 > [TODO] - A work in process.
 
 ## Open Questions
-1. How would the C++ object corresponding to the shape of a Native Module know the Java class (for example com.facebook.react.nativemodule.DeviceInfo) that it needs to call. Does this need to be a switch/case or a map in Java/ObjC that is constructed manually ? Would this be done using BUCK dependencies ? 
-2. Today, native modules usually take `ReactApplicationContext` as a parameter when they are constructed, but they can also be constructed in other ways like using a builder, or multiple parameters in the constructor. How would this be enforced ? 
-3. How would the C++ code gen happen in Open Source, where BUCK is not used ? 
-4. Since the generated C++ host objects have the same lifetime of the JS scopes they are referred in, what is the API to tell Java/ObjC when these objects are deallocated ? 
-5. ReactModule options like `OnBatchCompleteListener` and `hasEagerInitialization` will be removed. Are they needed anymore, if yes - whats the alternative ? 
-6. This method allows Native Modules to not be singletons. What would this new pattern look like ? Would this lead to memory leaks ? 
+1. How would the C++ object corresponding to the shape of a Native Module know the Java class (for example com.facebook.react.nativemodule.DeviceInfo) that it needs to call. Does this need to be a switch/case or a map in Java/ObjC that is constructed manually? Would this be done using BUCK dependencies? 
+2. Today, native modules usually take `ReactApplicationContext` as a parameter when they are constructed, but they can also be constructed in other ways like using a builder, or multiple parameters in the constructor. How would this be enforced? 
+3. How would the C++ code gen happen in Open Source, where BUCK is not used? 
+4. Since the generated C++ host objects have the same lifetime of the JS scopes they are referred in, what is the API to tell Java/ObjC when these objects are deallocated? 
+5. ReactModule options like `OnBatchCompleteListener` and `hasEagerInitialization` will be removed. Are they needed anymore, if yes - whats the alternative?
+6. This method allows Native Modules to not be singletons. What would this new pattern look like? Would this lead to memory leaks?
 
-## Backward Compatiability
+## Backward Compatibility
 1. It looks like existing native modules do not have to change since they are usually singletons. 
