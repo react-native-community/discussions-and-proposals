@@ -11,11 +11,11 @@ date: 06/12/2019
 
 This proposal adds new accessibility roles for supporting lists as well as new APIs for describing size of lists,nth item in the list etc.,
 
-This addresses Issues [2578](https://github.com/microsoft/react-native-windows/issues/2578) and [2579](https://github.com/microsoft/react-native-windows/issues/2579) from react-native-windows.
+This addresses Issues [2578](https://github.com/microsoft/react-native-windows/issues/2578) and [2579](https://github.com/microsoft/react-native-windows/issues/2579) from react-native-windows. An implementation of the same can be tracked through [this PR](https://github.com/microsoft/react-native-windows/pull/2743). 
 
 ## Basic example
 
-React Native developers can now describe lists, listitems, size of lists, nth item in the list etc., to assistive technologies using simple code as shown below:
+React Native developers can use these new APIs to describe lists, listitems, size of lists, nth item in the list etc., to assistive technologies using simple code as shown below:
 
 ```
 <FlatList
@@ -52,11 +52,13 @@ The following new properties will be introduced to customize and describe detail
 
 In keeping with the ARIA equivalents like [aria-setSize](https://accessibilityresources.org/aria-setsize) and [aria-posInSet](https://accessibilityresources.org/aria-posinset), these properties are marked on the members of a set, not the container element that collects the members of the set. When set, assistive technologies will call out "item X out of Y," when a member of a set with this property has accessibility focus. The assistive technologies would use X equal to the `acessibilityPosInSet` attribute and Y equal to the `accessibilitySetSize` attribute.
 
-By default, these properties will be set with calculated size and position of each item and the developer does not need to specify unless they are overriding the calculated values. These properties should be used in conjunction with each other.
+These properties should be used in conjunction with each other.
 
 ## Drawbacks
 
-FlatList tries to be a simple building block component and hence adding a lot of functionality to it can make it more complex. However, the APIs we are adding are ARIA based and have equivalents in all platforms. Lists are also some of the most common experiences in any app and hence the complexity this adds feels warranted.
+FlatList tries to be a simple building block component and hence adding a lot of functionality to it can make it more complex. However, the APIs we are adding are ARIA based and have equivalents in all platforms. However, Lists are also some of the most common experiences in any app and hence the small amount of complexity this adds feels warranted.
+
+Given the nature of FlatList, SectionList in React Native where there are no actual collections/items that the list itself maybe aware of, it is not possible to provide good default behaviors for the item specific APIs in this proposal and it is up to each developer to set these values for the right behaviors.
 
 ## Adoption strategy
 
