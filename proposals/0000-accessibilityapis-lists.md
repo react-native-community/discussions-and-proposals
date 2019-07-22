@@ -22,7 +22,7 @@ React Native developers can use these new APIs to describe lists, listitems, siz
   data={this.state.listdata}
   accessibilityRole="list"
   renderItem={({item}) =>
-     <View accessibilityRole="listItem" 
+     <View accessibilityRole="listitem" 
            accessibilitySetSize ={this.state.listdata.count}
            accessibilityPostInSet={item.id} >
         <Text>{item.name}</Text>
@@ -47,8 +47,8 @@ FlatList, SectionList, VirtualizedList components will have `accessibilityRole =
 
 ### P2 APIs:
 The following new properties will be introduced to customize and describe details of the list/list items:
-- **accessibilitysetsize** 
-- **accessibilityposinset**
+- **accessibilitySetSize** 
+- **accessibilityPosInSet**
 
 In keeping with the ARIA equivalents like [aria-setSize](https://accessibilityresources.org/aria-setsize) and [aria-posInSet](https://accessibilityresources.org/aria-posinset), these properties are marked on the members of a set, not the container element that collects the members of the set. When set, assistive technologies will call out "item X out of Y," when a member of a set with this property has accessibility focus. The assistive technologies would use X equal to the `acessibilityPosInSet` attribute and Y equal to the `accessibilitySetSize` attribute.
 
