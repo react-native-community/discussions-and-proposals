@@ -41,14 +41,14 @@ It is currently not possible for react-native developers to describe size of lis
 ### P1 APIs:
 The following roles will be added to [accessibilityRole](https://facebook.github.io/react-native/docs/accessibility#accessibilityrole-ios-android) APIs:
 - **list** Used when element should be treated as a list
-- **listItem** Used when element should be treated as a list item
+- **listitem** Used when element should be treated as a list item
 
 FlatList, SectionList, VirtualizedList components will have `accessibilityRole = list` set by default. 
 
 ### P2 APIs:
 The following new properties will be introduced to customize and describe details of the list/list items:
-- **accessibilitySetSize** 
-- **accessibilityPosInSet**
+- **accessibilitysetsize** 
+- **accessibilityposinset**
 
 In keeping with the ARIA equivalents like [aria-setSize](https://accessibilityresources.org/aria-setsize) and [aria-posInSet](https://accessibilityresources.org/aria-posinset), these properties are marked on the members of a set, not the container element that collects the members of the set. When set, assistive technologies will call out "item X out of Y," when a member of a set with this property has accessibility focus. The assistive technologies would use X equal to the `acessibilityPosInSet` attribute and Y equal to the `accessibilitySetSize` attribute.
 
