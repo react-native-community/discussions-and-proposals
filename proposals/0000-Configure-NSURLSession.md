@@ -156,4 +156,4 @@ Should be described as an opt-in auxillary feature.
 
 ## Unresolved questions
 
-Configuration via Javascript could be considered preferable. However, this would require to touch on the Android implementation as well.
+Configuration via Javascript could be considered preferable. However, this would require to touch on the Android implementation. Additionally, this requires implementing a bridging mechanism in Javascript.
