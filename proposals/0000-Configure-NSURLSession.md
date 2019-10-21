@@ -142,7 +142,7 @@ static NSURLSessionConfigurationProvider theProvider;
 @end
 ```
 
-This is more light weight, but it relies on setting a static variable inside of `RCTHTTPRequestHandler.m`, thus potentially being shared amongst different instances. The programmer also needs to know where in `AppDelegate` to set the configuration provider block.
+This is more light weight, but it relies on setting a static variable inside of `RCTHTTPRequestHandler.m`, thus potentially being shared amongst different instances. The programmer also needs to know where in the application life cycle to set the configuration provider block.
 
 ## Adoption strategy
 
