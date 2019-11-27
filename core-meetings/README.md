@@ -28,3 +28,6 @@ Everything related to the way we use command line to run React Native apps, link
 
 - [2018-08 The CLI and its future](2018-08-cli-meeting.md)
 - [2018-07 Releases and Keeping CI green](2018-07-ci-meeting.md)
+- [2018-09 Metro](2018-09-metro-meeting.md)
+- [2018-11 OSS Chat](2018-11-oss-meeting.md)
+- [2019-11 React Native & Microsoft Collab](2019-11-21 RN-MSFT-collab-kickoff.md)
