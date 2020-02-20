@@ -170,6 +170,9 @@ app how to launch your app. For instance, given the declaration below:
 ```js
 module.exports = {
   ...
+  "assets": [
+    ...
+  ],
   "entryPoints": [
     {
       "name": "MyFeature",
@@ -213,6 +216,11 @@ One could also forgo the name, in which case the `entryPoint` string will be
 used instead. If only one entry point is declared, the test app should launch
 directly into that app.
 
+Alternatively, we should be able to omit the `entryPoints` block and retrieve
+the list of entry points from
+[AppRegistry](https://github.com/facebook/react-native/blob/master/Libraries/ReactNative/AppRegistry.js#L165)
+instead.
+
 All of this should be transparent to the consumer; they should only have to deal
 with the manifest.
 
@@ -242,17 +250,28 @@ packages. You just want a test app for development and run tests on CI.
 
 ### Expo
 
-[Expo](https://github.com/facebook/react-native/tree/master/RNTester) is a great
-solution to get started, and you don't mind that it's including a lot of things
-that your app won't use. Once your app matures to a point where it needs better
-control over what's included, or it needs to consume native modules that aren't
-bundled in the SDK. Ejecting brings you back to the world of having to maintain
-React Native yourself.
+[Expo](https://expo.io/) provides an app called Expo client that includes
+multiple versions of the runtime in a single binary and makes it easy to switch
+between them. Each version of the runtime uses a single version React Native.
 
-Expo also isn't aimed at core contributors/maintainers. Its main goal is to
-simplify getting started with your React Native app. If you're looking to
-implement a native module of your own, you'll need to eject and stay ejected.
-This defeats the purpose of using Expo in the first place.
+[Snack](https://snack.expo.io/) is an in-browser editor like
+[CodeSandbox](https://codesandbox.io/) for React Native apps. You can choose the
+version of Expo SDK to target using a drop-down menu. A specific version of the
+SDK usually maps to a distinct React Native version, e.g. SDK 36 uses React
+Native 0.61 and SDK 35 uses React Native 0.59.
+
+This is the quickest and easiest way to test React Native libraries for iOS,
+Android, and web, provided that they depend on primitives in React Native core
+or the most common dependencies in the ecosystem like
+`react-native-gesture-handler`, `react-native-reanimated`, `react-native-maps`,
+`react-native-svg`, and so on.
+
+There are two reasons why this isn't feasible for the particular use case
+described in this proposal. First, if a library includes its own native
+dependencies, it cannot be run inside of Expo client unless the appropriate
+native code is also included in the client at build-time. Second, Expo client
+apps are not yet built for Windows and macOS. You would not be able to test on
+those platforms.
 
 ### React Native CLI
 
@@ -277,9 +296,22 @@ coupled to React Native and requires building the framework with the app.
 ## How we teach this
 
 - Point to real PRs showing how it can be integrated
-- Aim to become part of the default create-react-native-app template
+- Make it simple to get started with, e.g.:
+  - A library template for
+    [react-native-cli](https://github.com/react-native-community/cli) so
+    developers can run
+    `react-native init ProjectName --template "react-native-library-template"`
+    to generate a project with test apps for all platforms ready to go
+  - Ship as default with library project generators such as
+    [Bob](https://github.com/react-native-community/bob) or
+    [create-react-native-module](https://github.com/brodybits/create-react-native-module)
 
 ## Unresolved questions
 
 - Manifest format
 - Versioning scheme
+
+## Related discussions
+
+- https://github.com/react-native-community/discussions-and-proposals/issues/96
+- https://github.com/facebook/react-native/issues/6292
