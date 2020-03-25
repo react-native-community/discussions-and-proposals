@@ -6,6 +6,10 @@ The core team regularly meets to review technical and structural problems, creat
 
 The topics listed below have ongoing meetings. Expect to see more notes and proposals on these subjects. Please note that this is not be an exhaustive list; members are welcome to introduce topics where there is opportunity to collaborate, and being listed is not a barrier to progress.
 
+### Issue Management
+
+The primary goal of the issue management meeting is to ensure processes are in place that lead to actionable issues - those that are labeled properly and include clear reproduction steps.
+
 ### Continuous Integration
 
 _Lead by [@grabbou](https://twitter.com/grabbou)_
