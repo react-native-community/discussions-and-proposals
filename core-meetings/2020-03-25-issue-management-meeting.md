@@ -48,7 +48,7 @@ The full configuration file can be found in [`.github/label-actions.yml`
 
 The [needs-attention](https://github.com/hramos/needs-attention) GitHub Action has been enabled, and will trigger whenever a new comment is added to an issue. The goal is to manage the "Needs: Author Feedback" label and make sure we do not lose track of issues where we asked for more information. If an issue with this label gets a new comment from the original author of the issue, this action will replace the "Needs: Author Feedback" label with a "Needs: Attention" label. This is the same process used in the `react-native-windows` repository. 
 
-The workflow is configured in [.github/workflows/needs-attention.yml](https://github.com/facebook/react-native/blob/master/.github/workflows/needs-attention.yml), and the action itself is hosted at https://github.com/hramos/needs-attention. Pull requests that enhance this workflow are welcome.
+The workflow is configured in [`.github/workflows/needs-attention.yml`](https://github.com/facebook/react-native/blob/master/.github/workflows/needs-attention.yml), and the action itself is hosted at https://github.com/hramos/needs-attention. Pull requests that enhance this workflow are welcome.
 
 ## Issue triage
 
