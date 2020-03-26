@@ -61,7 +61,7 @@ We went through a small number of issues with the goal of demonstrating the new 
 - Héctor to update Wiki with latest workflow decisions: https://github.com/facebook/react-native/wiki/Issues
 
 ## Attendees:
-- Coinbase: @imownbey
-- Expo: @cruzach
-- SumoLogic: @safaiyeh
-- Facebook: @TheSavior, @hramos	
+- Coinbase: Ian Ownbey (@imownbey)
+- Expo: Charlie Cruzan (@cruzach)
+- SumoLogic: Jason Safaiyeh (@safaiyeh)
+- Facebook: Eli White (@TheSavior), Héctor Ramos (@hramos)
