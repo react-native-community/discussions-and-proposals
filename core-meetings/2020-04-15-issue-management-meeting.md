@@ -12,7 +12,7 @@
 
 - No issues flagged [Needs: Issue Manager Attention](https://github.com/facebook/react-native/labels/Needs%3A%20Issue%20Manager%20Attention) this week
 - Lots of issue traffic from upgrade issues to 0.62
-  - [Type: Upgrade Issue](https://github.com/facebook/react-native/labels/Type%3A%20Upgrade%20Issue) will redirect to the upgrade helper and close it.
+  - [Type: Upgrade Issue](https://github.com/facebook/react-native/labels/Type%3A%20Upgrade%20Issue) will redirect to the Upgrade Support repository and close it.
   - Action item: Add some communication in the bot tag response that they should come back if they are unable to resolve their issue due to an actual bug.
   - Potentially retire these: [DX: Upgrading](https://github.com/facebook/react-native/labels/DX%3A%20Upgrading), [Issue When Upgrading](https://github.com/facebook/react-native/labels/Issue%20When%20Upgrading).
 - COVID cadence - offline every other week.
