@@ -4,29 +4,28 @@ about: Start a new conversation about a broad topic for React Native
 ---
 
 <!--
-Hello there!
-Thanks for deciding to start a conversation about React Native and how it could evolve for the better!
+Thank you for starting a discussion about React Native!
 
-If possible, please follow the structure shown below (you can also take inspiration from other open issues).
+Please follow the structure shown below.
 
-Given the nature of this repository, ideally only long-form discussions should be held here in the issue section.
+Note: Issues should be limited to long-form discussions.
 If you have a proposal, please add it via a Pull Request.
 -->
 
 ### Introduction
 
 <!--
-Give a brief intro about the subject you want to discuss about
+A brief intro about the topic you want to discuss.
 -->
 
-### The Core of It
+### Details
 
 <!--
-Here you should explain in details what you want to discuss about, providing all the necessary details for everyone to understand
+Details about what you want to discuss.
 -->
 
 ### Discussion points
 
 <!--
-If you can, summarize the 'hot points' that you want the discussion to focus on
+Summarize the main points you want to focus the discussion on.
 -->
