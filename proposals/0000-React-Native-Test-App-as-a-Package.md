@@ -140,7 +140,8 @@ Once the test app package is configured, **adding an additional platform**
 should only require doing one of the platform specific substeps of step 4.
 
 **Upgrading React Native** to the latest version, or any desired version, should
-only require bumping the version of this package.
+only require bumping the version of `react-native`. The test app should support
+multiple versions of React Native, including being able to compile from source.
 
 This package should not require additional tools other than the ones required by
 React Native itself, and should not fundamentally change how a package is
@@ -309,7 +310,6 @@ coupled to React Native and requires building the framework with the app.
 ## Unresolved questions
 
 - Manifest format
-- Versioning scheme
 
 ## Related discussions
 
