@@ -14,7 +14,7 @@ In one year, the only point that seems to have moved on on this slider is the su
 
 ## Possible solution
 
-I Propose that we make @sharcoux/slider the new official implementation of this slider. Here is a list of why:
+I Propose that we make [@sharcoux/slider](https://www.npmjs.com/package/@sharcoux/slider) the new official implementation of this slider. Here is a list of why:
 
 - It is easy to maintain as the implementation is common for all devices
 - It depends only on react-native
