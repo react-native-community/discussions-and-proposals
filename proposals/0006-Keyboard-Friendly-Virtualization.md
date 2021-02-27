@@ -1,7 +1,6 @@
 ---
 title: "RFC0006: Keyboard-friendly List Virtualization Behavior"
-author:
-  - Nick Gerleman
+author: Nick Gerleman
 date: February 2021
 ---
 
@@ -23,7 +22,7 @@ APIs to address them. It does not address concrete implementation.
 
 ```jsx
 <FlatList
-  ...otherProps,
+  {...otherProps}
   keepAreasRealized={{
     focused: false,
     home: [true, {windowSize: 1}],
