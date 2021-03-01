@@ -9,7 +9,7 @@ date: February 2021
 ## Summary
 
 VirtualizedList virtualizes away items based on proximity to the lists viewport,
-without consideration for other features such as focus or selection. This
+without consideration for other inputs such as focus or selection. This
 strategy limits the ability to correctly implement some common keyboard
 interactions. This especially impacts desktop platforms (react-native-web,
 react-native-windows, react-native-macos), but also impacts the tablet with
@@ -32,34 +32,30 @@ APIs to address them. It does not address concrete implementation.
 
 ## Motivation
 
-### Keyboarding issues with VirtualizedList (and FlatList/SectionList)
-
 Keyboard users expect to be able to navigate between between views inside of a
 list via tab-loop or arrow keys. A component with focus may move out of
 visibility by panning or scrolling a parent surface. The focused component may
 be virtualized away after leaving visibility.
 
-Removing components in the focus chain breaks some common keyboard scenarios:
-1. Moving to a previous/next selected item via arrow-key
-1. Tabbing focus to a user-definable next component
-1. Imperatively moving focus to a user-defined component
+The removal of this native component disrupts state needed to move focus/selection.
 
 ## Detailed design
 
 ### Realization windows
 
-Focus may be synchronously moved by the native UI framework. This forces us to
+Focus may be moved by the native UI framework without waiting on a new component to be rendered. This forces us to
 prevent virtualization (keep realized) any components which focus may be moved
 to. We may see additional navigation after the initial focus change, unblocked
 on the rendering of new components. This necessitates a chain of additional
 realized components.
 
-Common keyboarding scenarios should "just work" without having to change
-settings. Three of these scenarios include:
+Common keyboarding scenarios should ideally work by default, without having to change
+settings. Some of these scenarios include
 
 1. Navigating from one child component of a rendered item to another
 1. Arrowing between focused items
-1. Shifting to first/last focused item via home/end keys
+1. Shifting focus from currently focused item via page up/down
+1. Shifting focus to first/last item via home/end keys
 
 `VirtualizedList` has enough internal knowledge to transparently support these
 scenarios. This can be accomplished by adding three **"realization windows"**:
@@ -67,6 +63,9 @@ scenarios. This can be accomplished by adding three **"realization windows"**:
 tracked by listening to bubbling onFocus in the default `CellRendererComponent`.
 1. **"home"** The area at the beginning of the list (for home key).
 1. **"end"** The area at the end of the list (for end key).
+
+> Note that Apple devices have "fn + left" or "fn + right" which behave similarly
+> to home/end, but do not move selection in apps like Finder.
 
 The above scenarios are not exhaustive. E.g. we may want to keep a *selected*
 item realized that is not *focused*. These scenarios may require additional APIs
@@ -82,13 +81,12 @@ realization is not free however, increasing memory usage to retain additional
 cells. This tradeoff may not make sense for mobile.
 
 This leads to desired behavior of:
-- **Keep FlatList focus-safe on desktop:** Common realization windows for
-needed for keyboard navigation are enabled by default.
+- **Keep FlatList focus-safe on desktop:** Realization windows needed for
+correct keyboard navigation should be enabled by default.
 - **Keep FlatList memory usage steady on mobile:** New realization windows
 are opt-in where not pay to play.
 
-The full matrix of behaviors is described in the *API Reference* below. In
-general, **desktop users should realize **
+The full matrix of behaviors is described in the *API Reference* below.
 
 Endpoint detection is generally performed via `Platform` APIs, such as
 `Platform.isTV()` or `Platform.isPad()`. This change would add a
@@ -122,9 +120,7 @@ export type RealizationWindow =
 export type RealizationWindowConfig = {
   /**
    * Keeps the area around the currently focused item realized.
-   * - Enabled by default on desktop/tv (where focus-loop is important)
-   * - Enabled by default on mobile, where this can only use more memory when
-   * physical-keyboard is used.
+   * - Enabled by default on all platforms
    *
    * Requires the default (CellRenderComponent)[
    * https://reactnative.dev/docs/virtualizedlist#cellrenderercomponent] to be
@@ -136,21 +132,25 @@ export type RealizationWindowConfig = {
   focused?: RealizationWindow;
 
   /**
-   * Keeps the beginning area of the list realized.
-   * - Enabled by default on desktop (for home-key navigation)
-   * - Disabled by default on mobile/TV
+   * Keeps the beginning area of the list realized. Useful to allow instantly
+   * shifting focus to the first item (e.g. via Home key).
+   * - Disabled by default on all platforms
+   * - Should be enabled by default on desktop if FlatList begins transparently
+   * supporting home/end focus.
    *
-   * Defaults to **half** the (VirtualizedList windowSize)[
+   * Defaults to **1/4th** the (VirtualizedList windowSize)[
    * https://reactnative.dev/docs/virtualizedlist#windowsize]
    */
   home?: RealizationWindow;
 
   /**
-   * Keeps the end area of the list realized.
-   * - Enabled by default on desktop (for end-key navigation)
-   * - Disabled by default on mobile/TV
+   * Keeps the end area of the list realized. Useful to allow instantly
+   * shifting focus to the first item (e.g. via End key).
+   * - Disabled by default on all platforms
+   * - Should be enabled by default on desktop if FlatList begins transparently
+   * supporting home/end focus.
    *
-   * Defaults to **half** the (VirtualizedList windowSize)[
+   * Defaults to **1/4th** the (VirtualizedList windowSize)[
    * https://reactnative.dev/docs/virtualizedlist#windowsize]
    */
   end?: RealizationWindow;
@@ -177,9 +177,3 @@ export type VirtualizedListProps = {
 Apart from implementation complexity and risk, the greatest drawback to
 additional realization is memory consumption. This motivates configurability to
 mitigate impact.
-
-## Alternatives
-
-The main alternative to improving keyboarding support of existing components on
-desktop platforms would be to add additional virtualization components unique to
-them.
