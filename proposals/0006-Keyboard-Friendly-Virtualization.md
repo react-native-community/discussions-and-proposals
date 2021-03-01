@@ -122,9 +122,9 @@ export type RealizationWindowConfig = {
    * Keeps the area around the currently focused item realized.
    * - Enabled by default on all platforms
    *
-   * Requires the default (CellRenderComponent)[
-   * https://reactnative.dev/docs/virtualizedlist#cellrenderercomponent] to be
-   * used
+   * To function with a non-default (CellRendererComponent)[
+   * https://reactnative.dev/docs/virtualizedlist#cellrenderercomponent],
+   * `onFocus` and `onBlur` props must be supported.
    *
    * Defaults to the (VirtualizedList windowSize)[
    * https://reactnative.dev/docs/virtualizedlist#windowsize]
