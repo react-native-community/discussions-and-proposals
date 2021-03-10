@@ -138,7 +138,7 @@ export type RealizationWindowConfig = {
    *
    * To function with a non-default (CellRendererComponent)[
    * https://reactnative.dev/docs/virtualizedlist#cellrenderercomponent],
-   * `onFocusCapture` and `onBlurCapture` props must be supported.
+   * the `onFocusCapture` prop must be supported.
    *
    * Defaults to keeping the screen centered around the focused cell, along
    * with a screen above and below realized.
