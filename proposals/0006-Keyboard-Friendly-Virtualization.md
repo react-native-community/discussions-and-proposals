@@ -49,8 +49,8 @@ to. We may see additional navigation after the initial focus change, unblocked
 on the rendering of new components. This necessitates a chain of additional
 realized components.
 
-Common keyboarding scenarios should ideally work by default, without having to change
-settings. Some of these scenarios include
+Common keyboarding scenarios should ideally work by default, without having to
+change settings. Some of these scenarios include
 
 1. Navigating from one child component of a rendered item to another
 1. Arrowing between focused items
@@ -59,19 +59,33 @@ settings. Some of these scenarios include
 
 `VirtualizedList` has enough internal knowledge to transparently support these
 scenarios. This can be accomplished by adding three **"realization windows"**:
-1. **"focused"** Realize cells around a cell with active focus. Can be
-tracked by listening to bubbling onFocus in the default `CellRendererComponent`.
+1. **"focused"** Realize cells around a cell with most recent focus. Can be
+tracked by listening to bubbling onFocusCapture in the default
+`CellRendererComponent`.
 1. **"home"** The area at the beginning of the list (for home key).
+    - Note that part of the top may already reamain realized, since the initial
+    render is retained. This may not be the case with non-default
+    `initialItemIndex` however, and the height may not correspond to layout
+    window.
 1. **"end"** The area at the end of the list (for end key).
 
 > Note that Apple devices have "fn + left" or "fn + right" which behave similarly
 > to home/end, but do not move selection in apps like Finder.
 
-The above scenarios are not exhaustive. E.g. we may want to keep a *selected*
-item realized that is not *focused*. These scenarios may require additional APIs
-allowing external users greater control over realization behavior. These could
-potentially be exposed in the future as dynamic/user-controllable realization
-windows, or separate high-level APIs.
+The above scenarios are not exhaustive. It may be required to add additional
+APIs allowing external users greater control over realization behavior. These 
+ould potentially be exposed in the future as dynamic/user-controllable
+realization windows, or separate high-level APIs.
+
+### Batch rendering behavior
+
+After rendering a predefined number of initial items, `VirtualizedList` renders
+new items in batches. Batches may not render the full extent of items to
+realize, and the number of items to render per-batch is configurable.
+
+Cells in realization windows should be automatically rendered, even if not yet
+visible. This can be done during batch renders, giving priority to first render
+the window around visible content.
 
 ### Endpoint-specific default behaviors
 
@@ -113,9 +127,9 @@ export type RealizationWindow =
   | [boolean, {windowSize?: number}];
 
 /**
- * Determines what areas of the list to keep realized. Enabling realization may
- * be required for correct behavior when focus is out of viewport, but may also
- * increase memory usage.
+ * Determines what areas of the list to keep realized. Realizing extra windows
+ * may be required for correct behavior when focus is out of viewport, but may
+ * also increase memory usage.
  */
 export type RealizationWindowConfig = {
   /**
@@ -124,22 +138,20 @@ export type RealizationWindowConfig = {
    *
    * To function with a non-default (CellRendererComponent)[
    * https://reactnative.dev/docs/virtualizedlist#cellrenderercomponent],
-   * `onFocus` and `onBlur` props must be supported.
+   * `onFocusCapture` and `onBlurCapture` props must be supported.
    *
-   * Defaults to the (VirtualizedList windowSize)[
-   * https://reactnative.dev/docs/virtualizedlist#windowsize]
+   * Defaults to keeping the screen centered around the focused cell, along
+   * with a screen above and below realized.
    */
   focused?: RealizationWindow;
 
   /**
    * Keeps the beginning area of the list realized. Useful to allow instantly
    * shifting focus to the first item (e.g. via Home key).
-   * - Disabled by default on all platforms
-   * - Should be enabled by default on desktop if FlatList begins transparently
-   * supporting home/end focus.
+   * - Disabled by default on all platforms (Should be enabled by default on
+   * desktop if FlatList begins transparently supporting home/end focus)
    *
-   * Defaults to **1/4th** the (VirtualizedList windowSize)[
-   * https://reactnative.dev/docs/virtualizedlist#windowsize]
+   * Defaults to keeping a single screen at the beginning of the list realized
    */
   home?: RealizationWindow;
 
@@ -150,8 +162,7 @@ export type RealizationWindowConfig = {
    * - Should be enabled by default on desktop if FlatList begins transparently
    * supporting home/end focus.
    *
-   * Defaults to **1/4th** the (VirtualizedList windowSize)[
-   * https://reactnative.dev/docs/virtualizedlist#windowsize]
+   * Defaults to keeping a single screen at the end of the list realized
    */
   end?: RealizationWindow;
 
