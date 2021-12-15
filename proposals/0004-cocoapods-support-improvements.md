@@ -98,6 +98,7 @@ Why should we _not_ do this? Please consider:
 ## Alternatives
 
 - CocoaPods support could be handled by [shipping binaries](https://github.com/react-native-community/discussions-and-proposals/issues/15) of React Native to clients. Personally, I prefer to be working with the source code for ease of forkability and debugging. 
+- CocoaPods adds unnecessary overhead adoption friction for new developers wanting to simply try out React Native. Swift Package Manager bypasses this friction. Suggest making React Native available as a Swift Package. 
 
 ## Adoption strategy
 
