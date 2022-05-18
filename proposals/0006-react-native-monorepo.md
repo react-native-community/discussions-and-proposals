@@ -33,7 +33,10 @@ On top of this, there are some more substantial issues:
   - which also means that the same person then needs to manually bump the dependency in other parts of the codebase, since they are fixed. For example, see how root level package.json depends on `"@react-native/polyfills": "2.0.0",` ([permalink](https://github.com/facebook/react-native/blob/b331229b06dde31ff92091a163cfabb030082925/package.json#L108)).
 
 - because of the root `package.json` being not just the `react-native` package but also the root/CI for the repo, during the release script for `react-native` there's some 🪄magic🪄 that happens to copy over some dependencies from `repo-config/package.json` into the root one (see [this commit](https://github.com/facebook/react-native/commit/6efb51777c620a95e457488fbc7df5c272b3c695#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519)). It's a weird pattern that is undocumented and I'm scared of the issues it creates, since (as all the others) `repo-config/package.json` is manually maintained.
+
   - for example, 0.69.0-rc0 was still depending on React 17 in the 0.69 branch; it was addressed afterwards with [this commit](https://github.com/facebook/react-native/commit/a862d9294bf22ba2304fe5d742010dc210a2ef5a)
+
+- because this configuration is mostly "github repo only", there's an high risk of things getting outdated or changes slipping between the cracks (such as the `repo-config` example mentioned there), and only being addressed after someone hits them as a third party consumer.
 
 ### A IRL scenario of this being a problem: `react-native-codegen` and RN 68
 
@@ -47,9 +50,9 @@ Here's the catch: in the time between the cut of `0.68-stable` branch and the re
 
 To address this, in the end with the releases team we had to coordinate a triple version number change for `react-native-codegen` so that it would reshape into:
 
-* `0.68-stable` uses `0.0.17`
-* `0.69-stable` uses `0.69.x`
-* `main` uses `0.70.x`
+- `0.68-stable` uses `0.0.17`
+- `0.69-stable` uses `0.69.x`
+- `main` uses `0.70.x`
 
 And all of this had to be done manually, and after each version bump for this package, a new version of the 0.68 and 0.69 had to be released with the updated dependency on the new appropriate version.
 
@@ -62,6 +65,12 @@ This proposal will seem deceptively simple: to decouple the root level of the pa
 The graph here shows in a bit more detail the end goal, along with a few more details and side-changes that are needed to fully address the current situation:
 
 ![proposal for the react-native GitHub codebase](/proposals/assets/0006-proposal.png "Proposal")
+
+Reiterating the changes proposed in the graph:
+
+- one
+- two
+- three
 
 In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Facebook monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
@@ -77,7 +86,7 @@ Another option, that would build on top of the (new) existing process, would sti
 
 - This work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557))
 - Since Metro by default doesn't handle symlinks well, it could be that for RN Tester to keep working we might have to add [`@rnx-kit/metro-resolver-symlinks`](https://github.com/microsoft/rnx-kit/tree/main/packages/metro-resolver-symlinks)
-- the changelog generator will need to be worked on to accomodate generating changelogs for any or all or some of the packages in the new monorepo structure
+- the changelog generator ([`@rnx-kit/rn-changelog-generator`](https://github.com/microsoft/rnx-kit/tree/main/incubator/rn-changelog-generator)) will need to be worked on to accommodate generating changelogs for any/all/some of the packages in the new monorepo structure
 
 ### Other considerations
 
