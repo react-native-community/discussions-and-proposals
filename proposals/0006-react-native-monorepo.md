@@ -2,7 +2,8 @@
 title: React Native as a monorepo
 author:
   - Lorenzo Sciandra
-date: 2022-05-17
+  - Tommy Nguyen
+date: 2022-05-18
 ---
 
 # RFC0006: React Native as a monorepo
@@ -86,9 +87,14 @@ The graph here shows in a bit more detail the end goal, along with a few more de
 
 Reiterating the changes proposed in the graph:
 
-- one
-- two
-- three
+- step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accomodate for this change.
+- step 2 is to **rename** the other packages as shown above, and in this table:
+- this will need to be followed up by releasing a new version of the packages with the new npm name/org (and version number)
+- this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
+- at this point (step 3), in which the codebase works as it used to do previously, and all the packages are on a consistent naming and semver (manual) convention, we can introduce tooling to avoid having to repeat this process manually going forward.
+  - in particular, we recommend adding the tool [`changeset`](https://github.com/changesets/changesets) to the codebase to handle the release coordination (as in, once 0.70 gets created, all the packages in that branch get versioned to `0.70.x`) and bump packages accordingly when new versions are needed
+
+*sidenote*: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
 
 In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Facebook monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
@@ -105,6 +111,7 @@ Another option, that would build on top of the (new) existing process, would sti
 - This work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557))
 - Since Metro by default doesn't handle symlinks well, it could be that for RN Tester to keep working we might have to add [`@rnx-kit/metro-resolver-symlinks`](https://github.com/microsoft/rnx-kit/tree/main/packages/metro-resolver-symlinks)
 - the changelog generator ([`@rnx-kit/rn-changelog-generator`](https://github.com/microsoft/rnx-kit/tree/main/incubator/rn-changelog-generator)) will need to be worked on to accommodate generating changelogs for any/all/some of the packages in the new monorepo structure
+- the logic for the release of nightlies will also need to be revisited to account for the new structure (it would be interesting to )
 
 ### Other considerations
 
