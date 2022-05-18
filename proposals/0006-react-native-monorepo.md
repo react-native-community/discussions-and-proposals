@@ -108,10 +108,10 @@ Another option, that would build on top of the (new) existing process, would sti
 
 ### Implementation detail considerations
 
-- This work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557))
+- This work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557)): there's a lot of company specific knowledge involved in how the `react-native` repo gets created for GitHub, and in how the code is shaped in the internal monorepo.
 - Since Metro by default doesn't handle symlinks well, it could be that for RN Tester to keep working we might have to add [`@rnx-kit/metro-resolver-symlinks`](https://github.com/microsoft/rnx-kit/tree/main/packages/metro-resolver-symlinks)
 - the changelog generator ([`@rnx-kit/rn-changelog-generator`](https://github.com/microsoft/rnx-kit/tree/main/incubator/rn-changelog-generator)) will need to be worked on to accommodate generating changelogs for any/all/some of the packages in the new monorepo structure
-- the logic for the release of nightlies will also need to be revisited to account for the new structure (it would be interesting to )
+- the logic for the release of nightlies will also need to be revisited to account for the new structure (it would be interesting to star evaluating for which packages a new nightly would be needed at which point); to be clear, right now the existing logic only works for the core `react-native` package.
 
 ### Other considerations
 
@@ -145,7 +145,7 @@ Also, the documentation about handling releases will have to be slightly modifie
 
 ## Future work
 
-We just wanted to point out how this is basically a big refactoring to enable more complex and impactful changes to be more easily done in the subsequent future, such as the integration with Hermes mentioned above or the other proposal ["Move iOS and Android Specific Code to Their Own Packages"](https://github.com/react-native-community/discussions-and-proposals/pull/49). In fact, this proposal addresses [the latest comment](https://github.com/react-native-community/discussions-and-proposals/pull/49#issuecomment-1046073630) on that RFC from @cortinico, in particular resolves points 1 and 2.
+We just wanted to point out how this is basically a big refactoring to enable more complex and impactful changes to be more easily done in the subsequent future, such as the integration with Hermes mentioned above or the other proposal ["Move iOS and Android Specific Code to Their Own Packages"](https://github.com/react-native-community/discussions-and-proposals/pull/49). In fact, this proposal addresses [the latest comment](https://github.com/react-native-community/discussions-and-proposals/pull/49#issuecomment-1046073630) on that RFC from [@cortinico](https://github.com/cortinico), in particular resolves points 1 and 2.
 
 ## Unresolved questions
 
