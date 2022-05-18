@@ -35,11 +35,35 @@ On top of this, there are some more substantial issues:
 - because of the root `package.json` being not just the `react-native` package but also the root/CI for the repo, during the release script for `react-native` there's some 🪄magic🪄 that happens to copy over some dependencies from `repo-config/package.json` into the root one (see [this commit](https://github.com/facebook/react-native/commit/6efb51777c620a95e457488fbc7df5c272b3c695#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519)). It's a weird pattern that is undocumented and I'm scared of the issues it creates, since (as all the others) `repo-config/package.json` is manually maintained.
   - for example, 0.69.0-rc0 was still depending on React 17 in the 0.69 branch; it was addressed afterwards with [this commit](https://github.com/facebook/react-native/commit/a862d9294bf22ba2304fe5d742010dc210a2ef5a)
 
+### A IRL scenario of this being a problem: `react-native-codegen` and RN 68
+
+To clarify further how this current structure negatively affects maintaining the codebase, here's a quick example that has happened relatively recently.
+
+`react-native-codegen` is one of the packages shown in the graph as one that is on a `0.0.X` versioning. This meant that with RN `0.68.0`, the version of `react-native-codegen` it depended on was the one the codebase was at the time of cutting the `0.68-stable` branch (`0.0.13`).
+
+After releasing `0.68.0`, it was quickly realised that there was an issue with this version (details are unnecessary) that required a fix; this fix also needed to affect code within the `react-native-codegen` folder.
+
+Here's the catch: in the time between the cut of `0.68-stable` branch and the release of `0.68.0`, work on the main branch kept on going and by when the fix was needed, `react-native-codegen` was on `0.0.16`. This meant that we needed to apply a 0.68 specific fix on `react-native-codegen` in its code shape in the `0.68-stable` branch, and do a release in such a way that it would only get picked up by RN 68. But because of the way semver works on Node, the only version we could release was `0.0.17` (`0.0.13.1` is not a thing). And it should be clear that releasing an higher version number of a package, that contains older code, is a very bad situation.
+
+To address this, in the end with the releases team we had to coordinate a triple version number change for `react-native-codegen` so that it would reshape into:
+
+* `0.68-stable` uses `0.0.17`
+* `0.69-stable` uses `0.69.x`
+* `main` uses `0.70.x`
+
+And all of this had to be done manually, and after each version bump for this package, a new version of the 0.68 and 0.69 had to be released with the updated dependency on the new appropriate version.
+
+This proposal aims to address this problem so that it won't have to be dealt with in the future.
+
 ## The Proposal - detailed design
+
+This proposal will seem deceptively simple: to decouple the root level of the package from being both root and `react-native`, to just be the former, and move `react-native` as a package in the `packages/` folder.
+
+The graph here shows in a bit more detail the end goal, along with a few more details and side-changes that are needed to fully address the current situation:
 
 ![proposal for the react-native GitHub codebase](/proposals/assets/0006-proposal.png "Proposal")
 
-**// WIP**
+In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Facebook monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
 ### Going the extra mile: Hermes
 
@@ -75,13 +99,19 @@ Since this is basically a fix and not a re-invention, alternatives have not been
 
 There's not really a need for an adoption strategy per se, we just ensure to complete this workstream before a given new 0.XX minor branch cut & RC process start, and communicate that as a step to upgrade to the new version that folks will have to change the name & version or certain packages to the new one ( since `react-native` will stay `react-native`, to many folks this will be transparent).
 
-Tools like [`dep-check`](https://github.com/microsoft/rnx-kit/tree/main/packages/dep-check) or a codemod should be enough to support edge-cases in which some packages where imported directly.
+Tools like [`dep-check`](https://github.com/microsoft/rnx-kit/tree/main/packages/dep-check) or a codemod should be enough to support edge-cases in which some packages were imported directly.
 
 No breaking changes are expected, it's just a matter of naming & semver convention re-alignment.
 
 ## How we teach this
 
 Nothing to teach, we just need to ensure that the first version to be released after this will have the documentation and blogpost communicate accordingly the new package names (but since `react-native` will stay `react-native`, to many folks this will be transparent).
+
+Also, the documentation about handling releases will have to be slightly modified if new scripts will get added.
+
+## Future work
+
+We just wanted to point out how this is basically a big refactoring to enable more complex and impactful changes to be more easily done in the subsequent future, such as the integration with Hermes mentioned above or the other proposal ["Move iOS and Android Specific Code to Their Own Packages"](https://github.com/react-native-community/discussions-and-proposals/pull/49). In fact, this proposal addresses [the latest comment](https://github.com/react-native-community/discussions-and-proposals/pull/49#issuecomment-1046073630) on that RFC from @cortinico, in particular resolves points 1 and 2.
 
 ## Unresolved questions
 
