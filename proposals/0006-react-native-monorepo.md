@@ -88,7 +88,7 @@ The graph here shows in a bit more detail the end goal, along with a few more de
 Reiterating the changes proposed in the graph:
 
 - step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accommodate for this change.
-- step 2 is to **rename** the other packages as shown above, and in this table:
+- step 2 is to **rename** some of other packages as shown above, and in this table:
 
   | old name                              | new name                           |
   | ------------------------------------- | ---------------------------------- |
