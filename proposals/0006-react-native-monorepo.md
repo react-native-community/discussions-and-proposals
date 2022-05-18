@@ -87,14 +87,28 @@ The graph here shows in a bit more detail the end goal, along with a few more de
 
 Reiterating the changes proposed in the graph:
 
-- step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accomodate for this change.
+- step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accommodate for this change.
 - step 2 is to **rename** the other packages as shown above, and in this table:
+
+  | old name                              | new name                           |
+  | ------------------------------------- | ---------------------------------- |
+  | @react-native/assets                  | @react-native/packager-assets      |
+  | @react-native/babel-plugin-codegen    | @react-native/babel-plugin-codegen |
+  | @react-native-community/eslint-config | @react-native/eslint-config        |
+  | @react-native-community/eslint-plugin | @react-native/eslint-plugin        |
+  | @react-native/normalize-color         | @react-native/normalize-colors     |
+  | @react-native/polyfills               | @react-native/js-polyfills         |
+  | react-native-codegen                  | @react-native/codegen              |
+  | react-native-gradle-plugin            | @react-native/gradle-plugin        |
+
+  - this step is needed to allow to reset the versioning and introduce alignment across the board
+
 - this will need to be followed up by releasing a new version of the packages with the new npm name/org (and version number)
 - this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
 - at this point (step 3), in which the codebase works as it used to do previously, and all the packages are on a consistent naming and semver (manual) convention, we can introduce tooling to avoid having to repeat this process manually going forward.
   - in particular, we recommend adding the tool [`changeset`](https://github.com/changesets/changesets) to the codebase to handle the release coordination (as in, once 0.70 gets created, all the packages in that branch get versioned to `0.70.x`) and bump packages accordingly when new versions are needed
 
-*sidenote*: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
+_sidenote_: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
 
 In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Facebook monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
