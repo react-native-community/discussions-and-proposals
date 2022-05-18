@@ -13,6 +13,22 @@ This proposal is not much as in introducing something completely new, but more t
 
 This proposal is about re-shaping the existing codebase on GitHub into what is commonly expected of a monorepo in the JavaScript ecosystem (see, for example, [Babel.js](https://github.com/babel/babel) or [Next.js](https://github.com/vercel/next.js)): consistent versioning, naming and tooling.
 
+### Table of Content
+
+- [Motivation](#motivation)
+  - [A IRL scenario of this being a problem: `react-native-codegen` and RN 68](#a-irl-scenario-of-this-being-a-problem-react-native-codegen-and-rn-68)
+- [Detailed design](#detailed-design)
+  - [The proposal](#the-proposal)
+  - [Going the extra mile: Hermes](#going-the-extra-mile-hermes)
+  - [Implementation detail considerations](#implementation-detail-considerations)
+  - [Other considerations](#other-considerations)
+- [Drawbacks](#drawbacks)
+- [Alternatives](#alternatives)
+- [Adoption strategy](#adoption-strategy)
+- [How we teach this](#how-we-teach-this)
+- [Future work](#future-work)
+- [Unresolved questions](#unresolved-questions)
+
 ## Motivation
 
 To quickly explain the motivation behind this proposal, here's the current shape of the React Native codebase hosted on GitHub and corrispective npm packages:
@@ -58,7 +74,9 @@ And all of this had to be done manually, and after each version bump for this pa
 
 This proposal aims to address this problem so that it won't have to be dealt with in the future.
 
-## The Proposal - detailed design
+## Detailed design
+
+### The proposal
 
 This proposal will seem deceptively simple: to decouple the root level of the package from being both root and `react-native`, to just be the former, and move `react-native` as a package in the `packages/` folder.
 
