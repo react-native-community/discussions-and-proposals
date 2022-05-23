@@ -90,6 +90,9 @@ Reiterating the changes proposed in the graph:
 - step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accommodate for this change.
 - step 2 is to **rename** some of other packages as shown above, and in this table:
 
+  <details>
+  <summary>Expand table of package.json/npm names</summary>
+
   | old name                              | new name                           |
   | ------------------------------------- | ---------------------------------- |
   | @react-native/assets                  | @react-native/packager-assets      |
@@ -101,7 +104,26 @@ Reiterating the changes proposed in the graph:
   | react-native-codegen                  | @react-native/codegen              |
   | react-native-gradle-plugin            | @react-native/gradle-plugin        |
 
-  - this step is needed to allow to reset the versioning and introduce alignment across the board
+  </details>
+
+  <details>
+  <summary>Optional: change name of folders</summary>
+
+  | old path                                                   | new path                                   |
+  | ---------------------------------------------------------- | ------------------------------------------ |
+  | react-native/packages/assets                               | react-native/packages/packager-assets      |
+  | react-native/packages/babel-plugin-codegen                 | react-native/packages/babel-plugin-codegen |
+  | react-native/packages/eslint-config-react-native-community | react-native/packages/eslint-config        |
+  | react-native/packages/eslint-plugin-react-native-community | react-native/packages/eslint-plugin        |
+  | react-native/packages/normalize-color                      | react-native/packages/normalize-colors     |
+  | react-native/packages/polyfills                            | react-native/packages/js-polyfills         |
+  | react-native/packages/react-native-codegen                 | react-native/packages/codegen              |
+  | react-native/packages/react-native-gradle-plugin           | react-native/packages/gradle-plugin        |
+  | react-native/packages/rn-tester                            | react-native/packages/tester               |
+
+  </details>
+
+  - _(this step is needed to allow to reset the versioning and introduce alignment across the board)_
 
 - this will need to be followed up by releasing a new version of the packages with the new npm name/org (and version number)
 - this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
