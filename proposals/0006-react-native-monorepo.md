@@ -107,6 +107,7 @@ Reiterating the changes proposed in the graph:
 - this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
 - at this point (step 3), in which the codebase works as it used to do previously, and all the packages are on a consistent naming and semver (manual) convention, we can introduce tooling to avoid having to repeat this process manually going forward.
   - in particular, we recommend adding the tool [`changeset`](https://github.com/changesets/changesets) to the codebase to handle the release coordination (as in, once 0.70 gets created, all the packages in that branch get versioned to `0.70.x`) and bump packages accordingly when new versions are needed
+  - as an alternative, another one of Meta's projects in OSS, [Metro](https://github.com/facebook/metro) could be used as an inspiration for how to setup this scenario: it addresses the naming and versioning in the same manner as described here, and it's a project that has a lot of similarities to RN in the fact that it's also a "partial replica of monorepo code" scenario. It uses [Lerna]().
 
 _sidenote_: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
 
