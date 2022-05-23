@@ -110,7 +110,7 @@ Reiterating the changes proposed in the graph:
 
 _sidenote_: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
 
-In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Facebook monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
+In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Meta monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
 ### Going the extra mile: Hermes
 
