@@ -48,12 +48,19 @@ On top of this, there are some more substantial issues:
 - releasing a new version of any package that is not the main `react-native` one requires an engineer manually releasing it via CLI on a local machine (which is potentially also a security issue, given how some of these packages are owned by members of the community)
 
   - which also means that the same person then needs to manually bump the dependency in other parts of the codebase, since they are fixed. For example, see how root level package.json depends on `"@react-native/polyfills": "2.0.0",` ([permalink](https://github.com/facebook/react-native/blob/b331229b06dde31ff92091a163cfabb030082925/package.json#L108)).
+  - this also affects the nightlies cycle: the only package that gets nightly releases is `react-native`, and no other packages (which implies a high risk of the nightly being broken because the rest of the toolchain not having a corrispective release).
 
 - because of the root `package.json` being not just the `react-native` package but also the root/CI for the repo, during the release script for `react-native` there's some 🪄magic🪄 that happens to copy over some dependencies from `repo-config/package.json` into the root one (see [this commit](https://github.com/facebook/react-native/commit/6efb51777c620a95e457488fbc7df5c272b3c695#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519)). It's a weird pattern that is undocumented and I'm scared of the issues it creates, since (as all the others) `repo-config/package.json` is manually maintained.
 
   - for example, 0.69.0-rc0 was still depending on React 17 in the 0.69 branch; it was addressed afterwards with [this commit](https://github.com/facebook/react-native/commit/a862d9294bf22ba2304fe5d742010dc210a2ef5a)
 
 - because this configuration is mostly "github repo only", there's an high risk of things getting outdated or changes slipping between the cracks (such as the `repo-config` example mentioned there), and only being addressed after someone hits them as a third party consumer.
+
+- The current setup is not encouraging modularization (that makes situations like the [RFC about ios and android packages](https://github.com/react-native-community/discussions-and-proposals/pull/49) harder). Essentially creating a new `@react-native/*` NPM package today is over-complicated and the infrastructure is not able to handle this properly.
+
+- This setup makes it hard to have consistent testing in the CI:
+  - there are two different build patterns for [RNTester](https://github.com/facebook/react-native/tree/main/packages/rn-tester) and for [the template](https://github.com/facebook/react-native/tree/main/template).
+  - template has to do 🪄magic tricks🪄 to simulate an npm package for react-native when testing - [see more here](https://github.com/facebook/react-native/blob/main/scripts/test-manual-e2e.sh#L109).
 
 ### A IRL scenario of this being a problem: `react-native-codegen` and RN 68
 
