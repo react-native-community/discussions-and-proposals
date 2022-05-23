@@ -135,7 +135,7 @@ Another option, that would build on top of the (new) existing process, would sti
 
 - Most of it needs to be tackled in "one fell swoop"
 - Old open pull requests will likely need to be rebased and re-arranged
-- Some of the native build scripts (gradle, BUCK, xcode, etc.) and CI scripts and config will need to be updated for the new code locations
+- Some of the native build scripts (Gradle, BUCK, Xcode, etc.) and CI scripts and config will need to be updated for the new code locations
 
 - _(Adding this bullet point to easily allow comments on other drawbacks that might have not been considered)_
 
