@@ -7,7 +7,7 @@
 
 The React Native Core team is working to strike a balance between the speed of innovation with the amount of regular change to the platform. We understand that each release brings new value and has an adoption cost to the community.
 This document describes how we intend to formally balance these concerns and provide clear and consistent support over time.
-React Native team will work on best-effort bases to release a new version of React Native every four months. And will focus on speeding up the release cycle and put considerable effort into ensuring a seamless upgrade path.
+React Native team will work on best-effort basis to release a new version of React Native every four months. And will focus on speeding up the release cycle and put considerable effort into ensuring a seamless upgrade path.
 This document describes the level of support we can provide and which set of versions is supported.
 
 ## Glossary
@@ -18,7 +18,7 @@ Below we are defining terms used in this document:
 * **latest version** - **** The latest stable version with the highest version number (e.g. 0.68.2).
     * The highest version number is defined following the [NPM server algorithm](https://github.com/npm/node-semver).
 * **next version** - The next version that hasn’t been fully released yet, and is currently in development/testing (e.g. 0.69.0-RC1).
-* **minor series** - A collection of version (either stable or not stable) sharing the same minor version (e.g. **0.68**.0-RC0, **0.68**.0, **0.68**.1 are all part of the **0.68** minor series).
+* **minor series** - A collection of versions (either stable or not stable) sharing the same minor version (e.g. **0.68**.0-RC0, **0.68**.0, **0.68**.1 are all part of the **0.68** minor series).
 
 ## Which versions are currently supported?
 
