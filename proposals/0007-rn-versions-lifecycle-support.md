@@ -2,7 +2,7 @@
 
 
 
->As we are finding ways to better support React Native community, we are moving towards supporting a limited amount of versions of React Native better.
+>As we look for ways to better support the React Native community, we will move towards supporting a limited number of versions of React Native better.
 
 
 The React Native Core team is working to strike a balance between the speed of innovation with the amount of regular change to the platform. We understand that each release brings new value and has an adoption cost to the community.
@@ -23,7 +23,7 @@ Below we are defining terms used in this document:
 ## Which versions are currently supported?
 
 We’re supporting the **latest** **version**, and the latest versions from the **two previous minor series.**
-We’re also supporting the **next version,** having in mind this is the not yet stable version we are developing at that moment in time.
+We’ll also support the **next version** being developed, which will become stable after its release.
 
 Versions:
 
@@ -42,7 +42,7 @@ Due to support bandwidth, the React Native team, with the community's help, is l
 
 Issues & PRs opened against older versions would be considered only in exceptional cases. Please update your application to one of the supported versions and raise the Issue/PR targeted to that version.
 
-Issues should contain a [**reproducer**](https://stackoverflow.com/help/minimal-reproducible-example) project regardless of which version they targeting, for them to be considered.
+Issues should contain a [**reproducer**](https://stackoverflow.com/help/minimal-reproducible-example) project regardless of which version they are targeting, for them to be considered.
 Issues without a reproducer will require more effort to understand and fix, and are less likely to receive attention.
 
 At this point in time, we are prioritizing issues that are related to:
@@ -57,7 +57,7 @@ We’re **accepting cherry-pick requests** for the currently supported versions.
 
 Cherry-Pick requests should be submitted via the [React Native Releases Working Group](https://github.com/reactwg/react-native-releases/discussions/categories/patches), in the corresponding discussion thread.
 
-Please note that each cherry-pick request will be assessed and approved individually. Cherry-Pick requests against unsupported versions will be rejected unless they’re involving security issues.
+Please note that each cherry-pick request will be assessed and approved individually. Cherry-Pick requests against unsupported versions will be rejected unless they involve security issues.
 
 ## Security Issues
 
