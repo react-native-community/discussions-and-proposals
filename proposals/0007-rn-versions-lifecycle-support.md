@@ -42,7 +42,7 @@ Due to support bandwidth, the React Native team, with the community's help, is l
 
 Issues & PRs opened against older versions would be considered only in exceptional cases. Please update your application to one of the supported versions and raise the Issue/PR targeted to that version.
 
-Issues should contain a [**reproducer**](https://stackoverflow.com/help/minimal-reproducible-example) project regardless of which version they are targeting, for them to be considered.
+Issues should contain a [**reproducer**](https://stackoverflow.com/help/minimal-reproducible-example) project regardless of which version they target, for them to be considered.
 Issues without a reproducer will require more effort to understand and fix, and are less likely to receive attention.
 
 At this point in time, we are prioritizing issues that are related to:
