@@ -252,7 +252,7 @@ This will partially mitigate the issue as the `android-prebuilts` package will s
 #### Cons
 
 * We will be forced to “recompose” the various prebuilts from the several NPM packages to a Maven Local repository inside users’ `node_modules` folder.
-* All the users will be downloading all the pre-builts for all the build-types/split/abi whenever they `yarn install`.
+* All the users will be downloading all the pre-builts for all the build-types/split/abi whenever they `yarn install`. Therefore users who develop for a single platform incur a download cost for binaries they will never use, vs delaying the download until the specific native build system needs the artifact.
 * Having [github.com/facebook/react-native](http://github.com/facebook/react-native) as currently set up (not a proper monorepo) makes really hard to create new NPM packages.
 * We will still be having a hard limit on NPM packages so we’ll have to handle further splitting as our library/SDK grows. This is especially more critical as we have more and more C++ code, therefore we’re generating more and more native pre-builts.
 
