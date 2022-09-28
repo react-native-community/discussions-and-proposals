@@ -24,6 +24,7 @@ This proposal is about re-shaping the existing codebase on GitHub into what is c
   - [Going the extra mile: Hermes](#going-the-extra-mile-hermes)
   - [Implementation detail considerations](#implementation-detail-considerations)
   - [Other considerations](#other-considerations)
+- [Plan of action](#plan-of-action)
 - [Drawbacks](#drawbacks)
 - [Alternatives](#alternatives)
 - [Adoption strategy](#adoption-strategy)
