@@ -94,8 +94,8 @@ The graph here shows in a bit more detail the end goal, along with a few more de
 
 Reiterating the changes proposed in the graph:
 
-- step 1 is to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accommodate for this change.
-- step 2 is to **rename** some of other packages as shown above, and in this table:
+- we need to move the `react-native` specific code in its own folder within the `packages/` folder. This is the most error prone step to handle, as many paths and variables might have to be modified (for ex. in the CI configurations) to accommodate for this change.
+- we have to **rename** some of other packages as shown above, and in this table:
 
   <details>
   <summary>Expand table of package.json/npm names</summary>
@@ -132,13 +132,11 @@ Reiterating the changes proposed in the graph:
 
   - _(this step is needed to allow to reset the versioning and introduce alignment across the board)_
 
-- this will need to be followed up by releasing a new version of the packages with the new npm name/org (and version number)
-- this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
-- at this point (step 3), in which the codebase works as it used to do previously, and all the packages are on a consistent naming and semver (manual) convention, we can introduce tooling to avoid having to repeat this process manually going forward.
+- we will need to release a new version of the packages with the new npm name/org (and version number)
+  - this will require a ripple effect of renaming also the places in which those packages are consumed, and to the new version, in the rest of the codebase.
+- we want to introduce tooling to avoid having to manually release and version packages.
   - in particular, we recommend adding the tool [`changeset`](https://github.com/changesets/changesets) to the codebase to handle the release coordination (as in, once 0.70 gets created, all the packages in that branch get versioned to `0.70.x`) and bump packages accordingly when new versions are needed
   - as an alternative, another one of Meta's projects in OSS, [Metro](https://github.com/facebook/metro) could be used as an inspiration for how to setup this scenario: it addresses the naming and versioning in the same manner as described here, and it's a project that has a lot of similarities to RN in the fact that it's also a "partial replica of monorepo code" scenario. It uses [Lerna]().
-
-_sidenote_: we recommend this work to be done all in the same timeframe between a minor branch cut and the next (ex. `0.70-stable` gets created, then this works start, and until all of it has been done, `0.71-stable` is **not** created).
 
 In closing this section, we also want to acknowledge how this proposal is deliberately not introducing any high degree of automation or advanced tooling - this is because we are well aware that this repository is but a "partial mirror" of how the react-native code is shaped within the Meta monorepo, and adding more extensive and invasive tooling would require also introducing them to that monorepo. So we opted for the minimal footprint that would be OSS-side only (with the tradeoff of more custom, local code and scripts).
 
@@ -152,7 +150,7 @@ Another option, that would build on top of the (new) existing process, would sti
 
 ### Implementation detail considerations
 
-- This work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557)): there's a lot of company specific knowledge involved in how the `react-native` repo gets created for GitHub, and in how the code is shaped in the internal monorepo.
+- Some parts of this work will have to start from Meta's side (see [comments in the other proposal](https://github.com/react-native-community/discussions-and-proposals/pull/49/files#r255135557)): there's a lot of company specific knowledge involved in how the `react-native` repo gets created for GitHub, and in how the code is shaped in the internal monorepo. Also, renaming and pathing will affect the interal codebase so coordination will be needed.
 - Since Metro by default doesn't handle symlinks well (see [this issue for details](https://github.com/facebook/metro/issues/1)), it could be that for RN Tester to keep working we might have to add [`@rnx-kit/metro-resolver-symlinks`](https://github.com/microsoft/rnx-kit/tree/main/packages/metro-resolver-symlinks)
 - the changelog generator ([`@rnx-kit/rn-changelog-generator`](https://github.com/microsoft/rnx-kit/tree/main/incubator/rn-changelog-generator)) will need to be worked on to accommodate generating changelogs for any/all/some of the packages in the new monorepo structure
 - the logic for the release of nightlies will also need to be revisited to account for the new structure (it would be interesting to star evaluating for which packages a new nightly would be needed at which point); to be clear, right now the existing logic only works for the core `react-native` package.
@@ -160,10 +158,10 @@ Another option, that would build on top of the (new) existing process, would sti
 ### Other considerations
 
 - we could consired renaming `react-native` into `@react-native/core` but no strong opinion; given how this is the "front-facing" package it might be easier and more digestable for consumers of react-native to just keep stay on the current convention.
+- given the many artifacts involved in the react native toolchain for building an app, there's also the need to figure out a more stable and "automatable" via for creating and distributing these assets. For that purpose, a [separate RFC has been set up here](https://github.com/react-native-community/discussions-and-proposals/pull/508).
 
 ## Drawbacks
 
-- Most of it needs to be tackled in "one fell swoop"
 - Old open pull requests will likely need to be rebased and re-arranged
 - Some of the native build scripts (Gradle, BUCK, Xcode, etc.) and CI scripts and config will need to be updated for the new code locations
 
@@ -173,9 +171,40 @@ Another option, that would build on top of the (new) existing process, would sti
 
 Since this is basically a fix and not a re-invention, alternatives have not been really explored deeply. Most of the alternative takes boil down to tech choices details in ex. which tool to use to handle the monorepo setup, and not really in the final overall shape of the codebase.
 
+## Plan of action
+
+After several brainstorming, we envision the work split in those phases:
+
+### Phase 1 (Package Renaming & Re-versioning)
+
+Package renaming & versions alignment. We already have some PR opens on this side which is great! I've created an umbrella task to keep track of the work and give the opportunity to others to also jump on this:
+https://github.com/facebook/react-native/issues/34692
+
+As a rule of thumb, we decide to **not** do folder renaming at this stage. This is causing a lot of friction as it requires a lot of internal handling on our end, and we believe it brings little value, at least at this early stage.
+
+Ideally we should be done with all the renaming by 0.71.x so that we can annonce that this change has happened in the release notes. We don't expect any user facing impact as users should depend only on `react-native`. Still it's worth to make sure that all the renaming/bumps are bundled together in a single version.
+
+### Phase 2 (Automation)
+
+Once all the versions are aligned, we can work on automation to support:
+
+- Publishing of all the packages from the CI
+- Automating the bumping of the version
+
+### Phase 3 (Moving the `react-native` package)
+
+Once we're done with the setup, we can look into moving the top level package inside `packages/react-native` and have a proper yarn workspace in the top level `package.json` (by also removing the `repo-config/` folder).
+
+### Phase 4 (Cleanup)
+
+Once we're done with the full monorepo setup, we'll into follow-up tasks such as:
+
+- Deprecating older packages on NPM (those that have been renamed)
+- Remaing folders, for those we believe we'll get value out of the rename.
+
 ## Adoption strategy
 
-There's not really a need for an adoption strategy per se, we just ensure to complete this workstream before a given new 0.XX minor branch cut & RC process start, and communicate that as a step to upgrade to the new version that folks will have to change the name & version or certain packages to the new one ( since `react-native` will stay `react-native`, to many folks this will be transparent).
+This workstream will span multiple minor releases (see the various steps), so we will need to communicate that each user-facing change as a step to upgrade to the new version.
 
 Tools like [`dep-check`](https://github.com/microsoft/rnx-kit/tree/main/packages/dep-check) or a codemod should be enough to support edge-cases in which some packages were imported directly.
 
