@@ -220,6 +220,11 @@ Github offers the possibility to use the [Container Registry](https://docs.githu
 
 Ideally we could create a container, which separate layer per artifact (i.e. one for Hermes iOS tarball, one for React Native Android, etc). Each layer will be a .tar.gz file we can freely populate.
 
+#### Prototype
+
+A prototype of this solution is available at [cortinico/space-unlimited-space](https://github.com/cortinico/space-unlimited-space).
+The repo will showcase how to publish and retrieve arbitrary tarballs using HTTP without authentication.
+
 #### Pro
 
 * Elegant solution which relies on the Github infrastructure and doens’t involve external services (no need to auth, sign, or interact with new services).
@@ -230,6 +235,8 @@ Ideally we could create a container, which separate layer per artifact (i.e. one
 
 * Need to write extra infrastructure to handle downloading the OCI images and placing the artifacts in the right folder.
 * No caching mechanism out of the box (users with 2 React Native projects, will re-download everything). 
+* URLs are hard to compose (e.g. https://ghcr.io/v2/cortinico/space-unlimited-space/anakin/blobs/sha256:57b8eee16897b0bb1d00190e99fb722dbaa32ecd1eb70686012ecf814ce329ba). We would need a mapping in place for knowing which blob contains what.
+* Plain HTTP access is still not possible, we'll have to pass a `"Authorization: Bearer QQ=="` header, making it hard to consume via CocoaPods or other tool which are expecting HTTP urls ([see here for a curl request](https://github.com/cortinico/space-unlimited-space#consuming-via-http))
 
 ### Separate NPM Package
 
