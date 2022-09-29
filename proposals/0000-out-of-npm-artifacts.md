@@ -266,11 +266,20 @@ This will partially mitigate the issue as the `android-prebuilts` package will s
 ### Dedicated Maven Repository
 
 Ideally we could look into publishing the `/android` folder into a remote Maven Repository (most likely Maven Central).
+We could re-use a Maven Repository to store artifacts which are not Android-specific (e.g. the Hermes iOS Tarball).
+
+#### Prototype
+
+A prototype of how the storing of the Hermes iOS Tarball on Maven would look like is available on: [react-native#34812](https://github.com/facebook/react-native/pull/34812).
+
+This has been tested against RN Tester iOS on `main` and the tarball download is working correctly. 
 
 #### Pro
 
-* Uses a packaging system which is familiar for Android developers and re-uses the already existing caching/perf improvement that are shipping with the platform pipeline.
+* For Android: Uses a packaging system which is familiar for Android developers and re-uses the already existing caching/perf improvement that are shipping with the platform pipeline.
     * A practical benefit of this is that users will have only a local copy of react-native or hermes-engine inside their `~/.gradle` folder instead of having multiple copies, one for every RN project.
+* For iOS: We would have stable URLs which can be easily composed with the release version (e.g. https://repo1.maven.org/maven2/com/facebook/react/react-native-artifacts/0.0.1/react-native-artifacts-0.0.1-hermes-ios.tar.gz)
+* We will end up using a single solution for both platforms, resulting in reduced maintainance costs.
 * Users will download the artifact they need at build time only when needed
     * E.g. iOS-only users will benefit of faster `yarn install` and smaller `node_modules` folder.
     * Users which are not using Hermes will benefit similarly as well
@@ -282,7 +291,7 @@ Ideally we could look into publishing the `/android` folder into a remote Maven 
 
 #### Cons
 
-* This solution addressed only the Android/JVM side of the problem.
+* ~This solution addressed only the Android/JVM side of the problem~ See the prototype paragraph for a solution that works on both platforms.
 * We will have to publish to remote Maven Repositories as part of our RN release process (i.e. a new step inside the CircleCI config, means yet another thing that can be broken) + we’ll have to maintain GPG keys for publishing.
 * We’ll have to make sure NPM packages and Maven pubblications are syncronized with a version number.
 
@@ -334,11 +343,8 @@ We could extend on Github Releases as we’re doing today for the Hermes iOS tar
 
 ## Preferred solution
 
-We're currently investigating the feasibility of the OCI Images solution.
+We've investigated prototype for both the OCI and the Maven solution.
 
-At the time of writing we're leaning towards opting for either:
-- Using only the OCI image approach to store all the artifacts
-- Store platform specific artifacts with the platform specific solution (Android on Maven Central, iOS on CocoaPods, etc.)
-- The hybrid solution.
+At this stage the preferred solution is Maven, due to the list of PROs. This solution will make consuming artifacts easier for users and will reduce the maintainance costs on core contributors and release managers.
 
 As this change is going to affect contributors, library authors, and developers of tools on top of React Native, we're sharing this RFC publicly to collect consensus and feedback.
