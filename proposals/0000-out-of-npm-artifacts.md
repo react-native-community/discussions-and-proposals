@@ -85,7 +85,7 @@ Please note that the files needs to follow the repository layout to properly be 
 
 ### The Hermes Android Archive
 
-With [Bundled Hermes](https://reactnative.dev/architecture/bundled-hermes), the prebuilt version of Hermes have been moved inside the `react-native` NPM package. They’re located inside the `android` folder similarly to:[The React Native Android Archive](https://fb.quip.com/vBssAxF1lzFm#temp:C:aHXc98a51248365471ebf15e694f)
+With [Bundled Hermes](https://reactnative.dev/architecture/bundled-hermes), the prebuilt version of Hermes have been moved inside the `react-native` NPM package. They’re located inside the `android` folder similarly to:[The React Native Android Archive](#the-react-native-android-archive)
 
 ```
 // Checksum files have been removed for brevity.
