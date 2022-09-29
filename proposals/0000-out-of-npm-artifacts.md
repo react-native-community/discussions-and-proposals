@@ -109,7 +109,7 @@ android
 ```
 
 
-Due to limitation on the NPM package size, we’ve been forced to **remove the debug symbols & disable prefab for Hermes** (see [https://github.com/facebook/react-native/pull/33439](https://www.internalfb.com/diff/D34929265)) from the `react-native` NPM package. 
+Due to limitation on the NPM package size, we’ve been forced to **remove the debug symbols & disable prefab for Hermes** (see [https://github.com/facebook/react-native/pull/33439](https://github.com/facebook/react-native/pull/33439)) from the `react-native` NPM package. 
 
 This had a couple of negative side effects:
 
