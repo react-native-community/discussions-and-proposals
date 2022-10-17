@@ -1,4 +1,4 @@
-# RFC: React Native Versions Lifecycle & Support
+# RFC0503: React Native Versions Lifecycle & Support
 
 >As we look for ways to better support the React Native community, we will move towards supporting a limited number of versions of React Native better.
 
