@@ -6,7 +6,7 @@ author:
 date: 2018-08-15
 ---
 
-# RFC0004: CocoaPods Support Improvements
+# RFC0018: CocoaPods Support Improvements
 
 ## Summary
 

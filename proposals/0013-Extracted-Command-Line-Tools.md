@@ -5,7 +5,7 @@ author:
 date: 2018-08-10
 ---
 
-# RFC0003: Extract CLI from Core
+# RFC0013: Extract CLI from Core
 
 ## Summary
 
