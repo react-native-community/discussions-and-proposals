@@ -98,7 +98,7 @@ This is the primary breaking change introduced by `"exports"`.
 > When the `"exports"` field is defined, all subpaths of the package are encapsulated and no longer available to importers.\
 – https://nodejs.org/docs/latest-v18.x/api/packages.html#main-entry-point-export
 
-```json
+```js
 "exports": {
   // Paths outside of this list are inaccessible to importers
   ".": "./lib/index.js",
@@ -116,7 +116,7 @@ This is the primary breaking change introduced by `"exports"`.
 This relates to the ability for packages to define subpath aliases that point to an underlying file.\
 https://nodejs.org/docs/latest-v18.x/api/packages.html#subpath-exports
 
-```
+```json
 "exports": {
   ".": "./index.js",
   "./submodule.js": "./src/submodule.js"
@@ -297,7 +297,7 @@ This default is directly misaligned with react-native-web via Webpack  ([docs](h
 Combined, this is the only breaking change we foresee in Metro that will immediately impact app developers, and which we are not deferring via strict mode opt-in. It will align behaviour for existing users of react-native-web via Webpack.
 
 | Condition name | Description | Node.js | Webpack | Metro (proposed) |
-| - | - | - | - | - | - |
+| - | - | - | - | - |
 | `"browser"` | Any web browser environment | - | Matched when `platform === 'web'` | Matched when `platform === 'web'` |
 | `"react-native"` [New] | Any React Native runtime environment (non-browser) | - | Matched when `platform !== 'web'` | Matched when `platform !== 'web'` |
 | All other | | (unimplemented) | Various supported, e.g. `"deno"`, `"worker"`, `"electron"` | (unimplemented) |
@@ -341,7 +341,7 @@ Therefore, Metro will default to lenient and backwards compatible behaviour, as 
 
 The new flag will be exposed as a `reactNative.metroExportsMode` field within `package.json`.
 
-```json
+```js
 {
   "name": "my-package",
   "exports": {...},
@@ -354,7 +354,7 @@ The new flag will be exposed as a `reactNative.metroExportsMode` field within `p
 
 Note: `"reactNative"` (in camel case) will be a distinct field from `"react-native"` (in dash case, used as a `"main"` module alias that we are starting to deprecate with `"exports"`). We are [separately considering a `‌"newArchSupport"` option](https://github.com/microsoft/rnx-kit/issues/1863#issuecomment-1246580474) within this new top-level key, which will encapsulate options available to React Native packages.
 
-### Behaviour under `"nonstrict"` mode (default)
+#### Behaviour under `"nonstrict"` mode (default)
 
 - Any subpaths are importable (package encapsulation is not enforced).
 - When ambiguous, subpaths outside `"exports"` are preferred.
