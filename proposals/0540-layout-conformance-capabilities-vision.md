@@ -110,23 +110,24 @@ The below shows a structure the babel transform could replicate:
 const styles = StyleSheet.create({
   widget: {
     flex: 1,
-  }
+  },
 });
 
 // After babel transform
-let styles = StyleSheet.create({
-  widget: {
-    flex: 1,
-  }
+const styles = StyleSheet.create({
+  widget: StyleSheet.compose(
+    {
+      flex: 1,
+    },
+    {_creationOrigin: 123},
+  ),
 });
-styles = StyleSheet.compose(styles, {_creationOrigin: 123})
-
 
 // Style calculated by function
-<View style={calculateStyle()} />
+<View style={calculateStyle()} />;
 
 // After babel transform
-<View style={StyleSheet.compose(calculateStyle(), {_applyOrigin: 456}} />
+<View style={StyleSheet.compose(calculateStyle(), {_applyOrigin: 456})} />;
 ```
 
 ### Migration hints
