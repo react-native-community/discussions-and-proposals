@@ -50,7 +50,7 @@ We should instead treat `StrictLayout` as an unstable API, then coalesce the cha
 
 ```jsx
 // Treat StrictLayout as unstable until we have a fuller set of breaks
-import {unstable_StrictLayout as StrictLayout} from 'react-native'
+import {unstable_StrictLayout as StrictLayout} from 'react-native';
 ```
 
 ### Implementation
@@ -93,7 +93,7 @@ An app otherwise using strict layout may want to opt specific component trees in
 ```jsx
 // Disable a single behavior change and its migration hints
 <ClassicLayout quirks=['stale-basis-measurements']>
-   <CruftView /> 
+  <CruftView /> 
 </ClassicLayout>
 ```
 
