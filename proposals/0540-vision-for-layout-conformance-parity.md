@@ -224,7 +224,7 @@ The following is a non-exhaustive list of capabilities where Yoga lags browsers.
 4. **`position: fixed/sticky`:** React native does not support `position: fixed` or `position: sticky`. React Native’s closest API is `stickyHeaderIndices`, which allows top-level ScrollView items to be sticky.
 5. **`box-sizing`:** React Native does not support specifying box-sizing, and anecdotally is closest to but does not fully conform to `border-box`. implementing box-sizing allows new modes which may be conformant.
 6. **`align-content: space-evenly`:** Yoga does not supported `space-evenly` as a value for flexbox alignment.
-7. **`place-content`:** Shorthand for `align-content` and `justify-content`. Trivial to add but has a memory const without [sparse stylesheets](](#mitigating-bloat-to-heap-usage)).
+7. **`place-content`:** Shorthand for `align-content` and `justify-content`. Trivial to add but has a memory const without [sparse stylesheets](#mitigating-bloat-to-heap-usage).
 8. **`inset:`** Shortland for top/left/bottom/right (similar considerations to `place-contents` as a shorthand property)
 9. **Viewport based units `(vmin, vh, vw, etc)`:** React Native + Yoga does not support units derived from viewport/root node size.
 10. **Font based units `(em, rem, etc)`:** React Native + Yoga does not support units derived from the size of the current font. Configurable `fontSize`  in React Native is currently confined to text components, and will not cascade. Its pixel value would then be scaled by `fontSize` if set on a Text component or by system default font if unset on Text, or on a View.
