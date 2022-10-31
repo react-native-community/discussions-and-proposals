@@ -1,9 +1,9 @@
 
 # Vision for Layout Conformance/Parity
 
-React Native models its layout and styling support after web browsers, offering a subset of CSS features. Some CSS properties like color are mapped to functionality in the backing UI framework. Sizing, positioning, and general layout is handled by the Yoga layout engine. This intersection gives web developers a familiar experience when working in React Native, but also behaves similarly enough to enable code-sharing, as supported by projects like react-native-web.
+React Native models its layout and styling support after web browsers, offering a subset of CSS features. Some CSS properties like color are mapped to functionality in the backing UI framework. Sizing, positioning, and general layout is handled by the Yoga layout engine. This intersection gives web developers a familiar experience when working in React Native, but also behaves similarly enough to web to enable code-sharing, as supported by projects like react-native-web.
 
-There are gaps in what React Native supports, with “CSS Features” being the [#1 request](https://github.com/react-native-community/discussions-and-proposals/discussions/528?sort=top#discussioncomment-3886000) for in a recent survey to the community over the state of React Native. This intertwines with asks for us to invest in Yoga, which has been [inactive](https://github.com/facebook/yoga/issues/1151) in OSS. Flexbox support has had limitations akin to targeting [Internet Explorer 9](http://caniuse.com/?search=column-gap). We also hear a desire for more consistent behavior of existing behaviors with web. This document outlines a set of problems, strategies, and solutions, for building out the intertwined problems of layout conformance, and layout parity.
+There are gaps in what React Native supports, with “CSS Features” being the [#1 request](https://github.com/react-native-community/discussions-and-proposals/discussions/528?sort=top#discussioncomment-3886000) in a recent survey to the community over the state of React Native. This intertwines with asks for us to invest in Yoga, which has been [inactive](https://github.com/facebook/yoga/issues/1151). Flexbox support in React Native has had limitations akin to targeting [Internet Explorer 9](http://caniuse.com/?search=column-gap). We also hear a desire for more consistent behavior of existing behaviors with web. This document outlines a set of problems, strategies, and solutions, for building out the intertwined problems of layout conformance, and layout parity.
 
 ## Where are the differences?
 
@@ -27,11 +27,11 @@ import {StrictLayout} from 'react-native';
 </StrictLayout>
 ```
 
-This style of component has downsides. React encourages encapsulation, where individual components don’t have to reason about the tree above or around them. If `StrictLayout` were to radically shift behavior, it would require component authors to reason about more state outside of their component and negatively impact developer experience. For this reason `StrictLayout` **does not** change the default styles of a component tree. It instead is focused on algorithm correctness, and will only cause changes where components were previously relying on out-of-spec behavior. We will also try to alert users where their component rendering is reliant on out-of-spec behavior, and attempt to offer actionable guidance (see “Migration Hints” below).
+This style of component has downsides. React encourages encapsulation, where individual components don’t have to reason about the tree above or around them. If `StrictLayout` were to radically shift behavior, it would require component authors to reason about more state outside of their component and negatively impact developer experience. For this reason `StrictLayout` **does not** change the default styles of a component tree. It instead is focused on algorithm correctness, and will only cause changes where components were previously relying on behavior divergent from browsers. After StrictMode is [stable](#staging), we will start flagging to developers where their component rendering is reliant on out-of-spec behavior, and attempt to offer actionable guidance (see “Migration Hints” below).
 
 ### Usage
 
-Existing apps or shared components targeting both web and mobile can safely opt-into stricter conformance layout algorithms, since any existing layout must render correctly on web. A `strict` property is present, which allows opting a component subtree into a set of [multiple behavior changes](https://fb.quip.com/l9ibAMvt6Bgu#temp:C:fMOd3c9cc6ceae04319be44e809c) to align closer to web algorithms:
+Existing apps or shared components targeting both web and mobile can safely get wins from glovally opting into stricter layout algorithms, since any existing layout must render correctly on web. A `<StrictLayout>` component allows opting a component subtree into a continually growing [set of changes](#specific-w3c-conformance-issues) to align closer to web algorithms:
 
 ```jsx
 // Shared surfaces/components can be authored with consistent rendering
@@ -40,22 +40,6 @@ Existing apps or shared components targeting both web and mobile can safely opt-
     {...}
   </StrictLayout>
 </XPlatApp>
-```
-
-There are several cases where an app otherwise using strict layout may want to opt certain trees into classic layout behavior. This can be useful both as a tool for incremental migration (starting by disabling strict layout where it causes differences), cases where code may be unable to be changed (e.g. third-party components), or as a tool to unblock fixing new algorithm issues (see “Staging” below). `LayoutMode` should offer an API which allows opting out of either all strict layout changes, or individual changes (especially useful for large migrations). 
-
-```jsx
-import CruftView from '@react-native-community/cruft-view' 
-
-// Force fully classic rendering and disable migration hints
-<ClassicLayout>
-  <CruftView />
-<ClassicLayout>
-
-// Disable a single behavior change and its migration hints
-<ClassicLayout quirks=['stale-basis-measurements']>
-   <CruftView /> 
-</ClassicLayout>
 ```
 
 ### Staging
@@ -71,9 +55,9 @@ import {unstable_StrictLayout as StrictLayout} from 'react-native'
 
 ### Implementation
 
-`StrictLayout` and `ClassicLayout` would internally change the `YGConfig` used to layout individual Yoga nodes. The most valuable implementation is in Fabric, where this code is shared between all platforms. A custom shadow node would have access to all child Yoga nodes, so a `LayoutMode` ShadowNode may traverse its full set of children to change Yoga node configuration before the root is laid out.
+`StrictLayout` and `ClassicLayout` would internally change the `YGConfig` used to layout individual Yoga nodes. The most valuable implementation is in Fabric, where this code is shared between all platforms. A custom shadow node would have access to all child Yoga nodes, so a single `RCTLayoutConfig` ShadowNode may traverse its full set of children to change Yoga node configuration before the root is laid out.
 
-For platforms where Fabric is further out (e.g. desktop), this could still be implemented, but the implementation would need to be per-platform.
+Where Fabric is potentially further out (e.g. out-of-tree platforms), this set of changes could still be implemented, but the implementation would need to be per-platform.
 
 ## Handling different default styles
 
@@ -82,22 +66,40 @@ Changing existing default styles would be an incredibly disruptive change, break
 ```jsx
 // Defaults to flexDirection: 'column'
 <View />
-
+```
+```jsx
 // Defaults to flexDirection: 'row'
 <Div /> 
 ```
 
-This direct approach of defining this translation in JS has potential to tangibly increased memory usage. ShadowNodes are pay-for-play in terms of number of properties, and while Yoga node stylesheets may be in the future (see below). This could be mitigated by new internal APIs to allow switching to web defaults on the level of a Yoga node explicitly specifying style properties at the component level.
+This direct approach of defining this translation in JS has potential to tangibly increased memory usage. ShadowNodes are pay-for-play in terms of number of properties, and Yoga stylesheets [may be in the future](#mitigating-bloat-to-heap-usage). This could possibly be mitigated as part of the `RCTLayoutConfig` internal interface.
 
 ## Fixing the ecosystem
 
-Some projects, like those already being shared with web, can migrate to strict layout safely and quickly. Others will require some amount of work, which may not be immediately valuable to their usages. This creates a situation where without incentives, strict layout would be likely to fragment the ecosystem in a way that causes pain for developers.
+Projects already sharing code with web can safely enable `StrictLayout` at their top-level to opt into a continuing set of fixes. Projects not previously targeting the web need some amount of intervention to safely adopt W3C compliant behaviors behaviors. Strict layout would then fragment the ecosystem if it didn't also offer benefits for existing projects only targeting Android and iOS.
 
-Aspirationally, we should aim to eventually make strict layout mode the default of react-native. Apart from being a more expected behavior it unlocks new opportunities for layout engine usage (see “Betting on Yoga” below).  We must take steps to create a critical mass of usage in currently active projects. We can do this by making it easy to fix code which depends on non-conforming layout, and to provide tangible benefits for doing so.
+We should instead lean towards a future where components are shareable with web by default, while quarantining components which asume previous behaviors. Apart from better code-sharing, moving the bulk of the ecosystem towards tolerating W3C behavior unlocks new opportunities for [layout engine usage](#betting-on-yoga-alternative-choices). We must take steps to create a critical mass of usage in currently active projects. We can do this by making it easy to fix code which depends on non-conforming layout, and to provide tangible benefits for doing so.
+
+### Classic layout
+
+An app otherwise using strict layout may want to opt specific component trees into classic layout behavior. This can be useful both as a tool for incremental migration (starting by disabling strict layout where it causes differences), cases where code may be unable to be changed (e.g. third-party components), or as a tool to unblock fixing [new algorithm issues](#staging). `<StrictLayout>` then needs a negatinig counterpart `<ClassicLayout>` to allows opting out of a configurable subset of changes (especially useful for large migrations). 
+
+```jsx
+// Force fully classic rendering and disable migration hints
+<ClassicLayout>
+  <CruftView />
+<ClassicLayout>
+```
+```jsx
+// Disable a single behavior change and its migration hints
+<ClassicLayout quirks=['stale-basis-measurements']>
+   <CruftView /> 
+</ClassicLayout>
+```
 
 ### Traceable styles
 
-It is not possible to statically reason about whether a given style will render differently under strict layout. We can instead rely on runtime feedback from the underlying JS engine. We can add an API to Yoga like `YGNodeAffectedByQuirk()`  to query if the engine made choices based on legacy behavior. E.g. on branching to `UseLegacyStretchBehaviour` we can calculate whether the different behavior will lead to a visible difference, and cache that on the yoga node within an existing flags buffer.
+It is not possible to statically reason about whether a given style will render differently under strict layout. We can instead rely on runtime feedback from the underlying layout engine. We can add an API to Yoga like `YGNodeAffectedByQuirk()`  to query if the engine made choices based on legacy behavior. E.g. on branching to `UseLegacyStretchBehaviour` we can calculate whether the different behavior will lead to a visible difference, and cache that on the yoga node.
 
 The Yoga Node attached to a Shadow Node is far enough away from the JS source defining a style that we need a method to correlate the two. This can be solved by a Babel transform, which inserts a correlation ID into each style, forwarded to the underlying Yoga Node. This ID can be mapped in the bundle to source location. This has a negative effect on bundle size, but should be possible to add to development mode bundles, as a debugging feature.
 
@@ -125,24 +127,18 @@ styles = StyleSheet.compose(styles, {_creationOrigin: 123})
 
 // After babel transform
 <View style={StyleSheet.compose(calculateStyle(), {_applyOrigin: 456}} />
-
-// Compound style
-<View style={[style1, style2]} />
-
-// After babel transform
-<View style={StyleSheet.compose([style1, style2], {_applyOrigin: 789}} />
 ```
 
 ### Migration hints
 
-Traceable styles let us point to what style acts differently under strict layout. React Native uses LogBox warnings for providing this sort of information to developers, but we must take care not to make them spammy or inactionable. This can be mitigated by:
+Traceable styles let us point to what makes styles acts differently under strict layout. React Native uses LogBox warnings for providing guising information to developers, but we must take care not to make them spammy or inactionable. This can be mitigated by:
 
-1. Measuring the occurrence of these warnings internally, before rolling out (they should be relatively rare)
+1. Measuring the occurrence of these warnings silently internally, before rolling out (they should be relatively rare)
 2. Disable the warnings if a user explicitly opts into classic layout (such as for abandoned third-party components)
 
->**Warning**
+>**⚠️ Warning**
 >
->A component was laid out with behavior incompatible with W3C Flexbox. See >more at https://reactnative.dev/docs/strict-layout.
+>A component was laid out with behavior incompatible with W3C Flexbox. See more at https://reactnative.dev/docs/strict-layout.
 >
 >Issue: React Native stretched your component along the main axis.
 >Fix: Add `flexGrow: 1` to your style if this was intentional or enable `<StrictLayout>` to opt into W3C behavior (no stretching).
@@ -154,7 +150,7 @@ Traceable styles let us point to what style acts differently under strict layout
 
 Future layout capabilities may depend on using an engine without the quirks of Yoga. We can enable this future flexibility, and encourage migration (avoid splitting the ecosystem) by requiring StrictLayout to use the new capabilities we add.
 
->**Error**
+>**❌ Error**
 >
 >`display: 'grid'` is only supported when using strict layout mode. See more at https://reactnative.dev/docs/strict-layout.
 >
@@ -213,7 +209,7 @@ It’s clear there is a desire for more capabilities, but there is a question of
 
 With the initial focus of building for developer experience, instead of compatibility, we need input on what the community cares about. We can derive a lot of this from asking directly, but should be opportunistic in our choices, accounting for implementation complexity.
 
-## Mitigating Bloat
+## Mitigating bloat to heap usage
 
 Yoga internally represents a stylesheet as a packed structure of all possible properties. This structure is already 192 bytes, scaling with each additional Yoga Node. As we add more styles, this could expand. Doubling the number of styles on a tree of 20,000 nodes would increase memory consumption by almost 4MB, a huge amount for some of the devices React Native targets. We should measure, and potentially switch YGStyle to a data structure which is pay-for-play in number of properties. This shift would be performance sensitive, but theoretically quick data structures exist (e.g. a bitfield header with a small-vector for larger values). 
 
@@ -227,8 +223,8 @@ The following is a non-exhaustive list of capabilities where Yoga lags browsers.
 4. **`position: fixed/sticky`:** React native does not support `position: fixed` or `position: sticky`. React Native’s closest API is `stickyHeaderIndices`, which allows top-level ScrollView items to be sticky.
 5. **`box-sizing`:** React Native does not support specifying box-sizing, and anecdotally is closest to but does not fully conform to `border-box`. implementing box-sizing allows new modes which may be conformant.
 6. **`align-content: space-evenly`:** Yoga does not supported `space-evenly` as a value for flexbox alignment.
-7. **`place-content`:** Shorthand for `align-content` and `justify-content`. Trivial to add but lower value. It raises a question on memory tradeoffs, and if we should aim to avoid properties, or make the per-node style dictionary sparser).
-8. **`inset:`** Shortland for top/left/bottom/right (similar considerations to `place-contents` as a shorthand property
+7. **`place-content`:** Shorthand for `align-content` and `justify-content`. Trivial to add but has a memory const without [sparse stylesheets](](#mitigating-bloat-to-heap-usage)).
+8. **`inset:`** Shortland for top/left/bottom/right (similar considerations to `place-contents` as a shorthand property)
 9. **Viewport based units `(vmin, vh, vw, etc)`:** React Native + Yoga does not support units derived from viewport/root node size.
 10. **Font based units `(em, rem, etc)`:** React Native + Yoga does not support units derived from the size of the current font. Configurable `fontSize`  in React Native is currently confined to text components, and will not cascade. Its pixel value would then be scaled by `fontSize` if set on a Text component or by system default font if unset on Text, or on a View.
 11. **Percentages in more places:** Some existing functionality like gap is implemented with support for pixels, but are missing support for percentage.
