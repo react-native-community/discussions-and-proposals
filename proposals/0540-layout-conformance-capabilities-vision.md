@@ -27,11 +27,11 @@ import {StrictLayout} from 'react-native';
 </StrictLayout>
 ```
 
-This style of component has downsides. React encourages encapsulation, where individual components don’t have to reason about the tree above or around them. If `StrictLayout` were to radically shift behavior, it would require component authors to reason about more state outside of their component and negatively impact developer experience. For this reason `StrictLayout` **does not** change the default styles of a component tree. It instead is focused on algorithm correctness, and will only cause changes where components were previously relying on behavior divergent from browsers. After StrictMode is [stable](#staging), we will start flagging to developers where their component rendering is reliant on out-of-spec behavior, and attempt to offer actionable guidance (see “Migration Hints” below).
+This style of component has downsides. React encourages encapsulation, where individual components don’t have to reason about the tree above or around them. If `StrictLayout` were to radically shift behavior, it would require component authors to reason about more state outside of their component and negatively impact developer experience. For this reason `StrictLayout` **does not** change the default styles of a component tree. It instead is focused on algorithm correctness, and will only cause changes where components were previously relying on behavior divergent from browsers. After StrictMode is [stable](#staging), we will start flagging to developers where their component rendering is reliant on out-of-spec behavior, and attempt to offer [actionable guidance](#migration-hints).
 
 ### Usage
 
-Existing apps or shared components targeting both web and mobile can safely get wins from glovally opting into stricter layout algorithms, since any existing layout must render correctly on web. A `<StrictLayout>` component allows opting a component subtree into a continually growing [set of changes](#specific-w3c-conformance-issues) to align closer to web algorithms:
+Existing apps or shared components targeting both web and mobile can safely get wins from globally opting into stricter layout algorithms, since any existing layout must render correctly on web. A `<StrictLayout>` component allows opting a component subtree into a continually growing [set of changes](#specific-w3c-conformance-issues) to align closer to web algorithms:
 
 ```jsx
 // Shared surfaces/components can be authored with consistent rendering
@@ -136,26 +136,26 @@ Traceable styles let us point to what makes styles acts differently under strict
 1. Measuring the occurrence of these warnings silently internally, before rolling out (they should be relatively rare)
 2. Disable the warnings if a user explicitly opts into classic layout (such as for abandoned third-party components)
 
->**⚠️ Warning**
+> **⚠️ Warning**
 >
->A component was laid out with behavior incompatible with W3C Flexbox. See more at https://reactnative.dev/docs/strict-layout.
+> A component was laid out with behavior incompatible with W3C Flexbox. See more at https://reactnative.dev/docs/strict-layout.
 >
->Issue: React Native stretched your component along the main axis.
->Fix: Add `flexGrow: 1` to your style if this was intentional or enable `<StrictLayout>` to opt into W3C behavior (no stretching).
+> Issue: React Native stretched your component along the main axis.
+> Fix: Add `flexGrow: 1` to your style if this was intentional or enable `<StrictLayout>` to opt into W3C behavior (no stretching).
 >
->View: Widget.js:123
->Style: Widget.js:60
+> View: Widget.js:123<br>
+> Style: Widget.js:60
 
-### Capability Lockout
+### Restriction to conformant trees
 
 Future layout capabilities may depend on using an engine without the quirks of Yoga. We can enable this future flexibility, and encourage migration (avoid splitting the ecosystem) by requiring StrictLayout to use the new capabilities we add.
 
->**❌ Error**
+> **❌ Error**
 >
->`display: 'grid'` is only supported when using strict layout mode. See more at https://reactnative.dev/docs/strict-layout.
+> `display: 'grid'` is only supported when using strict layout mode. See more at https://reactnative.dev/docs/strict-layout.
 >
->View: Widget.js:123
->Style: Widget.js:60
+> View: Widget.js:123<br>
+> Style: Widget.js:60
 
 ## Betting on Yoga (Alternative Choices)
 
@@ -205,7 +205,7 @@ While not a W3C conformance issue, React Native doesn’t expose the DOMs method
 
 React Native does not implement the full set of browser CSS features. Apart from higher level concepts like stylesheets, selectors, and cascading (which can largely be supplanted by CSS-in-JS solutions shared between RN and browser), React Native doesn’t implement all style properties.
 
-It’s clear there is a desire for more capabilities, but there is a question of which should be added. React Native should enable skills to be transferable, offer a stellar developer experience, and enable substantial code-sharing (while being leaner than a browser). A natural conflict is whether to prioritize building for compatibility (existing usages), or for developer experience. Given the capability lockout strategy, ecosystem traction is dependent on building out features developers would like to use, in their existing React Native projects. 
+It’s clear there is a desire for more capabilities, but there is a question of which should be added. React Native should enable skills to be transferable, offer a stellar developer experience, and enable substantial code-sharing (while being leaner than a browser). A natural conflict is whether to prioritize building for compatibility (existing usages), or for developer experience. [Adoption of conformant layout](#restriction-to-conformant-trees) is dependent on building out features developers would like to use, in their existing React Native projects. 
 
 With the initial focus of building for developer experience, instead of compatibility, we need input on what the community cares about. We can derive a lot of this from asking directly, but should be opportunistic in our choices, accounting for implementation complexity.
 
