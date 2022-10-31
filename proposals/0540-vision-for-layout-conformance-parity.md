@@ -144,8 +144,8 @@ Traceable styles let us point to what makes styles acts differently under strict
 > Issue: React Native stretched your component along the main axis.
 > Fix: Add `flexGrow: 1` to your style if this was intentional or enable `<StrictLayout>` to opt into W3C behavior (no stretching).
 >
-> View: Widget.js:123<br>
-> Style: Widget.js:60
+> View: Widget.jsx:60<br>
+> Style: Widget.jsx:123
 
 ### Restriction to conformant trees
 
@@ -155,8 +155,8 @@ Future layout capabilities may depend on using an engine without the quirks of Y
 >
 > `display: 'grid'` is only supported when using strict layout mode. See more at https://reactnative.dev/docs/strict-layout.
 >
-> View: Widget.js:123<br>
-> Style: Widget.js:60
+> View: Widget.jsx:80<br>
+> Style: Widget.jsx:146
 
 ## Betting on Yoga (Alternative Choices)
 
