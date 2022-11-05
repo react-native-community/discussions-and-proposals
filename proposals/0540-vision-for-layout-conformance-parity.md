@@ -76,7 +76,7 @@ This direct approach of defining this translation in JS has potential to tangibl
 
 ## Fixing the ecosystem
 
-Projects already sharing code with web can safely enable `StrictLayout` at their top-level to opt into a continuing set of fixes. Projects not previously targeting the web need some amount of intervention to safely adopt W3C compliant behaviors behaviors. Strict layout would then fragment the ecosystem if it didn't also offer benefits for existing projects only targeting Android and iOS.
+Projects already sharing code with web can safely enable `StrictLayout` at their top-level to opt into a continuing set of fixes. Projects not previously targeting the web need some amount of intervention to safely adopt W3C compliant behaviors. Strict layout would then fragment the ecosystem if it didn't also offer benefits for existing projects only targeting Android and iOS.
 
 We should instead lean towards a future where components are shareable with web by default, while quarantining components which asume previous behaviors. Apart from better code-sharing, moving the bulk of the ecosystem towards tolerating W3C behavior unlocks new opportunities for [layout engine usage](#betting-on-yoga-alternative-choices). We must take steps to create a critical mass of usage in currently active projects. We can do this by making it easy to fix code which depends on non-conforming layout, and to provide tangible benefits for doing so.
 
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
 
 ### Migration hints
 
-Traceable styles let us point to what makes styles acts differently under strict layout. React Native uses LogBox warnings for providing guising information to developers, but we must take care not to make them spammy or inactionable. This can be mitigated by:
+Traceable styles let us point to what makes styles acts differently under strict layout. React Native uses LogBox warnings for providing guiding information to developers, but we must take care not to make them spammy or inactionable. This can be mitigated by:
 
 1. Measuring the occurrence of these warnings silently internally, before rolling out (they should be relatively rare)
 2. Disable the warnings if a user explicitly opts into classic layout (such as for abandoned third-party components)
