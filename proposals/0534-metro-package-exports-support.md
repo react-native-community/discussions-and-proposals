@@ -1,11 +1,11 @@
 ---
-title: Package exports and strict entry points support in Metro
+title: Package exports support in Metro
 author:
 - Alex Hunt <alexeh@meta.com>
 date: 2022-10-17
 ---
 
-# RFC0534: Package exports and strict entry points support in Metro
+# RFC0534: Package exports support in Metro
 
 ## Summary
 
@@ -29,7 +29,9 @@ The `"exports"` field is an expanded way for npm packages to define entry points
 
 https://nodejs.org/docs/latest-v18.x/api/packages.html#package-entry-points
 
-With `"exports"` support enabled, Metro will need to resolve paths appropriately based on what is defined by each package. We are proposing that package maintainers will be able to opt into strict handling of `"exports"`, with lenient and backwards compatible behaviour by default.
+With `"exports"` support enabled, Metro will need to resolve paths appropriately based on what is defined by each package.
+
+In this first iteration, we intend for `"exports"` paths to be handled inclusively on top of current resolution behaviour. In a future proposal, package maintainers will be able to opt into strict handling of `"exports"`.
 
 ```js
 import MyPackage from 'my-package';
@@ -47,12 +49,15 @@ Developers using React Native should be able to use current JavaScript standards
 
 React Native developers expect a seamless experience when consuming packages from npm. Supporting `"exports"` within Metro has been a specific pain point ([facebook/metro#670](https://github.com/facebook/metro/issues/670)), with this feature having been adopted by other bundlers and a growing proportion of the JavaScript ecosystem.
 
+We intend to initially roll out lenient and backwards compatible support for `"exports"` features. We posit that compatibility with `"exports"` packages is the most immediate unit of benefit we can provide to app developers, while keeping the surface area and upgrade guidance minimal for package maintainers.
+
 The expected outcomes are that:
 
 1. React Native projects will work with more npm packages out-of-the-box. Packages using `"exports"` will have associated non-breaking behaviours respected under Metro (described in the next section).
 2. [React Native for Web](https://necolas.github.io/react-native-web/) projects will work with more npm packages out-of-the-box due to better-aligned resolution of the `"browser"` and `"react-native"` runtimes under `"exports"`.
-3. We will provide a migration path for React Native (and other, willing) package maintainers to opt into strict and spec-compliant handling of `"exports"` under Metro, via a breaking release.
-    - Headline benefit: Enforced encapsulation of private modules (and therefore reduced surface area for misuse/bugs).
+3. Package maintainers will have less ambiguity and more control over which entry points are provided to React Native projects under `"exports"`.
+
+At a later date, we will revisit strict mode in a separate proposal (initially drafted in earlier versions of this doc: [\#534](https://github.com/react-native-community/discussions-and-proposals/pull/534)).
 
 ## Priorities within this proposal
 
@@ -106,10 +111,7 @@ This is the primary breaking change introduced by `"exports"`.
 }
 ```
 
-**Proposed**:
-
-- By default, Metro will ignore this constraint. We will log a warning when an inaccessible import is accessed.
-- Under strict handling, Metro will prevent inaccessible imports and surface a resolution error to the developer.
+**Proposed**: Metro will ignore this constraint (reserved for a future strict mode). We will log a warning when an inaccessible import is accessed.
 
 ### Subpath exports
 
@@ -138,7 +140,7 @@ One edge case is a path conflict, for instance if the file tree for this package
 
 Illustration of subpath resolution for the above conflict example:
 
-| | Default handling (non-strict) | Strict handling |
+| | Default handling (proposed) | Future strict handling |
 | - | - | - |
 | `'pkg/submodule.js'` | `./submodule.js` | `./src/submodule.js` |
 | `'pkg/src/submodule.js'` | `./src/submodule.js` | (Inaccessible) |
@@ -187,7 +189,7 @@ This feature has a lower prioritisation due to possible implementation complexit
 > Package authors should provide either extensioned (`import 'pkg/subpath.js'`) [...] or extensionless (`import 'pkg/subpath'`) [...] subpaths [...] This ensures that there is only one subpath for each exported module so that all dependents import the same consistent specifier.\
 — https://nodejs.org/docs/latest-v18.x/api/packages.html#extensions-in-subpaths
 
-This detail has the potential to conflict with React Native's [platform-specific extensions](https://reactnative.dev/docs/platform-specific-code#platform-specific-extensions), if extensionless subpaths are not offered by the package, under strict handling. Metro's existing resolution behaviour (without `"exports"`) is as follows:
+This detail has the potential to conflict with React Native's [platform-specific extensions](https://reactnative.dev/docs/platform-specific-code#platform-specific-extensions), if extensionless subpaths are not offered by the package. Metro's existing resolution behaviour (without `"exports"`) is as follows:
 
 ```js
 // For extensions in `resolver.sourceExts`
@@ -209,11 +211,10 @@ The second case above demonstrates less intuitive existing functionality within 
 
 **Proposed**:
 
-- Keep current behaviour: Metro will try platform extension variants when resolving both extensionless and extensioned subpaths via `"exports"`.
-- Under strict behaviour, Metro will treat extensioned imports as direct imports and will not attempt to resolve platform extensions.
-- We will communicate to React Native package authors that extensionless exports should be preferred, since they allow the ability to introduce platform-specific modules where needed.
+- Keep current behaviour: Metro will try platform extension variants when resolving both extensionless and extensioned subpaths via `"exports"` (which are appended and not replaced).
+- We will communicate to React Native package authors that extensionless exports should be preferred, since they allow the ability to introduce platform-specific modules where needed. (Note: Will depend on a future decision to keep or drop this feature under `"exports"` strict mode.)
 
-Not committed to in this RFC: We are considering deprecating or changing support for `.native.js` (raised in [facebook/metro#874](https://github.com/facebook/metro/pull/874)). This could be coupled with `"exports"` strict behaviour.
+Not committed to in this RFC: We are considering deprecating or changing support for `.native.js` (raised in [facebook/metro#874](https://github.com/facebook/metro/pull/874)).
 
 ### Conditional exports
 
@@ -272,38 +273,32 @@ For React Native projects, we have historically implemented no distinction betwe
 Analysing the [Community Conditions Definitions](https://nodejs.org/docs/latest-v18.x/api/packages.html#community-conditions-definitions) documented in the Node.js spec and introduced previously:
 
 - We note that `"browser"`, representing any web browser environment, is an established use case that will make sense to support in Metro — enabling packages to work seamlessly in React Native web apps.
-- We see a space for `"react-native"`, representing a React Native runtime environment (i.e. Hermes or JavaScript Core VMs), to be introduced — enabling packages to make compatibility or performance decisions around this in select cases.
+- We see a space and community need for a `"react-native"` condition to be available under `"exports"`, replacing the existing `"react-native"` top-level field.
 
-#### Current misalignment
+#### Improving current behaviour
 
-Metro supports the [top-level `"browser"` field spec](https://github.com/defunctzombie/package-browser-field-spec) and a derivation of this, `"react-native"`. While our functionality around these fields is equivalent in concept to the proposed `"exports"` conditions, they differ in behaviour. We have the opportunity to replace these with more intuitive and community-aligned versions when translated to `"exports"`.
+Metro supports equivalent behaviour currently with the [top-level `"browser"` field spec](https://github.com/defunctzombie/package-browser-field-spec) and our custom top-level `"react-native"` field.
 
-This can be seen in the defaults for Metro's [`resolverMainFields` option](https://facebook.github.io/metro/docs/configuration/#resolvermainfields) (applied by React Native CLI). As this is a static list of top-level fields, the resolver will invariantly prioritise `"react-native"` over `"browser"`:
+A pain point for developers has been the inability for packages to specify priority when using both of these fields, where the `"react-native"` entry point has historically been prioritised instead of `"browser"` in a react-native-web project. This (we believe) went against the general assumption of community package authors (in addition to React app developers) who intuitively expect `"browser"` to be used on web ([example](https://github.com/expo/router/issues/37)).
 
-```js
-resolverMainFields: ['react-native', 'browser', 'main'],
-```
-
-We believe this default is non-ideal as it inhibits packages using the `"browser"` field spec from targeting react-native-web — instead working only for React Native-specific `.web.js` extensions. We believe the majority of non-React Native community package authors (in addition to React app developers) expect `"browser"` to used on web.
-
-This default is directly misaligned with react-native-web via Webpack  ([docs](https://webpack.js.org/guides/package-exports/#target-environment)), which is used by a majority of users.
+As we translate these conditions to `"exports"`, this can be improved due to the order-sensitivity of conditional exports — which moves control of which conditions are matched to package authors.
 
 **Proposed**:
 
-- **Breaking**: We will implement the `"browser"` condition name — changed from the top-level field to be selected when the React Native platform is `'web'`.
-- **Breaking**: We will introduce a `"react-native"` condition name — changed from the top-level field to represent a native React Native JS runtime environment (and not web).
+- We will implement the `"browser"` condition name. This will not be implicitly preferred over `"react-native"`, but will be read in the order specified by the package (per Node spec).
+- We will introduce a `"react-native"` condition name representing all React Native projects (native and web). Metro will match this condition when configured for React Native (see next section).
 - Metro will not provide an implementation for other community conditions.
-
-Combined, this is the only breaking change we foresee in Metro that will immediately impact app developers, and which we are not deferring via strict mode opt-in. It will align behaviour for existing users of react-native-web via Webpack.
 
 | Condition name | Description | Node.js | Webpack | Metro (proposed) |
 | - | - | - | - | - |
 | `"browser"` | Any web browser environment | - | Matched when `platform === 'web'` | Matched when `platform === 'web'` |
-| `"react-native"` [New] | Any React Native runtime environment (non-browser) | - | Matched when `platform !== 'web'` | Matched when `platform !== 'web'` |
+| `"react-native"` [New] | Matched by the React Native framework (all  platforms) | - | Matched for React Native projects (when configured) (and/or "TBD" — [source](https://github.com/webpack/webpack.js.org/blob/65fa2e141b93b1fd4ef418ca85348c0ddebbd4e3/src/content/guides/package-exports.mdx?plain=1#L282-L294)) | Matched for React Native projects (when configured) |
 | All other | | (unimplemented) | Various supported, e.g. `"deno"`, `"worker"`, `"electron"` | (unimplemented) |
 | `"default"`| Makes no assumption about JS environment | Always matched | Always matched | Always matched |
 
-Note: Now that `"react-native"` and `"browser"` will not overlap, packages intending to support both native and web environments but which want to expose alternative `"exports"` targeting *React Native **APIs*** should continue to use the `"default"` condition and use a [subpath export](#subpath-exports) instead: e.g. `import { reactNativeExport } from 'some-pkg/react-native'`.
+Under this model, `"react-native"` and `"browser"` will continue to overlap. However, because earlier conditional exports entries have higher priority, package maintainers will have more fine-grained control over what is selected for their package — e.g. enabling matching of native platforms only when listed after `"browser"`.
+
+Note: Packages intending to support both native and web environments but which want to expose alternative `"exports"` targeting *React Native **APIs*** should consider continuing to use the `"default"` condition and use a [subpath export](#subpath-exports) instead: e.g. `import { reactNativeExport } from 'some-pkg/react-native'`.
 
 ### Conditional exports: User conditions
 
@@ -313,13 +308,15 @@ Prior art: [Webpack's `resolve.conditionNames`](https://webpack.js.org/configura
 
 **Proposed**:
 
-- P1 (not targeted in first iteration): We will provide a new config option within `metro.config.js` allowing app developers to define additional condition names which statically extend the default conditions matched.
+- We will provide a new config option within `metro.config.js` allowing app developers to define additional condition names which statically extend the default conditions matched.
+    - A default value of `['react-native']` will be applied by React Native CLI ([as with the existing `resolverMainFields` and `platforms` options](https://github.com/huntie/react-native-cli/blob/3c80c062acb1d4a5490d32a28b5fb62cbe0abe64/packages/cli-plugin-metro/src/tools/loadMetroConfig.ts#L92-L93C60)).
 
 ```js
 module.exports = {
   // ...
   resolver: {
-    conditionNames: ['browser', 'production'],
+    // Default: ['react-native']
+    conditionNames: ['worker', 'production'],
   },
 };
 ```
@@ -328,63 +325,32 @@ The exact name and shape of this option may change during implementation.
 
 In addition, `resolver.resolveRequest` will continue to provide an escape hatch from Metro's handling of conditional exports, should an app need to override imports from a given package.
 
-### Opting into strict `"exports"` handling
+### Additional consideration: Jest
 
-Since we are late to support `"exports"`, we cannot guarantee that enabling spec-compliant behaviour will not break existing users' apps. Even when we assume that packages have enabled `"exports"` via a breaking release, React Native projects may have updated to these under Metro's previous behaviour.
+Because Metro's implementation of `"exports"` will not be strict, package resolution behaviour will be misaligned between Metro and Jest (where support was [added in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28#packagejson-exports)). In projects consuming several exports-enabled dependencies, it is likely that misalignments will lead to confusing test failures.
 
-Therefore, Metro will default to lenient and backwards compatible behaviour, as has been noted in previous sections. We will provide an explicit opt-in method for strict handling, placing the responsibility for migration on React Native package authors. This allows these maintainers to have control over how their package behaves and to reconsider the exposed API under `"exports"`.
+Ideally, we can make use of the custom React Native test env introduced in [facebook/react-native#34971](https://github.com/facebook/react-native/pull/34971) to align major differences.
 
 **Proposed:**
 
-- Provide a strict mode opt-in for packages, enabling spec-compliant behaviour under Metro.
-- Use non-strict handling by default, which will be a non-breaking change for app developers.
-
-The new flag will be exposed as a `reactNative.metroExportsMode` field within `package.json`.
-
-```js
-{
-  "name": "my-package",
-  "exports": {...},
-  // ...
-  "reactNative": {
-    "metroExportsMode": "strict"
-  }
-}
-```
-
-Note: `"reactNative"` (in camel case) will be a distinct field from `"react-native"` (in dash case, used as a `"main"` module alias that we are starting to deprecate with `"exports"`). We are [separately considering a `‌"newArchSupport"` option](https://github.com/microsoft/rnx-kit/issues/1863#issuecomment-1246580474) within this new top-level key, which will encapsulate options available to React Native packages.
-
-#### Behaviour under `"nonstrict"` mode (default)
-
-- Any subpaths are importable (package encapsulation is not enforced).
-- When ambiguous, subpaths outside `"exports"` are preferred.
-- `"exports"` can be mixed with top-level `"browser"` and `"react-native"` fields.
-- **Breaking**: Conditions targeting `"react-native"` within `"exports"` will no longer match for react-native-web, unlike the previous `"react-native"` top-level field.
-- All other features of `"exports"` are respected.
-
-#### Behaviour under `"strict"` mode
-
-- **Breaking**: Inaccessible subpaths are non-importable.
-- **Breaking**: Platform-specific extensions will only be resolved for `"exports"` subpaths without file extensions.
-- Metro will validate that `"exports"` cannot be mixed with top level `"browser"` or `"react-native"` fields.
+- Update [`customExportConditions `](https://jestjs.io/blog/2022/04/25/jest-28#packagejson-exports) in React Native's project template to include `"react-native"`.
+- P1 (not targeted in first iteration): Align non-strict resolution in Jest via available configuration in React Native's Jest environment (potentially exposing a relevant integration point in metro-resolver).
 
 ## Adoption strategy
 
 ### Metro rollout
 
-We plan to deliver `"exports"` functionality to app developers via a future major release of Metro once we consider P0 functionality to be stable. Before this point, we will ship an experimental Metro config option (likely, `resolver.experimentalPackageExports`) allowing app and package developers to preview functionality.
+We plan to deliver `"exports"` functionality to app developers via a major release of Metro once we consider P0 functionality to be stable. Before this point, we will ship an experimental Metro config option (likely, `resolver.experimentalPackageExports`) allowing app and package developers to preview functionality.
 
-A major release will be warranted to deliver the indirect breaking change to the handling of `"browser"` and `"react-native"` conditions. However, all other features of `"exports"` at this stage will be lenient and backwards-compatible as described in *[Behaviour under `"nonstrict"` mode](#behaviour-under-nonstrict-mode-default)*.
+While no breaking changes are expected, because existing packages may have had differing assumptions about module resolution under `"exports"` in React Native, we will mark this as a major release.
 
-We anticipate an easy upgrade for app developers — with changes only likely to affect the subset of developers using react-native-web with Metro (non-default) or standalone web projects with Metro. In addition to current handling in Webpack, Expo will have aligned on this new default before us ([expo/expo#19529](https://github.com/expo/expo/pull/19529)).
+We anticipate an easy upgrade for app developers — with changes only likely to affect the subset of developers using react-native-web with Metro (non-default) or standalone web projects with Metro — due to the order-sensitivity of `"browser"` and `"react-native"` conditions under `"exports"`.
 
 ### Package adoption
 
-We will recommend that packages should start adopting `"metroExportsMode": "strict"` ([described above](#opting-into-strict-exports-handling)) at the point of the next major React Native release that includes `"exports"`-ready Metro.
+We will recommend that packages should start adopting `"exports"` at the point of the next major React Native release that includes `"exports"`-ready Metro.
 
-Package authors will then be able to drive this migration, reaching app developers in either minor or breaking package releases. We anticipate more breaking changes to materialise with these enforced changes to packages, such as from package encapsulation.
-
-We anticipate adoption on this side to be gradual. `"exports"` and `"metroExportsMode": "strict"` will be recommended, but not mandated — see next section.
+Package authors will then be able to drive this migration, reaching app developers in either minor or breaking package releases. We anticipate this adoption will be gradual. While consuming projects with Metro will use non-strict handling we will recommend that most packages define a spec-ready list of exports rather than exporting all entry points.
 
 ## How we teach this
 
@@ -400,56 +366,18 @@ A visible place we can indicate incompatibilities with the `"exports"` spec betw
 
 ### Updating package.json boilerplate in template projects
 
-We will update the following templates/tools used to scaffold React Native libraries to use `"exports"` and `‌"metroExportsMode": "strict"`:
+We will update the following templates/tools used to scaffold React Native libraries to use `"exports"` over the `"main"` field:
 
 - [create-react-native-library](https://www.npmjs.com/package/create-react-native-library)
 
 ### Metro/React Native website blog post
 
-On completion, we will publish a new article on the availability of `"exports"` in React Native. This will include (or be wholly focused around) examples and recommendations to on updating packages to use `"exports"` as either a non-breaking or breaking release.
+On completion, we will publish a new article on the availability of `"exports"` in React Native. This will include (or be wholly focused around) examples and recommendations to on updating packages to use `"exports"` as either a non-breaking or breaking release. The article may preview the future intended behaviour of opt-in strict handling, enabling package encapsulation and spec-compliant resolution.
 
 ## Unresolved questions
-
-### Removing the overlap of `"react-native"` and `"browser"`
-
-#### Is this conceptually right?
-
-Introducing the `"react-native"` condition name will be non-equivalent to the previous `"react-native"` top-level field (which is prioritised over `"browser"` and we are planning to invert). This hinges on:
-
-- What does the community think currently when targeting `"react-native"`?
-    - Assumption: *React Native for mobile or other non-web platforms*.
-- Will the proposed treatment of `"react-native"` representing the React Native runtime (but not `react-native-web`) be clear enough?
-
-#### Should we bring forward this change on the existing top-level fields?
-
-As our current handling of the `"browser"` and `"react-native"` top-level is mismatched from the condition names we are introducing with `"exports"`, packages may end up with conflicting behaviour in the same `package.json`.
-
-```js
-{
-  "main": "./index.js",
-  "browser": "./index.browser.js", // Overridden by "react-native", even on web
-  "react-native": "./index.react-native.js"
-  "exports": {
-    ".": {
-      "browser": "./index.browser.js", // Changed: Used if platform == 'web'
-      "react-native": "./index.react-native.js",
-      "default": "./index.js"
-    }
-  }
-}
-```
-
-We have the opportunity to tackle the alignment of this ahead of time to avoid confusion. We know that the existing behaviour is in most cases unhelpful. This could be actioned swiftly by changing defaults in React Native CLI and Expo Web (**update**: the latter is incoming in [expo/expo#19529](https://github.com/expo/expo/pull/19529)).
-
-At minimum, we will describe in the docs that the handling of these keys within `"exports"` is fixed, whereas the top-level fields are configured per app (the `"react-native"` preference is set by React Native CLI, not Metro).
 
 ### Use cases for custom condition names
 
 We are asking for input on the usefulness of this feature and use cases for apps, e.g. static `"development"` and `"production"` conditions.
 
 If there is a clear case that projects will benefit from dynamic configuration of matched condition names (e.g. per platform), this will inform config design.
-
-### Eventual deprecation of `"metroExportsMode": "strict"`
-
-We anticipate that the majority of npm packages outside React Native libraries will not make use of this option. It will make sense to flip this default in a future version of Metro. Before this point however, we will likely introduce a config option for app developers to opt into "force strict" handling, given they see no `"exports"`-related Metro warnings for their project.
-
