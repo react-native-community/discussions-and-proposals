@@ -221,13 +221,15 @@ import BazComponent from './BazComponent.mjs';
 
 **Proposed**:
 
-- **Breaking**: Under `"exports"`, we will remove support for platform-specific extensions.
+- **Breaking**: Under `"exports"`, Metro will not resolve platform-specific extensions for listed package entry points.
     - When resolving any import specifier:
         - If the package defines `"exports"` and the exact specifier is matched, the package-defined path will be used.
         - If there is no match in `"exports"`, Metro will look for files at the imported subpath, trying all extension variants (existing resolution logic).
-- Platform-specific extensions will narrow to a concept aimed at React Native app codebases, rather than for both apps and packages. We will communicate to React Native package authors that alternative patterns such as `Platform.select()` should be used.
-    - We have no near-term plans to drop platform-specific extensions for packages not using `"exports"`.
+- With this decision, we will have narrowed support for platform-specific extensions in packages. We will communicate to React Native package authors that alternative patterns should be used.
+    - We have no near-term plans to drop platform-specific extensions for packages not using `"exports"`, or in app code.
 - We will not take a strong stance on using extensionless or extensioned imports. The former may provide more flexibility for React Native package authors to change extensions in future without impacting consuming apps.
+
+Note: We may yet (unplanned) independently make the platform-specific extensions feature work with extensioned specifiers, at which point this could be opened back up on `"exports"` entry points.
 
 #### Illustrated
 
@@ -259,7 +261,26 @@ import FooComponent from 'pkg/src/FooComponent';
 
 The last example given is not expected to enable backwards compatibility, but may serendipitously capture pre-existing imports in apps. In a future strict mode, paths outside `"exports"` will not be considered.
 
-We will recommend that packages which rely on platform-specific extensions being available to consuming apps do not migrate to `"exports"` or change these entry points to handle platforms using `Platform.select()` or conditional exports.
+#### Workarounds
+
+We will recommend that packages which rely on platform-specific extensions being available to consuming apps do not migrate to `"exports"` or update these entry points to handle platform internally.
+
+One replacement pattern (besides `Platform.select()`) is a wrapper module:
+
+```sh
+└── src
+    ├── FooComponent.js # Listed in "exports"
+    ├── FooComponentImpl.android.js
+    ├── FooComponentImpl.ios.js
+    └── FooComponentImpl.js
+```
+
+```js
+// pkg/src/FooComponent.js
+export * from './FooComponentImpl'; // Will resolve platform exts
+```
+
+Conditional exports will be the recommended solution for replacing current `.native.js` entry points where aiming to identify React Native projects.
 
 ### Conditional exports
 
