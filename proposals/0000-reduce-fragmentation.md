@@ -488,6 +488,14 @@ Support the `document` object for common patterns such as listening to document 
 * [ ] `scroll`.
 * [ ] `visibilitychange`.
 
+## IntersectionObserver
+
+Support the [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) API for observing the intersection of target elements. This can also be used as a building block for performance tooling.
+
+## MutationObserver
+
+Support the latest [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API for watching changes to the host node tree. This can also be used as a building block for performance tooling.
+
 ## ResizeObserver
 
 Support the latest [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) API for responding the changes in the size of elements. Note that this API no longer includes positional coordinates and is optimized for width/height information.
