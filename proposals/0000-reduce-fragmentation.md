@@ -363,6 +363,8 @@ srcList.forEach((src) => {
 
 # Styles API (CSS subset)
 
+The styling capabilities of React Native should be significantly expanded to cover more of the features that are heavily relied upon by web engineers. Furthermore, React Native needs to gracefully handle unknown style properties or values as is expected on the web. Rather than hard crashing it could print warnings to bring attention to any styles that are not currently supported on native.
+
 ## StyleSheet
 
 * [ ] Deprecate `StyleSheet.absoluteFill`. Use `position:'absolute';inset:0;` instead.
@@ -371,6 +373,7 @@ srcList.forEach((src) => {
 * [ ] Deprecate `StyleSheet.flatten()`. This API encourages runtime introspection of styles in render calls. This pattern is a performance cost (flattening arrays of objects), and prevents us from supporting build-time optimizations for web (e.g., extracting styles to CSS files).
 * [ ] Deprecate or rename `setStyleAttributePreprocessor` (e.g., `unstable_setStyleAttributePreprocessor`).
 * [ ] `StyleSheet.create()` should obfuscate styles to prevent introspection (i.e., revert identify function change). On web, we need to be able to remove the JavaScript style objects from bundles to support build-time optimization like extraction to CSS files.
+* [ ] `StyleSheet` should be a function that returns native props, e.g., `const nativeProps = StyleSheet(...styles)`. On web, this is used to pass DOM `className` and `style` props, whereas on native it can be used to pass flattened/transformed styles and any other other native props to native components.
 
 ## CSS compatibility
 
@@ -386,7 +389,7 @@ srcList.forEach((src) => {
 * [ ] `textShadow`. Add native support for CSS text shadows.
 * [x] `transform`. Support using string values to set transforms.
 * [x] `verticalAlign` is equivalent to `textAlignVertical`.
-* [ ] `visiblity`. Add support for visually hiding elements.
+* [ ] `visibility`. Add support for visually hiding elements.
 * [x] `userSelect`. Equivalent to using `selectable` prop on `<Text>`.
 
 ## CSS Logical Properties
