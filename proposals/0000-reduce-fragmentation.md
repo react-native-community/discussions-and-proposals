@@ -375,26 +375,21 @@ The styling capabilities of React Native should be significantly expanded to cov
 * [ ] `StyleSheet.create()` should obfuscate styles to prevent introspection (i.e., revert identify function change). On web, we need to be able to remove the JavaScript style objects from bundles to support build-time optimization like extraction to CSS files.
 * [ ] `StyleSheet` should be a function that returns native props, e.g., `const nativeProps = StyleSheet(...styles)`. On web, this is used to pass DOM `className` and `style` props, whereas on native it can be used to pass flattened/transformed styles and any other other native props to native components.
 
-## CSS compatibility
+## CSS Compatibility
+
+Existing properties that can be adjusted to align with the CSS spec.
 
 * [x] `aspectRatio`. Support string values, i.e., `'16 / 9'`, to align with CSS.
-* [ ] `backgroundImage`. Add support for setting background images via `url()`. Stretch: support CSS gradients.
-* [ ] `boxShadow`. Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles.
 * [x] `fontVariant` support space-separated string values to align with CSS.
 * [x] `fontWeight` support number values to align with React DOM / CSS.
-* [ ] `lineClamp` is equivalent to `numberOfLines` prop on `<Text>` components.
 * [x] `objectFit` is equivalent to `resizeMode` for `<Image>`.
 * [x] `pointerEvents` is equivalent to `pointerEvents` prop.
 * [ ] `position`. Support for `fixed` and `sticky` values.
-* [ ] `textShadow`. Add native support for CSS text shadows.
 * [x] `transform`. Support using string values to set transforms.
 * [x] `verticalAlign` is equivalent to `textAlignVertical`.
-* [ ] `visibility`. Add support for visually hiding elements.
 * [x] `userSelect`. Equivalent to using `selectable` prop on `<Text>`.
 
-## CSS Logical Properties
-
-Support CSS logical property names, i.e., `paddingInlineStart` rather than only non-standard `paddingStart`. Support subtree-level logical properties, where setting the `dir` prop to `ltr` or `rtl` alters the way logical properties are resolved. Currently, React Native only supports global writing direction configuration for Android.
+Existing logical properties that can be adjusted to adopt the CSS standard names. In addition, React Native will need to add native support for subtree-level writing direction controls. Setting the `dir` prop (or `direction` style) to `ltr` or `rtl` on an element should alter the way logical properties are resolved in the subtree.
 
 * [ ] `direction` is equivalent to `writingDirection`.
 * [ ] `borderEndEndRadius` is equivalent to `borderBottomEndRadius`.
@@ -439,6 +434,36 @@ Support CSS logical property names, i.e., `paddingInlineStart` rather than only 
 * [ ] `insetInlineEnd` is equivalent to `right` or `left`.
 * [ ] `insetInlineStart` is equivalent to `right` or `left`.
 
+## CSS Animations
+
+Support declarative keyframes and animations that can be optimized on the native side and avoid the need for `Animated`. Consider dispatching the corresponding W3C animation events too. See [animation](https://developer.mozilla.org/en-US/docs/Web/CSS/animation)).
+
+## CSS Colors
+
+Support CSS 4 Colors using [Colorjs.io](https://colorjs.io/).
+
+## CSS Container Queries
+
+Prepare for [CSS Container Queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries).
+
+## CSS Custom Properties
+
+Support CSS custom property syntax `--variable-name`. This could be shimmed in user-space on top of the existing `StyleSheet` API, with a React Context used to provide variables and values to a subtree.
+
+## CSS Filters
+
+Support declarative filters as used by the CSS [filter](https://developer.mozilla.org/en-US/docs/Web/CSS/filter) style.
+
+## CSS Functions
+
+* [ ] `calc()`(https://developer.mozilla.org/en-US/docs/Web/CSS/calc)
+* [ ] `clamp()`(https://developer.mozilla.org/en-US/docs/Web/CSS/clamp)
+* [ ] `max()`(https://developer.mozilla.org/en-US/docs/Web/CSS/max)
+* [ ] `min()`(https://developer.mozilla.org/en-US/docs/Web/CSS/min)
+* [ ] `minmax()`(https://developer.mozilla.org/en-US/docs/Web/CSS/minmax)
+* [ ] `url()`(https://developer.mozilla.org/en-US/docs/Web/CSS/url)
+* [ ] `var()`(https://developer.mozilla.org/en-US/docs/Web/CSS/var)
+
 ## CSS Lengths
 
 Support major units where supported by CSS.
@@ -449,29 +474,42 @@ Support major units where supported by CSS.
 * [ ] `v*` units.
 * [ ] `%` units.
 
-## CSS Animations
-
-Support declarative keyframes and animations that can be optimized on the native side and avoid the need for `Animated`. See [animation](https://developer.mozilla.org/en-US/docs/Web/CSS/animation)).
-
-## CSS Colors
-
-Support CSS 4 Colors using [Colorjs.io](https://colorjs.io/).
-
-## CSS Custom Properties
-
-Support CSS custom property syntax `--variable-name`. This could be shimmed in user-space on top of the existing `StyleSheet` API, with a React Context used to provide variables and values to a subtree.
-
-## CSS Filters
-
-Support declarative filters as used by the CSS [filter](https://developer.mozilla.org/en-US/docs/Web/CSS/filter) style.
-
 ## CSS Media Queries
 
 Support CSS Media Queries. Although Media Queries are not a preferred long-term solution, [Container Queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries) are not yet widely supported by browsers. This could be shimmed in user-space on top of the existing `StyleSheet` API.
 
+## CSS Properties and Values
+
+Miscellaneous CSS properties and values that should be supported on native.
+
+* [ ] `backgroundImage`. Add support for setting background images via `url()`. Stretch: support CSS gradients.
+* [ ] `boxSizing`.
+* [ ] `boxShadow`. Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles.
+* [ ] `caretColor`.
+* [ ] `clipPath`.
+* [ ] `display` values of `block`, `inline`, `inline-block`, `inline-flex`.
+* [ ] `float`.
+* [ ] [`justifySelf`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self). Sets the way a box is justified inside its alignment container along the appropriate axis.
+* [ ] (`lineClamp` is equivalent to `numberOfLines` prop on `<Text>` components).
+* [ ] [`objectPosition`](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position).
+* [ ] `overflowBlock`.
+* [ ] `overflowInline`.
+* [ ] `overflowX`.
+* [ ] `overflowY`.
+* [ ] [`placeContent`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-content). Shorthand for setting `alignContent` and `justifyContent`. Value is an enum of `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `right`, `safe`, `space-around`, `space-between`, `space-evenly`, `start`, `stretch`, `unsafe`. Note that `space-evenly` should also be supported for `alignContent` and `justifyContent`.
+* [ ] [`placeItems`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-items). Shorthand for setting `alignItems` and `justifyItems`. Value is an enum of `auto`, `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `right`, `start`, `stretch`.
+* [ ] [`placeSelf`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-self). Shorthand for setting `alignSelf` and `justifySelf`. Value is an enum of `auto`, `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `normal`, `right`, `start`, `stretch`.
+* [ ] [`rotate`](https://developer.mozilla.org/en-US/docs/Web/CSS/rotate).
+* [ ] [`scale`](https://developer.mozilla.org/en-US/docs/Web/CSS/scale).
+* [ ] `textShadow`. Add native support for CSS text shadows.
+* [ ] [`touchAction`](https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action).
+* [ ] [`translate`](https://developer.mozilla.org/en-US/docs/Web/CSS/translate).
+* [ ] `visibility`. Add support for visually hiding elements.
+* [ ] [`whiteSpace`](https://developer.mozilla.org/en-US/docs/Web/CSS/white-space).
+
 ## CSS Transitions
 
-Support declarative transitions that can be optimized on the native side and avoid the need for `Animated`. Support `transitionProperty`, `transitionDuration`, `transitionTimingFunction`, and `transitionDelay` styles (see [transition](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)).
+Support declarative transitions that can be optimized on the native side and avoid the need for `Animated`. Support `transitionProperty`, `transitionDuration`, `transitionTimingFunction`, and `transitionDelay` styles (see [transition](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)). Consider dispatching the corresponding W3C transition events too.
 
 -----
 
