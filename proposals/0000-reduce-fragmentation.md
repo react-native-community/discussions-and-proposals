@@ -380,6 +380,7 @@ The styling capabilities of React Native should be significantly expanded to cov
 Existing properties that can be adjusted to align with the CSS spec.
 
 * [x] `aspectRatio`. Support string values, i.e., `'16 / 9'`, to align with CSS.
+* [x] `borderRadius`. Support percentage values to align with CSS.
 * [x] `fontVariant` support space-separated string values to align with CSS.
 * [x] `fontWeight` support number values to align with React DOM / CSS.
 * [x] `objectFit` is equivalent to `resizeMode` for `<Image>`.
@@ -391,7 +392,7 @@ Existing properties that can be adjusted to align with the CSS spec.
 
 Existing logical properties that can be adjusted to adopt the CSS standard names. In addition, React Native will need to add native support for subtree-level writing direction controls. Setting the `dir` prop (or `direction` style) to `ltr` or `rtl` on an element should alter the way logical properties are resolved in the subtree.
 
-* [ ] `direction` is equivalent to `writingDirection`.
+* [ ] (`direction` is equivalent to `writingDirection`. But it is [not recommended](https://w3c.github.io/csswg-drafts/css-writing-modes/#propdef-direction) on web, and we should consider removing it in favor of the `dir` prop.)
 * [ ] `borderEndEndRadius` is equivalent to `borderBottomEndRadius`.
 * [ ] `borderEndStartRadius` is equivalent to `borderBottomStartRadius`.
 * [ ] `borderStartEndRadius` is equivalent to `borderTopEndRadius`.
@@ -483,6 +484,7 @@ Support CSS Media Queries. Although Media Queries are not a preferred long-term 
 Miscellaneous CSS properties and values that should be supported on native.
 
 * [ ] `backgroundImage`. Add support for setting background images via `url()`. Stretch: support CSS gradients.
+* [ ] `backgroundPosition`.
 * [ ] `boxSizing`.
 * [ ] `boxShadow`. Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles.
 * [ ] `caretColor`.
