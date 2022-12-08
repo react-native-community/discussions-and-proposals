@@ -341,10 +341,23 @@ We could extend on Github Releases as we’re doing today for the Hermes iOS tar
 * Will create a lot of noise in the release space (i.e. we need to create a GIthub release for every nightly).
 * Practically unusable for commitlies and release testing (as the release is ‘not there yet’).
 
-## Preferred solution
+## Implemented solution
 
-We've investigated prototype for both the OCI and the Maven solution.
+After having investigated both the OCI and the Maven solution, we decided to move on with the **Dedicated Maven Repository** solution.
 
-At this stage the preferred solution is Maven, due to the list of PROs. This solution will make consuming artifacts easier for users and will reduce the maintainance costs on core contributors and release managers.
+Starting from React Native 0.71.x we'll be shipping the following changes:
 
-As this change is going to affect contributors, library authors, and developers of tools on top of React Native, we're sharing this RFC publicly to collect consensus and feedback.
+- We'll now distribute **prebuilts** for:
+  - React Native Android - Coordinates `com.facebook.react:react-android`
+    - Please note that the previous coordinates `com.facebook.react:react-native` have been voided due to [#35210](https://github.com/facebook/react-native/issues/35210)
+  - Hermes Engine Android - Coordinates `com.facebook.react:hermes-android`
+    - Please note that the previous coordinates `com.facebook.react:hermes-engine` have been voided due to [#35210](https://github.com/facebook/react-native/issues/35210)
+  - Hermes Runtime for iOS - Coordinates `com.facebook.react:react-native-artifacts`
+
+Prebuilts will be available on
+- For **Stable** versions, on Maven Central ([browsable here](https://repo1.maven.org/maven2/com/facebook/react/))
+- For **Nightly** versions,on Sonatype's Snapshot Repository ([browsable here](https://oss.sonatype.org/content/repositories/snapshots/com/facebook/react/))
+
+This solution is flexible enough that will allow us to relocate our artifacts to other Maven repositories in the future, if needed.
+
+The templates for both Android & iOS have been updated to consume the proper prebuilt from the correct URL.
