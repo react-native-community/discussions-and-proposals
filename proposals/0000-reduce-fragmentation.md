@@ -16,7 +16,7 @@ This is a proposal to incrementally reduce the API fragmentation faced by develo
 
 React Native currently includes many APIs that are modelled on Web APIs but do not conform to the standards of those Web APIs. React Native also includes many APIs that achieve the same results on Android and iOS but are exposed as 2 different props. And React Native includes several APIs that have known performance (network and runtime) drawbacks on Web.
 
-This proposal aims to allow developers to target more platforms with cross-platform APIs, and deliver better performance when targeting browsers. Features for Android, iOS, and Web are unified by aligning with the Web standard. Support standards helps to:
+This proposal aims to allow developers to target more platforms with cross-platform APIs, and deliver better performance when targeting browsers. Features for Android, iOS, and Web are unified by aligning with the Web standard. Supporting standards helps to:
 
 * minimize the overhead when running in browsers;
 * reduce developer education required to learn features;
@@ -51,9 +51,9 @@ To further reduce risk, the underlying abstractions that we use to implement thi
 
 ## Adoption strategy
 
-Many of these additions are already in progress and have been proven in a user-space shim at Meta. The features that cannot be shimmed are explicitly called out below. Those features require core changes to React Native. Other features can be shimmed in user-space JavaScript if desired (with any associated performance cost of doing so).
+Many of these additions are already in progress and have been proven in a user-space shim at Meta. But a lot of the proposed features require core changes to React Native.
 
-To encourage library and product developers to proactively migrate to these new APIs, React Native for Web plans to only support these W3C standards-based APIs in future versions. This will allow us to incrementally add APIs to React Native without needing to commit to simultaneously deprecating APIs and migrating existing React Native code. Existing React Native developers will adopt these APIs if they wish to support web.
+To encourage React Native library and product developers to proactively migrate to these new APIs, React Native for Web plans to only support these W3C standards-based APIs in future versions. This will allow us to incrementally add APIs to React Native without needing to commit to simultaneously deprecating APIs and migrating existing React Native code. Existing React Native developers will adopt these APIs if they wish to support web.
 
 ## How we teach this
 
@@ -132,10 +132,11 @@ Certain props common to all core components have direct equivalents in React DOM
 - [x] [`aria-valuemin`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuemin) is the same as `accessibilityValue.min`.
 - [x] [`aria-valuenow`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuenow) is the same as `accessibilityValue.now`.
 - [x] [`aria-valuetext`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuetext) is the same as `accessibilityValue.text`.
+- [ ] ([`data-*`]() props. Resolves proposal [#323](https://github.com/react-native-community/discussions-and-proposals/issues/323))
 - [ ] [`dir`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir) configures element's layout / writing direction.
 - [ ] [`elementTiming`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/elementtiming).
 - [ ] [`lang`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang) identifies the language of the text content.
-- [ ] [`hidden`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden).
+- [ ] [`hidden`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden) is the same as `display:'none'`.
 - [x] [`id`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) is the same as `nativeID`.
 - [ ] [`inert`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inert).
 - [x] [`role`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles) is the same as `accessibilityRole` (with support for web values).
@@ -148,26 +149,28 @@ Props for commonly handled events should also be supported on core components. E
 
 To avoid breaking changes in React Native and React DOM, it may be preferrable to create new event prop names that receive events as specified by web standards, e.g., `on-click`, `on-pointerup`.
 
-- [ ] `onAuxClick` is a `PointerEvent` for auxillary clicks.
-- [ ] `onBlur`.
-- [ ] `onClick` is a `PointerEvent` for primary clicks.
-- [ ] `onContextMenu`.
-- [ ] `onCopy`.
-- [ ] `onCut`.
-- [ ] `onFocus`.
-- [ ] `onGotPointerCapture`.
-- [ ] `onLostPointerCapture`.
-- [ ] `onPaste`.
-- [ ] `onPointerCancel`.
-- [ ] `onPointerDown`.
-- [ ] `onPointerEnter`.
-- [ ] `onPointerLeave`.
-- [ ] `onPointerMove`.
-- [ ] `onPointerOut`.
-- [ ] `onPointerOver`.
-- [ ] `onPointerUp`.
-- [ ] `onKeyDown`.
-- [ ] `onKeyUp`.
+Resolves proposal [#492](https://github.com/react-native-community/discussions-and-proposals/issues/492).
+
+- [ ] `on-auxclick` is a `PointerEvent` for auxillary clicks.
+- [ ] `on-blur`.
+- [ ] `on-click` is a `PointerEvent` for primary clicks.
+- [ ] `on-contextmenu` is a `PointerEvent` for context clicks / long press.
+- [ ] `on-copy`.
+- [ ] `on-cut`.
+- [ ] `on-focus`.
+- [ ] `on-gotpointercapture`.
+- [ ] `on-lostpointercapture`.
+- [ ] `on-paste`.
+- [ ] `on-pointercancel`.
+- [ ] `on-pointerdown`.
+- [ ] `on-pointerenter`.
+- [ ] `on-pointerleave`.
+- [ ] `on-pointermove`.
+- [ ] `on-pointerout`.
+- [ ] `on-pointerover`.
+- [ ] `on-pointerup`.
+- [ ] `on-keydown`.
+- [ ] `on-keyup`.
 
 Example:
 
@@ -191,23 +194,24 @@ Inherits all props and events from "Core Component".
 
 Various React DOM `img` props have direct equivalents in React Native. For example, `srcSet` is a subset of the `source` prop but without support for specifying headers, etc. Features like alternative text content are also required to target web.
 
-- [x] `alt` prop for alternative text support.
-- [x] `crossOrigin` is equivalent to setting the relevant `Header` in the `source` object. Declaratively configure cross-origin permissions for loaded images.
-- [ ] `decoding`.
-- [ ] `fetchPriority`.
-- [x] `height` is the same as `source.height`.
-- [ ] `loading`.
-- [x] `referrerPolicy` is equivalent to setting the relevant `Header` in the `source` object. Declaratively configure referrer policy.
-- [x] `src` is the same as `source.uri`.
-- [x] `srcSet` is the same as setting a `source` array with `uri` and `scale` properties defined.
-- [x] `width` is the same as `source.width`.
+- [x] [`alt`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-alt) prop for alternative text support.
+- [x] [`crossOrigin`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-crossorigin) is equivalent to setting the relevant `Header` in the `source` object. Declaratively configure cross-origin permissions for loaded images.
+- [ ] [`decoding`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-decoding).
+- [ ] `draggable`.
+- [ ] [`fetchPriority`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-fetchpriority).
+- [x] [`height`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-height) is the same as `source.height`.
+- [ ] [`loading`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-loading).
+- [x] [`referrerPolicy`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-referrerpolicy) is equivalent to setting the relevant `Header` in the `source` object. Declaratively configure referrer policy.
+- [x] [`src`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-src) is the same as `source.uri`.
+- [x] [`srcSet`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-srcset) is the same as setting a `source` array with `uri` and `scale` properties defined.
+- [x] [`width`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-width) is the same as `source.width`.
 
 Longer-term we should look to decouple the image component from the image loader. The latter could take the form of a module and/or hook to provide the props needed for a simpler image component as is found in React DOM.
 
 ### Event props
 
-- [ ] `onError()`
-- [ ] `onLoad()`
+- [ ] [`on-error`](https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event)
+- [ ] `on-load`
 
 Example:
 
@@ -226,10 +230,10 @@ Inherits all props and events from "Core Component".
 
 ### Primitive props
 
-- [x] `autoComplete` is the same as mapped values for existing `autoComplete` (Android) and `textContentType` (iOS).
-- [ ] `disabled`.
-- [x] `enterKeyHint` is the same as mapped values for `returnKeyType`.
-- [x] `inputMode`  is the same as mapped values for `keyboardType`.
+- [x] [`autoComplete`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete) is the same as mapped values for existing `autoComplete` (Android) and `textContentType` (iOS).
+- [ ] [`disabled`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/disabled).
+- [x] [`enterKeyHint`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/enterkeyhint) is the same as mapped values for `returnKeyType`.
+- [x] [`inputMode`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode)  is the same as mapped values for `keyboardType`.
   - [x] `inputMode === 'decimal'` is the same as `keyboardType = 'decimal-pad'`.
   - [x] `inputMode === 'email'` is the same as `keyboardType = 'email-address'`.
   - [x] `inputMode === 'none'` is the same as `showSoftInputOnFocus = false`.
@@ -237,25 +241,25 @@ Inherits all props and events from "Core Component".
   - [x] `inputMode === 'search'` is the same as `keyboardType = 'search'`.
   - [x] `inputMode === 'tel'` is the same as `keyboardType = 'phone-pad'`.
   - [x] `inputMode === 'url'` is the same as `keyboardType = 'url'`.
-- [ ] `max`.
-- [x] `maxLength`.
-- [ ] `min`.
-- [ ] `minLength`.
-- [ ] `placeholder`.
-- [x] `readOnly` is the same as inverse `editable`.
-- [ ] `required`.
-- [x] `rows` is the same as `numberOfLines`.
-- [ ] `spellCheck`.
-- [ ] `value`.
+- [ ] [`max`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max).
+- [x] [`maxLength`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/maxlength).
+- [ ] [`min`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min).
+- [ ] [`minLength`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/minlength).
+- [ ] [`placeholder`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder).
+- [x] [`readOnly`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#readonly) is the same as inverse `editable`.
+- [ ] [`required`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#required).
+- [x] [`rows`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-rows) is the same as `numberOfLines`.
+- [ ] [`spellCheck`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-spellcheck).
+- [ ] [`value`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#value).
 
 ### Event props
 
-- [ ] `onBeforeInput()`
-- [ ] `onChange()`
-- [ ] `onInput()`
-- [ ] `onInvalid()`
-- [ ] `onSelect()`
-- [ ] `onSelectionChange()`
+- [ ] `on-beforeinput`
+- [ ] `on-change`
+- [ ] `on-input`
+- [ ] `on-invalid`
+- [ ] `on-select`
+- [ ] `on-selectionchange`
 
 Example:
 
@@ -379,20 +383,20 @@ The styling capabilities of React Native should be significantly expanded to cov
 
 Existing properties that can be adjusted to align with the CSS spec.
 
-* [x] `aspectRatio`. Support string values, i.e., `'16 / 9'`, to align with CSS.
-* [x] `borderRadius`. Support percentage values to align with CSS.
-* [x] `fontVariant` support space-separated string values to align with CSS.
-* [x] `fontWeight` support number values to align with React DOM / CSS.
-* [x] `objectFit` is equivalent to `resizeMode` for `<Image>`.
-* [x] `pointerEvents` is equivalent to `pointerEvents` prop.
-* [ ] `position`. Support for `fixed` and `sticky` values.
-* [x] `transform`. Support using string values to set transforms.
-* [x] `verticalAlign` is equivalent to `textAlignVertical`.
-* [x] `userSelect`. Equivalent to using `selectable` prop on `<Text>`.
+* [x] [`aspectRatio`](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio). Support string values, i.e., `'16 / 9'`, to align with CSS.
+* [x] [`borderRadius`](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius). Support percentage values to align with CSS.
+* [x] [`fontVariant`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant) support space-separated string values to align with CSS.
+* [x] [`fontWeight`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight) support number values to align with React DOM / CSS.
+* [x] [`objectFit`](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) is equivalent to `resizeMode` for `<Image>`.
+* [x] [`pointerEvents`](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events) is equivalent to `pointerEvents` prop.
+* [ ] [`position`](https://developer.mozilla.org/en-US/docs/Web/CSS/position). Support for `fixed` and `sticky` values.
+* [x] [`transform`](https://developer.mozilla.org/en-US/docs/Web/CSS/transform). Support using string values to set transforms.
+* [x] [`verticalAlign`](https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align) is equivalent to `textAlignVertical`.
+* [x] [`userSelect`](https://developer.mozilla.org/en-US/docs/Web/CSS/user-select). Equivalent to using `selectable` prop on `<Text>`.
 
 Existing logical properties that can be adjusted to adopt the CSS standard names. In addition, React Native will need to add native support for subtree-level writing direction controls. Setting the `dir` prop (or `direction` style) to `ltr` or `rtl` on an element should alter the way logical properties are resolved in the subtree.
 
-* [ ] (`direction` is equivalent to `writingDirection`. But it is [not recommended](https://w3c.github.io/csswg-drafts/css-writing-modes/#propdef-direction) on web, and we should consider removing it in favor of the `dir` prop.)
+* [ ] (`direction`. But it is [not recommended](https://w3c.github.io/csswg-drafts/css-writing-modes/#propdef-direction) on web, and we should consider removing it in favor of the `dir` prop.)
 * [ ] `borderEndEndRadius` is equivalent to `borderBottomEndRadius`.
 * [ ] `borderEndStartRadius` is equivalent to `borderBottomStartRadius`.
 * [ ] `borderStartEndRadius` is equivalent to `borderTopEndRadius`.
@@ -427,21 +431,32 @@ Existing logical properties that can be adjusted to adopt the CSS standard names
 * [x] `paddingBlockEnd` is equivalent to `paddingBottom`.
 * [x] `paddingBlock` is equivalent to `paddingVertical`.
 * [x] `paddingInline` is equivalent to `paddingHorizontal`.
-* [ ] `inset` is equivalent to `top` & `bottom` & `right` & `left`.
-* [ ] `insetBlock` is equivalent to `top` & `bottom`.
-* [ ] `insetBlockEnd` is equivalent to `bottom`.
-* [ ] `insetBlockStart` is equivalent to `top`.
-* [ ] `insetInline` is equivalent to `right` & `left`.
-* [ ] `insetInlineEnd` is equivalent to `right` or `left`.
-* [ ] `insetInlineStart` is equivalent to `right` or `left`.
+* [x] `inset` is equivalent to `top` & `bottom` & `right` & `left`.
+* [x] `insetBlock` is equivalent to `top` & `bottom`.
+* [x] `insetBlockEnd` is equivalent to `bottom`.
+* [x] `insetBlockStart` is equivalent to `top`.
+* [x] `insetInline` is equivalent to `right` & `left`.
+* [x] `insetInlineEnd` is equivalent to `right` or `left`.
+* [x] `insetInlineStart` is equivalent to `right` or `left`.
 
 ## CSS Animations
 
 Support declarative keyframes and animations that can be optimized on the native side and avoid the need for `Animated`. Consider dispatching the corresponding W3C animation events too. See [animation](https://developer.mozilla.org/en-US/docs/Web/CSS/animation)).
 
+- [ ] [`animationDelay`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-delay)
+- [ ] [`animationDirection`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction)
+- [ ] [`animationDuration`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-duration)
+- [ ] [`animationFillMode`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode)
+- [ ] [`animationIterationCount`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count)
+- [ ] [`animationName`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name)
+- [ ] [`animationPlayState`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state)
+- [ ] [`animationTimingFunction`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timing-function)
+
+TBD: the relationship between `animationName` (or equivalent) and the API used to define Animation keyframes.
+
 ## CSS Colors
 
-Support CSS 4 Colors using [Colorjs.io](https://colorjs.io/).
+Support CSS 4 Colors, possibly by using [Colorjs.io](https://colorjs.io/) or implementing a native equivalent.
 
 ## CSS Container Queries
 
@@ -451,71 +466,209 @@ Prepare for [CSS Container Queries](https://developer.mozilla.org/en-US/docs/Web
 
 Support CSS custom property syntax `--variable-name`. This could be shimmed in user-space on top of the existing `StyleSheet` API, with a React Context used to provide variables and values to a subtree.
 
+* [`CSS Variables`](https://w3c.github.io/csswg-drafts/css-variables/)
+* [Using CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties)
+* [`var()` function](https://developer.mozilla.org/en-US/docs/Web/CSS/var)
+
 ## CSS Filters
 
 Support declarative filters as used by the CSS [filter](https://developer.mozilla.org/en-US/docs/Web/CSS/filter) style.
 
+* [ ] [`blur()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/blur)
+* [ ] [`brightness()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/brightness)
+* [ ] [`contrast()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/contrast)
+* [ ] [`drop-shadow()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/drop-shadow)
+* [ ] [`grayscale()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/grayscale)
+* [ ] [`hue-rotate()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/hue-rotate)
+* [ ] [`invert()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/invert)
+* [ ] [`opacity()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/opacity)
+* [ ] [`saturate()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/saturate)
+* [ ] [`sepia()`](https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/sepia)
+
 ## CSS Functions
 
-* [ ] `calc()`(https://developer.mozilla.org/en-US/docs/Web/CSS/calc)
-* [ ] `clamp()`(https://developer.mozilla.org/en-US/docs/Web/CSS/clamp)
-* [ ] `max()`(https://developer.mozilla.org/en-US/docs/Web/CSS/max)
-* [ ] `min()`(https://developer.mozilla.org/en-US/docs/Web/CSS/min)
-* [ ] `minmax()`(https://developer.mozilla.org/en-US/docs/Web/CSS/minmax)
-* [ ] `url()`(https://developer.mozilla.org/en-US/docs/Web/CSS/url)
-* [ ] `var()`(https://developer.mozilla.org/en-US/docs/Web/CSS/var)
+* [ ] [`calc()`](https://developer.mozilla.org/en-US/docs/Web/CSS/calc)
+* [ ] [`clamp()`](https://developer.mozilla.org/en-US/docs/Web/CSS/clamp)
+* [ ] [`max()`](https://developer.mozilla.org/en-US/docs/Web/CSS/max)
+* [ ] [`min()`](https://developer.mozilla.org/en-US/docs/Web/CSS/min)
+* [ ] [`minmax()`](https://developer.mozilla.org/en-US/docs/Web/CSS/minmax)
+* [ ] [`url()`](https://developer.mozilla.org/en-US/docs/Web/CSS/url)
+* [ ] [`var()`](https://developer.mozilla.org/en-US/docs/Web/CSS/var)
 
 ## CSS Lengths
 
 Support major units where supported by CSS.
 
-* [ ] `em` units.
-* [ ] `rem` units.
+* [ ] [`em`](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units) units.
+* [ ] [`rem`](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units) units.
 * [ ] `px` units.
-* [ ] `v*` units.
-* [ ] `%` units.
+* [ ] [`v*`](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#relative_length_units) units.
+* [ ] [`%`](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units#percentages) units.
 
 ## CSS Media Queries
 
-Support CSS Media Queries. Although Media Queries are not a preferred long-term solution, [Container Queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries) are not yet widely supported by browsers. This could be shimmed in user-space on top of the existing `StyleSheet` API.
+Support CSS Media Queries.
+
+Although Media Queries are not a preferred long-term solution for responsive design, [Container Queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries) are not yet widely supported by browsers. The dimensional Media Queries could be shimmed in user-space on top of the existing `StyleSheet` API.
+
+Logical operators `not`, `and`, `or`, `only`.
+
+[Media features](https://developer.mozilla.org/en-US/docs/Web/CSS/@media#media_features):
+
+- [ ] [`aspect-ratio`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/aspect-ratio)
+- [ ] [`forced-colors`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors)
+- [ ] [`height`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/height)
+- [ ] [`inverted-colors`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/inverted-colors)
+- [ ] [`orientation`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation)
+- [ ] [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
+- [ ] [`prefers-contrast`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast)
+- [ ] [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
+- [ ] [`resolution`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/resolution)
+- [ ] [`width`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/width)
+
+Proposed syntax:
+
+```js
+// Either
+const styles = StyleSheet.create({
+  root: {
+    position: 'absolute',
+    '@media (max-width: 600px)': {
+      position: 'sticky',
+    }
+  }
+});
+
+// Or
+const styles = StyleSheet.create({
+  root: {
+    position: {
+      default: 'absolute',
+      '@media (max-width: 600px)': 'sticky',
+    }
+  }
+});
+```
+
+The benefit of the latter is clearer expectations (and greater constraints) about when properties are overridden. For example, it's not as clear what the value for `position` would be in the following:
+
+```js
+const styles = StyleSheet.create({
+  root: {
+    position: 'absolute',
+    '@media (max-width: 600px)': {
+      position: 'sticky',
+    }
+  },
+  override: {
+    position: 'relative',
+  }
+});
+
+const style = [ styles.root, styles.override ];
+// {
+//   position: relative,
+//   '@media (max-width: 600px)': {
+//     position: 'sticky',
+//   }
+// }
+```
+
+Whereas in the next example we can set expectations that a property *and any previous conditions* are completed overridden by any declaration that later modifies the property in any way.
+
+```js
+const styles = StyleSheet.create({
+  root: {
+    position: {
+      default: 'absolute',
+      '@media (max-width: 600px)': 'sticky'
+    }
+  },
+  override: {
+    position: {
+      default: 'relative',
+    }
+  }
+});
+
+const style = [ styles.root, styles.override ];
+// {
+//   position: relative
+// }
+```
+
+Consideration is also required to determine what the final value of a property is when Media Query conditions overlap, i.e., which media features and which conditions (e.g., multiple `width` conditions) take priority over others.
 
 ## CSS Properties and Values
 
 Miscellaneous CSS properties and values that should be supported on native.
 
-* [ ] `backgroundImage`. Add support for setting background images via `url()`. Stretch: support CSS gradients.
-* [ ] `backgroundPosition`.
-* [ ] `boxSizing`.
-* [ ] `boxShadow`. Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles.
-* [ ] `caretColor`.
-* [ ] `clipPath`.
-* [ ] `display` values of `block`, `inline`, `inline-block`, `inline-flex`.
-* [ ] `float`.
+* [ ] [`backgroundImage`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-image). Add support for setting background images via `url()`. Stretch: support CSS gradients.
+* [ ] [`backgroundOrigin`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin).
+* [ ] [`backgroundPosition`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position).
+* [ ] [`backgroundRepeat`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat).
+* [ ] [`backgroundSize`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size).
+* [ ] [`boxSizing`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing).
+* [ ] [`boxShadow`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow). Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles.
+* [ ] [`caretColor`](https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color).
+* [ ] [`clipPath`](https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path).
+* [ ] [`display`](https://developer.mozilla.org/en-US/docs/Web/CSS/display) values of `block`, `contents` (resolves proposal [#348](https://github.com/react-native-community/discussions-and-proposals/issues/348)), `inline`, `inline-block`, `inline-flex`.
+* [ ] [`float`](https://developer.mozilla.org/en-US/docs/Web/CSS/float).
 * [ ] [`justifySelf`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self). Sets the way a box is justified inside its alignment container along the appropriate axis.
-* [ ] (`lineClamp` is equivalent to `numberOfLines` prop on `<Text>` components).
+* [ ] ([`lineClamp`](https://www.w3.org/TR/css-overflow-3/#propdef-line-clamp) is equivalent to `numberOfLines` prop on `<Text>` components).
 * [ ] [`objectPosition`](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position).
-* [ ] `overflowBlock`.
-* [ ] `overflowInline`.
-* [ ] `overflowX`.
-* [ ] `overflowY`.
+* [ ] [`overflowBlock`](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-block).
+* [ ] [`overflowInline`](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-inline).
+* [ ] [`overflowX`](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-x).
+* [ ] [`overflowY`](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y).
 * [ ] [`placeContent`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-content). Shorthand for setting `alignContent` and `justifyContent`. Value is an enum of `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `right`, `safe`, `space-around`, `space-between`, `space-evenly`, `start`, `stretch`, `unsafe`. Note that `space-evenly` should also be supported for `alignContent` and `justifyContent`.
 * [ ] [`placeItems`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-items). Shorthand for setting `alignItems` and `justifyItems`. Value is an enum of `auto`, `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `right`, `start`, `stretch`.
 * [ ] [`placeSelf`](https://developer.mozilla.org/en-US/docs/Web/CSS/place-self). Shorthand for setting `alignSelf` and `justifySelf`. Value is an enum of `auto`, `baseline`, `first baseline`, `last baseline`, `center`, `end`, `flex-start`, `flex-end`, `left`, `normal`, `right`, `start`, `stretch`.
 * [ ] [`rotate`](https://developer.mozilla.org/en-US/docs/Web/CSS/rotate).
 * [ ] [`scale`](https://developer.mozilla.org/en-US/docs/Web/CSS/scale).
+* [ ] [`scrollSnap*`](https://drafts.csswg.org/css-scroll-snap-1/#overview)
 * [ ] `textShadow`. Add native support for CSS text shadows.
 * [ ] [`touchAction`](https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action).
+* [ ] [`transformStyle`](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style). Resolves proposal [#425](https://github.com/react-native-community/discussions-and-proposals/issues/425).
 * [ ] [`translate`](https://developer.mozilla.org/en-US/docs/Web/CSS/translate).
-* [ ] `visibility`. Add support for visually hiding elements.
+* [ ] [`visibility`](https://developer.mozilla.org/en-US/docs/Web/CSS/visibility). Add support for visually hiding elements.
 * [ ] [`whiteSpace`](https://developer.mozilla.org/en-US/docs/Web/CSS/white-space).
 
 ## CSS Transitions
 
-Support declarative transitions that can be optimized on the native side and avoid the need for `Animated`. Support `transitionProperty`, `transitionDuration`, `transitionTimingFunction`, and `transitionDelay` styles (see [transition](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)). Consider dispatching the corresponding W3C transition events too.
+Support declarative transitions that can be optimized on the native side and avoid the need for `Animated`. Consider dispatching the corresponding W3C transition events too.
+
+- [ ] [`transitionDelay`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay)
+- [ ] [`transitionDuration`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration)
+- [ ] [`transitionProperty`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property)
+- [ ] [`transitionTimingFunction`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function)
 
 -----
 
 # Environment API
+
+## window
+
+### Events
+
+* [ ] All W3C events dispatched to components (capture and bubble phase). Resolves proposal [#249](https://github.com/react-native-community/discussions-and-proposals/issues/249).
+* [ ] [`resize`](https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event).
+
+### matchMedia
+
+The JavaScript API equivalent of Media Queries. Resolves proposal [#350](https://github.com/react-native-community/discussions-and-proposals/issues/350).
+
+### IntersectionObserver
+
+Support the [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) API for observing the intersection of target elements. This can also be used as a building block for performance tooling.
+
+### MutationObserver
+
+Support the latest [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API for watching changes to the host node tree. This can also be used as a building block for performance tooling.
+
+### ResizeObserver
+
+Support the latest [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) API for responding the changes in the size of elements. Note that this API no longer includes positional coordinates and is optimized for width/height information.
 
 ## document
 
@@ -526,23 +679,14 @@ Support the `document` object for common patterns such as listening to document 
 - [ ] [`activeElement`](https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement).
 - [ ] [`visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState)
 
+### Methods
+
+- [ ] [`getElementFromPoint(x,y)`](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint). Resolves proposal [#501](https://github.com/react-native-community/discussions-and-proposals/issues/501).
+
 ### Events
 
-* [ ] `scroll`.
-* [ ] `visibilitychange`.
-
-## IntersectionObserver
-
-Support the [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) API for observing the intersection of target elements. This can also be used as a building block for performance tooling.
-
-## MutationObserver
-
-Support the latest [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API for watching changes to the host node tree. This can also be used as a building block for performance tooling.
-
-## ResizeObserver
-
-Support the latest [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) API for responding the changes in the size of elements. Note that this API no longer includes positional coordinates and is optimized for width/height information.
-
+* [ ] [`scroll`](https://developer.mozilla.org/en-US/docs/Web/API/Document/scroll_event).
+* [ ] [`visibilitychange`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event). Can replace the `AppState` API.
 -----
 
 # Components API (DOM subset)
@@ -555,58 +699,58 @@ This would provide a built-in declarative API for cross-platform elements in Rea
 
 Content sectioning elements allow you to organize the document content into logical pieces. Use the sectioning elements to create a broad outline for your page content, including header and footer navigation, and heading elements to identify sections of content.
 
-* [ ] `article` is equivalent to `View` with `display:block` layout and `role="article"`.
-* [ ] `aside`
-* [ ] `div` is equivalent to `View` with `display:block` layout.
-* [ ] `footer`.
-* [ ] `h1-6`.
-* [ ] `header`.
-* [ ] `main`.
-* [ ] `nav`.
-* [ ] `section` is equivalent to `View` with `display:block` layout and `role="section"`.
+* [ ] [`article`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/article) is equivalent to `View` with `display:block` layout and `role="article"`.
+* [ ] [`aside`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside).
+* [ ] [`div`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div) is equivalent to `View` with `display:block` layout.
+* [ ] [`footer`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/footer).
+* [ ] [`h1-6`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements).
+* [ ] [`header`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header).
+* [ ] [`main`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main).
+* [ ] [`nav`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nav).
+* [ ] [`section`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/section) is equivalent to `View` with `display:block` layout and `role="section"`.
 
 ## Text
 
 Text content elements organize blocks or sections of content. Important for accessibility, these elements identify the purpose or structure of that content.
 
-* [ ] `blockquote`.
-* [ ] `li`.
-* [ ] `ol`.
-* [ ] `ul`.
-* [ ] `p`.
-* [ ] `pre`.
+* [ ] [`blockquote`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote).
+* [ ] [`li`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/li).
+* [ ] [`ol`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ol).
+* [ ] [`ul`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul).
+* [ ] [`p`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p).
+* [ ] [`pre`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre).
 
 ## Inline text
 
 Inline text semantics define the meaning, structure, or style of a word, line, or any arbitrary piece of text.
 
-* [ ] `a`.
-* [ ] `b`.
-* [ ] `bdi`.
-* [ ] `bdo`.
-* [ ] `code`.
-* [ ] `em`.
-* [ ] `span` is equivalent to `Text` with `display:inline` layout.
-* [ ] `strong`.
-* [ ] `sub`.
-* [ ] `sup`.
+* [ ] [`a`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a). (Requires us to figure out how `href` fits into React Native.)
+* [ ] [`b`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/b).
+* [ ] [`bdi`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdi).
+* [ ] [`bdo`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdo).
+* [ ] [`code`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/code).
+* [ ] [`em`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/em).
+* [ ] [`span`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span) is equivalent to `Text` with `display:inline` layout.
+* [ ] [`strong`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strong).
+* [ ] [`sub`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub).
+* [ ] [`sup`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup).
 
 ## Media
 
-* [ ] `img` is equivalent to `Image` without advanced loader configuration.
+* [ ] [`img`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) is similar to `Image` without advanced loader configuration.
 
 ## Forms
 
 Elements which can be used together to create forms which the user can fill out and submit. There's a great deal of further information about this available in the [HTML forms guide](https://developer.mozilla.org/en-US/docs/Learn/Forms).
 
-* [ ] `button`.
-* [ ] `input` is equivalent to `TextInput` with `inputMode` corresponding to `type`.
-* [ ] `label`.
-* [ ] `optgroup`.
-* [ ] `option`.
-* [ ] `progress`.
-* [ ] `select`.
-* [ ] `textarea` is equivalent to `TextInput` with `multiline={true}`.
+* [ ] [`button`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button).
+* [ ] [`input`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) is equivalent to `TextInput` with `inputMode` corresponding to `type`. Expanding input type support to number, datetime, color, etc., resolves proposal [#510](https://github.com/react-native-community/discussions-and-proposals/issues/510).
+* [ ] [`label`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label).
+* [ ] [`optgroup`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup).
+* [ ] [`option`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option).
+* [ ] [`progress`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress).
+* [ ] [`select`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select).
+* [ ] [`textarea`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea) is equivalent to `TextInput` with `multiline={true}`.
 
 -----
 
@@ -616,15 +760,19 @@ Subset of cross-platform DOM APIs exposed on element instances, document, etc. T
 
 In practice, this DOM API subset is generally limited to the “best practice” APIs that can safely be used with React DOM (i.e., read-only operations that don’t modify the DOM tree), and most React components should already be limited to this subset.
 
+## Event and CustomEvent
+
+[Event()](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event) and [CustomEvent()](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent) represent events initialized by developers and that can be dispatched to elements using `EventTarget.dispatchEvent()`.
+
 ## EventTarget
 
 The `EventTarget` API is implemented in JS environments, and should be available on React Native host elements. This feature is commonly used on web, and could be used by React Native developers to support more complex features without first requiring further core API changes to support each use case.
 
 ### Methods
 
-- [ ] `EventTarget.addEventListener()`. Registers an event handler to a specific event type on the element.
-- [ ] `EventTarget.dispatchEvent()`. Dispatches an event to this node in the DOM and returns a boolean value that indicates whether no handler canceled the event.
-- [ ] `EventTarget.removeEventListener()`. Removes an event listener from the element.
+- [ ] [`EventTarget.addEventListener()`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener). Registers an event handler to a specific event type on the element.
+- [ ] [`EventTarget.dispatchEvent()`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent). Dispatches an event to this node in the DOM and returns a boolean value that indicates whether no handler canceled the event.
+- [ ] [`EventTarget.removeEventListener()`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener). Removes an event listener from the element.
 
 ## Node
 
@@ -636,8 +784,9 @@ In some cases, a particular feature of the base Node interface may not apply to 
 
 In addition to the properties below, Node inherits methods from its parent, EventTarget.
 
-- [ ] `Node.contains()`. Returns true or false value indicating whether or not a node is a descendant of the calling node.
-- [ ] `Node.getRootNode()`. Returns the context object's root which optionally includes the shadow root if it is available..
+- [ ] [`Node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
+- [ ] [`Node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
+- [ ] [`Node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
 
 ## Element
 
@@ -647,61 +796,62 @@ Element is the most general base class from which all element objects (i.e. obje
 
 Element inherits properties from its parent interface, Node, and by extension that interface's parent, EventTarget.
 
-- [ ] `Element.clientHeight` [Read only]. Returns a number representing the inner height of the element.
-- [ ] `Element.clientLeft` [Read only]. Returns a number representing the width of the left border of the element.
-- [ ] `Element.clientTop` [Read only]. Returns a number representing the width of the top border of the element.
-- [ ] `Element.clientWidth` [Read only]. Returns a number representing the inner width of the element.
-- [ ] `Element.id` [Read only]. Is a DOMString representing the id of the element.
-- [ ] `Element.scrollHeight` [Read only]. Returns a number representing the scroll view height of an element.
-- [ ] `Element.scrollLeft`. Is a number representing the left scroll offset of the element.
-- [ ] `Element.scrollLeftMax` [Read only]. Returns a number representing the maximum left scroll offset possible for the element.
-- [ ] `Element.scrollTop`. A number representing number of pixels the top of the element is scrolled vertically.
-- [ ] `Element.scrollTopMax` [Read only]. Returns a number representing the maximum top scroll offset possible for the element.
-- [ ] `Element.scrollWidth` [Read only]. Returns a number representing the scroll view width of the element.
+- [ ] [`Element.clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight) [Read only]. Returns a number representing the inner height of the element.
+- [ ] [`Element.clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft) [Read only]. Returns a number representing the width of the left border of the element.
+- [ ] [`Element.clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop) [Read only]. Returns a number representing the width of the top border of the element.
+- [ ] [`Element.clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth) [Read only]. Returns a number representing the inner width of the element.
+- [ ] [`Element.id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) [Read only]. Is a DOMString representing the id of the element.
+- [ ] [`Element.scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) [Read only]. Returns a number representing the scroll view height of an element.
+- [ ] [`Element.scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft). Is a number representing the left scroll offset of the element.
+- [ ] [`Element.scrollLeftMax`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeftMax) [Read only]. Returns a number representing the maximum left scroll offset possible for the element.
+- [ ] [`Element.scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop). A number representing number of pixels the top of the element is scrolled vertically.
+- [ ] [`Element.scrollTopMax`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTopMax) [Read only]. Returns a number representing the maximum top scroll offset possible for the element.
+- [ ] [`Element.scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth) [Read only]. Returns a number representing the scroll view width of the element.
 
 ### Methods
 
 Element inherits methods from its parents Node, and its own parent, EventTarget.
 
-- [ ] `Element.computedStyleMap()`. Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
-- [ ] `Element.getBoundingClientRect()` **P1**. Returns the size of an element and its position relative to the viewport.
-- [ ] `Element.scroll()`. Scrolls to a particular set of coordinates inside a given element.
-- [ ] `Element.scrollBy()`. Scrolls an element by the given amount.
-- [ ] `Element.scrollIntoView()`. Scrolls the page until the element gets into the view.
-- [ ] `Element.scrollTo()`. Scrolls to a particular set of coordinates inside a given element.
+- [ ] [`Element.computedStyleMap()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/computedStyleMap). Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
+- [ ] [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Returns the size of an element and its position relative to the viewport.
+- [ ] [`Element.getClientRects()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects). Returns a collection of `DOMRect` objects that indicate the bounding rectangles for each CSS border box in a client.
+- [ ] [`Element.scroll()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scroll). Scrolls to a particular set of coordinates inside a given element.
+- [ ] [`Element.scrollBy()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollBy). Scrolls an element by the given amount.
+- [ ] [`Element.scrollIntoView()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView). Scrolls the page until the element gets into the view.
+- [ ] [`Element.scrollTo()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo). Scrolls to a particular set of coordinates inside a given element.
 
 ### Events
 
 Listen to these events using `addEventListener()` or by assigning an event handler to the equivalent component prop.
 
-- [ ] `error`. Fired when a resource failed to load, or can't be used. For example, if a script has an execution error or an image can't be found or is invalid. Also available via the `onError` property.
-- [ ] `scroll`. Fired when the document view or an element has been scrolled. Also available via the `onScroll` property.
-- [ ] `select`. Fired when some text has been selected. Also available via the `onSelect` property.
-- [ ] `wheel`. Fired when the user rotates a wheel button on a pointing device (typically a mouse). Also available via the `onWheel` property.
+- [ ] `error`. Fired when a resource failed to load, or can't be used. For example, if a script has an execution error or an image can't be found or is invalid. Also available via the `on-error` property.
+- [ ] `scroll`. Fired when the document view or an element has been scrolled. Also available via the `on-scroll` property.
+- [ ] `select`. Fired when some text has been selected. Also available via the `on-select` property.
+- [ ] `wheel`. Fired when the user rotates a wheel button on a pointing device (typically a mouse). Also available via the `on-wheel` property.
 
 Clipboard events
 
-- [ ] `copy`. Fired when the user initiates a copy action through the browser's user interface. Also available via the `onCopy` property.
-- [ ] `cut`. Fired when the user initiates a cut action through the browser's user interface. Also available via the `onCut` prop.
-- [ ] `paste`. Fired when the user initiates a paste action through the browser's user interface. Also available via the `onPaste` prop.
+- [ ] [`copy`](https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event). Fired when the user initiates a copy action through the browser's user interface. Also available via the `on-copy` property.
+- [ ] [`cut`](https://developer.mozilla.org/en-US/docs/Web/API/Element/cut_event). Fired when the user initiates a cut action through the browser's user interface. Also available via the `on-cut` prop.
+- [ ] [`paste`](https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event). Fired when the user initiates a paste action through the browser's user interface. Also available via the `on-paste` prop.
 
 Focus events
 
-- [ ] `blur`. Fired when an element has lost focus. Also available via the `onBlur` prop.
-- [ ] `focus`. Fired when an element has gained focus. Also available via the `onFocus` prop.
-- [ ] `focusin`. Fired when an element is about to gain focus.
-- [ ] `focusout`. Fired when an element is about to lose focus.
+- [ ] [`blur`](https://developer.mozilla.org/en-US/docs/Web/API/Element/blur_event). Fired when an element has lost focus. Also available via the `on-blur` prop.
+- [ ] [`focus`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focus_event). Fired when an element has gained focus. Also available via the `on-focus` prop.
+- [ ] [`focusin`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focusin_event). Fired when an element is about to gain focus.
+- [ ] [`focusout`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focusout_event). Fired when an element is about to lose focus.
 
 Keyboard events
 
-- [ ] `keydown`. Fired when a key is pressed. Also available via the `onKeyDown` prop.
-- [ ] `keyup`. Fired when a key is released. Also available via the `onKeyUp` prop.
+- [ ] [`keydown`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event). Fired when a key is pressed. Also available via the `on-keydown` prop.
+- [ ] [`keyup`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keyup_event). Fired when a key is released. Also available via the `on-keyup` prop.
 
 Pointer events
 
-- [ ] `auxclick`. Fired when a non-primary pointing device button (e.g., any mouse button other than the left button) has been pressed and released on an element. Also available via the `onAuxClick` prop.
-- [ ] `click`. Fired when a pointing device button (e.g., a mouse's primary button) is pressed and released on a single element. Also available via the `onClick` prop.
-- [ ] `contextmenu`. Fired when the user attempts to open a context menu. Also available via the oncontextmenu property.
+- [ ] [`auxclick`](https://www.w3.org/TR/pointerevents3/#the-click-auxclick-and-contextmenu-events). Fired when a non-primary pointing device button (e.g., any mouse button other than the left button) has been pressed and released on an element. Also available via the `onAuxClick` prop.
+- [ ] [`click`](https://www.w3.org/TR/pointerevents3/#the-click-auxclick-and-contextmenu-events). Fired when a pointing device button (e.g., a mouse's primary button) is pressed and released on a single element. Also available via the `onClick` prop.
+- [ ] [`contextmenu`](https://www.w3.org/TR/pointerevents3/#the-click-auxclick-and-contextmenu-events). Fired when the user attempts to open a context menu. Also available via the oncontextmenu property.
 
 ## HTMLElement
 
@@ -711,20 +861,20 @@ The HTMLElement interface represents any HTML element. Some elements directly im
 
 Inherits properties from its parent, Element, and implements those from DocumentAndElementEventHandlers, GlobalEventHandlers, and TouchEventHandlers.
 
-- [ ] `HTMLElement.hidden` [Read only]. A boolean value indicating if the element is hidden or not.
-- [ ] `HTMLElement.offsetHeight` [Read only]. Returns a double containing the height of an element, relative to the layout.
-- [ ] `HTMLElement.offsetLeft` [Read only]. Returns a double, the distance from this element's left border to its offsetParent's left border.
-- [ ] `HTMLElement.offsetParent` [Read only]. Returns a Element that is the element from which all offset calculations are currently computed.
-- [ ] `HTMLElement.offsetTop` [Read only]. Returns a double, the distance from this element's top border to its offsetParent's top border.
-- [ ] `HTMLElement.offsetWidth` [Read only]. Returns a double containing the width of an element, relative to the layout.
+- [ ] [`HTMLElement.hidden`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden) [Read only]. A boolean value indicating if the element is hidden or not.
+- [ ] [`HTMLElement.offsetHeight`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight) [Read only]. Returns a double containing the height of an element, relative to the layout.
+- [ ] [`HTMLElement.offsetLeft`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft) [Read only]. Returns a double, the distance from this element's left border to its offsetParent's left border.
+- [ ] [`HTMLElement.offsetParent`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent) [Read only]. Returns a Element that is the element from which all offset calculations are currently computed.
+- [ ] [`HTMLElement.offsetTop`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop) [Read only]. Returns a double, the distance from this element's top border to its offsetParent's top border.
+- [ ] [`HTMLElement.offsetWidth`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetWidth) [Read only]. Returns a double containing the width of an element, relative to the layout.
 
 ### Methods
 
 Inherits methods from its parent, Element, and implements those from DocumentAndElementEventHandlers, GlobalEventHandlers, and TouchEventHandlers.
 
-- [x] `HTMLElement.blur()`. Removes keyboard focus from the currently focused element.
-- [ ] `HTMLElement.click()`. Sends a mouse click event to the element.
-- [ ] `HTMLElement.focus(options)`. Makes the element the current keyboard focus.
+- [x] [`HTMLElement.blur()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur). Removes keyboard focus from the currently focused element.
+- [ ] [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click). Sends a mouse click event to the element.
+- [ ] [`HTMLElement.focus(options)`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus). Makes the element the current keyboard focus.
 
 ### Events
 
@@ -734,22 +884,23 @@ Listen to these events using `addEventListener()` or by assigning an event liste
 
 Input events
 
-- [ ] `beforeinput`. Fired when the value of an `<input>`, `<select>`, or `<textarea>` element is about to be modified.
-- [ ] `input`. Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed. Also available via the `onInput` property.
-- [ ] `change`. Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed and committed by the user. Unlike the input event, the change event is not necessarily fired for each alteration to an element's value. Also available via the `onChange` property.
+- [ ] [`beforeinput`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/beforeinput_event). Fired when the value of an `<input>`, `<select>`, or `<textarea>` element is about to be modified.
+- [ ] [`input`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event). Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed. Also available via the `onInput` property.
+- [ ] [`change`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/change_event). Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed and committed by the user. Unlike the input event, the change event is not necessarily fired for each alteration to an element's value. Also available via the `onChange` property.
 
 Pointer events
 
-- [ ] `gotpointercapture`. Fired when an element captures a pointer using `setPointerCapture()`. Also available via the `onGotPointerCapture` prop.
-- [ ] `lostpointercapture`. Fired when a captured pointer is released. Also available via the `onLostPointerCapture` prop.
-- [ ] `pointercancel`. Fired when a pointer event is canceled. Also available via the onpointercancel property.
-- [ ] `pointerdown`. Fired when a pointer becomes active. Also available via the onpointerdown property.
-- [ ] `pointerenter`. Fired when a pointer is moved into the hit test boundaries of an element or one of its descendants. Also available via the onpointerenter property.
-- [ ] `pointerleave`. Fired when a pointer is moved out of the hit test boundaries of an element. Also available via the onpointerleave property.
-- [ ] `pointermove`. Fired when a pointer changes coordinates. Also available via the onpointermove property.
-- [ ] `pointerout`. Fired when a pointer is moved out of the hit test boundaries of an element (among other reasons). Also available via the `onPointerOut` prop.
-- [ ] `pointerover`. Fired when a pointer is moved into an element's hit test boundaries. Also available via the `onPointerOver` prop.
-- [ ] `pointerup`. Fired when a pointer is no longer active. Also available via the `onPointerUp` prop.
+- [ ] [`gotpointercapture`](https://www.w3.org/TR/pointerevents3/#the-gotpointercapture-event). Fired when an element captures a pointer using `setPointerCapture()`. Also available via the `on-gotpointercapture` prop.
+- [ ] [`lostpointercapture`](https://www.w3.org/TR/pointerevents3/#the-lostpointercapture-event). Fired when a captured pointer is released. Also available via the `on-lostpointercapture` prop.
+- [ ] [`pointercancel`](https://www.w3.org/TR/pointerevents3/#the-pointercancel-event). Fired when a pointer event is canceled. Also available via the `on-pointercancel` prop.
+- [ ] [`pointerdown`](https://www.w3.org/TR/pointerevents3/#the-pointerdown-event). Fired when a pointer becomes active. Also available via the `on-pointerdown` prop.
+- [ ] [`pointerenter`](https://www.w3.org/TR/pointerevents3/#the-pointerenter-event). Fired when a pointer is moved into the hit test boundaries of an element or one of its descendants. Also available via the `on-pointerenter` prop.
+- [ ] [`pointerleave`](https://www.w3.org/TR/pointerevents3/#the-pointerleave-event). Fired when a pointer is moved out of the hit test boundaries of an element. Also available via the `on-pointerleave` prop.
+- [ ] [`pointermove`](https://www.w3.org/TR/pointerevents3/#the-pointermove-event). Fired when a pointer changes coordinates. Also available via the `on-pointermove` prop.
+- [ ] [`pointerout`](https://www.w3.org/TR/pointerevents3/#the-pointerout-event). Fired when a pointer is moved out of the hit test boundaries of an element (among other reasons). Also available via the `on-pointerout` prop.
+- [ ] [`pointerover`](https://www.w3.org/TR/pointerevents3/#the-pointerover-event). Fired when a pointer is moved into an element's hit test boundaries. Also available via the `on-pointerover` prop.
+- [ ] [`pointerrawupdate`](https://www.w3.org/TR/pointerevents3/#the-pointerrawupdate-event). Fired when a pointer changes any properties that don't fire `pointerdown` or `pointerup` events.
+- [ ] [`pointerup`](https://www.w3.org/TR/pointerevents3/#the-pointerup-event). Fired when a pointer is no longer active. Also available via the `on-pointerup` prop.
 
 ## HTMLImageElement
 
@@ -759,15 +910,15 @@ The HTMLImageElement interface represents an HTML `<img>` element, providing the
 
 Inherits properties from its parent, HTMLElement.
 
-- [ ] `HTMLImageElement.complete` [Read only]. Returns a boolean value that is true if the browser has finished fetching the image, whether successful or not. That means this value is also true if the image has no src value indicating an image to load.
-- [ ] `HTMLImageElement.currentSrc` [Read only]. Returns a USVString representing the URL from which the currently displayed image was loaded. This may change as the image is adjusted due to changing conditions, as directed by any media queries which are in place.
-- [ ] `HTMLImageElement.naturalHeight` [Read only]. Returns an integer value representing the intrinsic height of the image in CSS pixels, if it is available; else, it shows 0. This is the height the image would be if it were rendered at its natural full size.
-- [ ] `HTMLImageElement.naturalWidth` [Read only]. An integer value representing the intrinsic width of the image in CSS pixels, if it is available; otherwise, it will show 0. This is the width the image would be if it were rendered at its natural full size.
+- [ ] [`HTMLImageElement.complete`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/complete) [Read only]. Returns a boolean value that is true if the browser has finished fetching the image, whether successful or not. That means this value is also true if the image has no src value indicating an image to load.
+- [ ] [`HTMLImageElement.currentSrc`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/currentSrc) [Read only]. Returns a USVString representing the URL from which the currently displayed image was loaded. This may change as the image is adjusted due to changing conditions, as directed by any media queries which are in place.
+- [ ] [`HTMLImageElement.naturalHeight`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/naturalHeight) [Read only]. Returns an integer value representing the intrinsic height of the image in CSS pixels, if it is available; else, it shows 0. This is the height the image would be if it were rendered at its natural full size.
+- [ ] [`HTMLImageElement.naturalWidth`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/naturalWidth) [Read only]. An integer value representing the intrinsic width of the image in CSS pixels, if it is available; otherwise, it will show 0. This is the width the image would be if it were rendered at its natural full size.
 
 ### Events
 
-- [ ] `error`. Also available via the `onError` prop.
-- [ ] `load`. Also available via the `onLoad` prop.
+- [ ] `error`. Also available via the `on-error` prop.
+- [ ] `load`. Also available via the `on-load` prop.
 
 ## HTMLInputElement
 
@@ -777,24 +928,24 @@ The HTMLInputElement interface provides special properties and methods for manip
 
 Properties that apply only to visible elements containing text or numbers
 
-- [ ] `selectionEnd`. unsigned long: Returns / Sets the end index of the selected text. When there's no selection, this returns the offset of the character immediately following the current text input cursor position.
-- [ ] `selectionStart`. unsigned long: Returns / Sets the beginning index of the selected text. When nothing is selected, this returns the position of the text input cursor (caret) inside of the <input> element.
-- [ ] `selectionDirection`. string: Returns / Sets the direction in which selection occurred. Possible values are: forward (the selection was performed in the start-to-end direction of the current locale), backward (the opposite direction) or none (the direction is unknown).
-- [ ] `value`. string: Returns / Sets the current value of the control. If the user enters a value different from the value expected, this may return an empty string.
+- [ ] [`selectionEnd`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectionend). unsigned long: Returns / Sets the end index of the selected text. When there's no selection, this returns the offset of the character immediately following the current text input cursor position.
+- [ ] [`selectionStart`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectionstart). unsigned long: Returns / Sets the beginning index of the selected text. When nothing is selected, this returns the position of the text input cursor (caret) inside of the <input> element.
+- [ ] [`selectionDirection`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectiondirection). string: Returns / Sets the direction in which selection occurred. Possible values are: forward (the selection was performed in the start-to-end direction of the current locale), backward (the opposite direction) or none (the direction is unknown).
+- [ ] [`value`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#value). string: Returns / Sets the current value of the control. If the user enters a value different from the value expected, this may return an empty string.
 
 ### Methods
 
-- [ ] `select()`. Selects all the text in the input element, and focuses it so the user can subsequently replace all of its content.
-- [ ] `setSelectionRange()`. Selects a range of text in the input element (but does not focus it).
-- [ ] `showPicker()`. Shows a browser picker for date, time, color, and files.
+- [ ] [`select()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/select). Selects all the text in the input element, and focuses it so the user can subsequently replace all of its content.
+- [ ] [`setSelectionRange()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange). Selects a range of text in the input element (but does not focus it).
+- [ ] [`showPicker()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/showPicker). Shows a browser picker for date, time, color, and files.
 
 ### Events
 
 Listen to these events using `addEventListener()` or by assigning an event listener to the oneventname property of this interface:
 
-- [ ] `input`. Fires when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed. Note that this is actually fired on the HTMLElement interface and also applies to contenteditable elements, but we've listed it here because it is most commonly used with form input elements. Also available via the `onInput` prop.
-- [ ] `invalid`. Fired when an element does not satisfy its constraints during constraint validation. Also available via the `onInvalid` prop.
-- [ ] `selectionchange` event **P1**. Fires when the text selection in a <input> element has been changed. Also available via the `onSelectionChange` prop.
+- [ ] [`input`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event). Fires when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed. Note that this is actually fired on the HTMLElement interface and also applies to contenteditable elements, but we've listed it here because it is most commonly used with form input elements. Also available via the `onInput` prop.
+- [ ] [`invalid`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/invalid_event). Fired when an element does not satisfy its constraints during constraint validation. Also available via the `onInvalid` prop.
+- [ ] [`selectionchange`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionchange_event) event. Fires when the text selection in a <input> element has been changed. Also available via the `onSelectionChange` prop.
 
 ## HTMLTextAreaElement
 
@@ -834,4 +985,4 @@ Other tasks that will help to reduce API fragmentation within React Native, and 
 * [ ] Move `FlatList` out of core and into a separate package in the monorepo.
 * [ ] Move `SectionList` out of core and into a separate package in the monorepo.
 * [ ] Strip flow types and JSX from pacakges published to npm (make this the default for the community).
-* [ ] Prevent libraries importing `'react-native'` package internals, by using the Node.js package exports API.
+* [ ] Prevent libraries importing `'react-native'` package internals, by using the [Node.js package exports API](https://nodejs.org/api/packages.html#package-entry-points).
