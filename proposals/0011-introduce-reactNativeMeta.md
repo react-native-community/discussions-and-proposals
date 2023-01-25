@@ -23,24 +23,24 @@ This is how this section would look like...
 
 ```json
 {
-  "name": "@rnx-kit/metro-serializer",
-  "version": "1.0.11",
-  ...,
-  "reactNativeMeta": {
-    "version": "2.3",
-    "type": "library",
-    "features": {
-      "fabric": "true",
+    "name": "@rnx-kit/metro-serializer",
+    "version": "1.0.11",
+    ...,
+    "reactNativeMeta": {
+        "version": "2.3",
+        "type": "library",
+        "features": {
+            "fabric": "true",
             "android": {
             "turbomodules": "true",
-      },
-    },
-    "requirements": {
-      "react-native": ">= 0.71.0",
-      "expo": ">= 46.0.0",
-      "expo-modules-core": "1.2.0"
+        },
+        },
+        "requirements": {
+            "react-native": ">= 0.71.0",
+            "expo": ">= 46.0.0",
+            "expo-modules-core": "1.2.0"
+        }
     }
-    ...
 }
 ```
 
@@ -48,23 +48,23 @@ This is how this section would look like...
 
 ```json
 {
-  "name": "contoso",
-  "version": "2.0.3",
-  ...,
-  "reactNativeMeta": {
+    "name": "contoso",
+    "version": "2.0.3",
+    ...,
+    "reactNativeMeta": {
     "version": "1.0",
     "type": "app",
     "features": {
-      "newArchEnabled": "true",
-            "android": {
-         "codegen": "true",
-               "turbomodules": "true",
-      },
-            // Future example
-            // "metroExportsMode": "strict"
+        "newArchEnabled": "true",
+        "android": {
+            "codegen": "true",
+            "turbomodules": "true",
+        },
+        // Future example
+        // "metroExportsMode": "strict"
     },
     ...
-  }
+    }
 ```
 
 ## Motivation
@@ -97,18 +97,18 @@ reactNativeMeta: {
     features: {
         // can be global...
         newArchEnabled: boolean,
-        hermesEnabled: boolean,
+        jsEngine: string, // ex. "hermes", "jsc", "V8"...
         // ...or platform specific
         android: {
             newArchEnabled: boolean,
             fabric: boolean,
             turbomodules: boolean,
-            hermesEnabled: boolean,
+            jsEngine: string,
         },
-        ios: {
+        iOs: {
         ... // same as android
         },
-        macos: {
+        macOs: {
         ... // same as android
         },
         windows: {
@@ -118,7 +118,7 @@ reactNativeMeta: {
     },
     // this section would most likely only be relevant for libraries
     requirements: {
-        react-native: string, // semver compliant range of versions of RN supported
+        "react-native": string, // semver compliant range of versions of RN supported
         expo: string, // semver compliant range of versions of Expo supported (if any)
     }
 }
@@ -130,7 +130,7 @@ The main drawback is that we'd need to convince developers to start using it, so
 
 ## Alternatives
 
-This section is, in itself, fully original and new: there are other files that are used to define configurations for various aspect of react-native based projects (such as `react-native.config.js`, `app.json`, Expo's `app.config.js`, `expo-module.config.json`) but by design this section does **not** overlap with any of them. Explicitly, this one has the purpose of being filled only with metadata to be read by package managers and other tools.
+`reactNativeMeta` is, by design, fully original and new: there are other files that are used to define configurations for various aspect of react-native based projects (such as `react-native.config.js`, `app.json`, Expo's `app.config.js`, `expo-module.config.json`) but this one does **not** overlap with any of them. Explicitly, this one has the purpose of being filled only with metadata to be read by package managers and other tools.
 
 ## Adoption strategy
 
