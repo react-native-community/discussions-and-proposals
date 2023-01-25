@@ -5,7 +5,7 @@ author:
 date: 25-01-2021
 ---
 
-# RFC0011: Introducing `reactNativeMeta` to `package.json`, for RN specific metadata
+# RFC0012: Introducing `reactNativeMeta` to `package.json`, for RN specific metadata
 
 ## Summary
 
@@ -32,8 +32,8 @@ This is how this section would look like...
         "features": {
             "fabric": "true",
             "android": {
-            "turbomodules": "true",
-        },
+                "turbomodules": "true",
+            },
         },
         "requirements": {
             "react-native": ">= 0.71.0",
