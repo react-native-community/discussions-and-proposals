@@ -134,13 +134,14 @@ The main drawback is that we'd need to convince developers to start using it, so
 
 ## Adoption strategy
 
-Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in tools such has `align-deps` and the RNDirectory, and in the react-native tools themselves. This first wave of support would have to be coordinated around a certain release that lives in RN's main branch, such as now it'd be introduced in 0.72 (which branch has not been cut).
+Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in tools such has `align-deps` and the RNDirectory, and in the react-native tools themselves. This first wave of support would have to be coordinated around a certain release that lives in RN's main branch; for example, if we were to introduce it now, it'd be in 0.72 (which branch has not been cut) via the app template.
 
 After adding this first wave of support, and related documentation, we could more broadly communicate to the community and the maintainers how adding this section would benefit them too. Especially for library maintainers we'll have another RFC coming up soon to describe how we are planning to better communicate this.
 
 ## How we teach this
 
 - add to core's documentation (which should happen anyway if we start using it for flags for new arch configuration)
+- add to the templates (both app and library)
 - have RNDirectory and align-deps mention a call to action to introduce this
 
 ## Unresolved questions
