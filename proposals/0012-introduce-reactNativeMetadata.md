@@ -1,15 +1,15 @@
 ---
-title: Introducing `reactNativeMeta` to `package.json`, for RN specific metadata
+title: Introducing `reactNativeMetadata` to `package.json`, for RN specific metadata
 author:
   - Lorenzo Sciandra
 date: 25-01-2021
 ---
 
-# RFC0012: Introducing `reactNativeMeta` to `package.json`, for RN specific metadata
+# RFC0012: Introducing `reactNativeMetadata` to `package.json`, for RN specific metadata
 
 ## Summary
 
-This RFC wants to introduce and formally discuss a new section for the package.json of a react-native project (app or library), called `reactNativeMeta`.
+This RFC wants to introduce and formally discuss a new section for the package.json of a react-native project (app or library), called `reactNativeMetadata`.
 
 This new section will allow developer to express certain characteristics of their code in a more formalized manner, that can easily used by tooling to act towards the code accordingly.
 
@@ -26,7 +26,7 @@ This is how this section would look like...
     "name": "@rnx-kit/metro-serializer",
     "version": "1.0.11",
     ...,
-    "reactNativeMeta": {
+    "reactNativeMetadata": {
         "version": "2.3",
         "type": "library",
         "features": {
@@ -51,7 +51,7 @@ This is how this section would look like...
     "name": "contoso",
     "version": "2.0.3",
     ...,
-    "reactNativeMeta": {
+    "reactNativeMetadata": {
     "version": "1.0",
     "type": "app",
     "features": {
@@ -75,7 +75,7 @@ A similar problem was also encountered by [React Native Directory](https://react
 
 It became clear that there was a need to be able to communicate and parse certain information about a react-native library via its `package.json`, which led to [a meeting](https://github.com/microsoft/rnx-kit/discussions/2125) between Meta, Microsoft and Expo to figure out a common solution.
 
-This RFC is the result of that meeting: a new section of the `package.json`, called `reactNativeMeta`, to contain certain metadata about a react-native project - it being either a library or an app.
+This RFC is the result of that meeting: a new section of the `package.json`, called `reactNativeMetadata`, to contain certain metadata about a react-native project - it being either a library or an app.
 
 There are a few areas that this section could express in a consistent manner; here's a list of the ones we could think of (in no particular order):
 
@@ -84,14 +84,14 @@ There are a few areas that this section could express in a consistent manner; he
 - if an app has opted in into Fabric, TM, or both
 - if an app is using Hermes or another js engine
 
-Sidenote: the name `reactNativeMeta` was chosen to mirror the camel case pattern used by other fields such as `peerDependenciesMeta`.
+Sidenote: the name `reactNativeMetadata` was chosen to mirror the camel case pattern used by other fields such as `peerDependenciesMeta`.
 
 ## Detailed design
 
 This is the section that in this first draft will need to be properly finalised. For now, here's what we envisioned:
 
 ```js
-reactNativeMeta: {
+reactNativeMetadata: {
     version: string, // ex. 1.0.0 - we know that this spec might evolve in the future
     type: string; // "app" or "library"
     features: {
@@ -130,7 +130,7 @@ The main drawback is that we'd need to convince developers to start using it, so
 
 ## Alternatives
 
-`reactNativeMeta` is, by design, fully original and new: there are other files that are used to define configurations for various aspect of react-native based projects (such as `react-native.config.js`, `app.json`, Expo's `app.config.js`, `expo-module.config.json`) but this one does **not** overlap with any of them. Explicitly, this one has the purpose of being filled only with metadata to be read by package managers and other tools.
+`reactNativeMetadata` is, by design, fully original and new: there are other files that are used to define configurations for various aspect of react-native based projects (such as `react-native.config.js`, `app.json`, Expo's `app.config.js`, `expo-module.config.json`) but this one does **not** overlap with any of them. Explicitly, this one has the purpose of being filled only with metadata to be read by package managers and other tools.
 
 ## Adoption strategy
 
