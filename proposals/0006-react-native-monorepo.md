@@ -36,7 +36,7 @@ This proposal is about re-shaping the existing codebase on GitHub into what is c
 
 To quickly explain the motivation behind this proposal, here's the current shape of the React Native codebase hosted on GitHub and corrispective npm packages:
 
-![current status of the react-native GitHub codebase](/proposals/assets/0006-current-status.png "Current Status")
+![current status of the react-native GitHub codebase](./assets/0006-current-status.png "Current Status")
 
 It should quickly become apparent that there are a few discrepancies:
 
@@ -92,7 +92,7 @@ This proposal will seem deceptively simple: to decouple the root level of the pa
 
 The graph here shows in a bit more detail the end goal, along with a few more details and side-changes that are needed to fully address the current situation:
 
-![proposal for the react-native GitHub codebase](/proposals/assets/0006-proposal.png "Proposal")
+![proposal for the react-native GitHub codebase](./assets/0006-proposal.png "Proposal")
 
 Reiterating the changes proposed in the graph:
 
