@@ -105,10 +105,10 @@ reactNativeMetadata: {
             turbomodules: boolean,
             jsEngine: string,
         },
-        iOs: {
+        ios: {
         ... // same as android
         },
-        macOs: {
+        macos: {
         ... // same as android
         },
         windows: {
