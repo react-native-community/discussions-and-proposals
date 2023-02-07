@@ -223,8 +223,8 @@ import BazComponent from './BazComponent.mjs';
 
 - **Breaking**: Under `"exports"`, Metro will not resolve platform-specific extensions for listed package entry points.
     - When resolving any import specifier:
-        - If the package defines `"exports"` and the exact specifier is matched, the package-defined path will be used.
-        - If there is no match in `"exports"`, Metro will look for files at the imported subpath, trying all extension variants (existing resolution logic).
+        - If the package defines `"exports"` and the import specifier (after expanding `sourceExts`) is matched, the package-defined path mapping will be used with no further transformation.
+        - If there is no match in `"exports"`, Metro will look for files which match the import specifier, trying all extension variants (existing resolution logic).
 - With this decision, we will have narrowed support for platform-specific extensions in packages. We will communicate to React Native package authors that alternative patterns should be used.
     - We have no near-term plans to drop platform-specific extensions for packages not using `"exports"`, or in app code.
 - We will not take a strong stance on using extensionless or extensioned imports. The former may provide more flexibility for React Native package authors to change extensions in future without impacting consuming apps.
