@@ -89,6 +89,7 @@ The following features and considerations are detailed in this section:
 - [Conditional exports: `"import"` and `"require"`](#conditional-exports-import-and-require)
 - [Conditional exports: Community definitions and `"browser"`](#conditional-exports-community-definitions-and-browser)
 - [Conditional exports: User conditions and configuration](#conditional-exports-user-conditions-and-configuration)
+- [Asset resolutions](#asset-resolutions)
 - [Opting into strict `"exports"` handling](#opting-into-strict-exports-handling)
 
 The following features will be implemented without any anticipated behaviour differences or special notes (links go to Node.js spec):
@@ -223,7 +224,7 @@ import BazComponent from './BazComponent.mjs';
 
 - **Breaking**: Under `"exports"`, Metro will not resolve platform-specific extensions for listed package entry points.
     - When resolving any import specifier:
-        - If the package defines `"exports"` and the import specifier (after expanding `sourceExts`) is matched, the package-defined path mapping will be used with no further transformation.
+        - If the package defines `"exports"` and the exact import specifier is matched, the package-defined path mapping will be used with no further transformation.
         - If there is no match in `"exports"`, Metro will look for files which match the import specifier, trying all extension variants (existing resolution logic).
 - With this decision, we will have narrowed support for platform-specific extensions in packages. We will communicate to React Native package authors that alternative patterns should be used.
     - We have no near-term plans to drop platform-specific extensions for packages not using `"exports"`, or in app code.
@@ -233,8 +234,10 @@ Note: We may yet (unplanned) independently make the platform-specific extensions
 
 #### Illustrated
 
-```json
+```js
 "exports": {
+  // Node.js recommends that packages list extensionless specifiers 
+  // for compatibility
   "./FooComponent": "./src/FooComponent.js",
   "./FooComponent.js": "./src/FooComponent.js",
 }
@@ -244,6 +247,7 @@ Import specifiers listed in `"exports"` will be used when matched. Alternative p
 
 ```js
 import FooComponent from 'pkg/FooComponent';
+// (Metro will not expand this specifier using sourceExts)
 // Reads from "exports":
 //   pkg/src/FooComponent.js
 
@@ -389,14 +393,10 @@ module.exports = {
     // (default: ['react-native'])
     conditionNames: ['react-native', 'production'],
 
-    // A function that will be used to assert additional
-    // condition names when resolving an exports field path
-    getAssertedConditions: ({ platform }) => {
-      if (platform === 'web') {
-        return ['browser'];
-      }
-
-      return [];
+    // The set of additional condition names to dynamically
+    // assert by platform
+    conditionsByPlatform: {
+      web: ['browser'],
     },
   },
 };
@@ -405,6 +405,22 @@ module.exports = {
 The exact name and shape of these options may change during implementation. Naming will ideally be broad enough to cover any future support for `"imports"`.
 
 In addition, `resolver.resolveRequest` will continue to provide an escape hatch from Metro's handling of conditional exports, should an app need to override imports from a given package.
+
+### Asset resolutions
+
+In addition to source files, Metro supports the concept of *asset files*. In addition to being bundled separately, asset files may have different resolution suffixes (configured via `resolver.assetResolutions`), for example `./img/check.png` may resolve a set of files that includes `./img/check@2x.png`, selected depending on target device.
+
+Since this concept is not expressible using the existing `"exports"` spec (see [Subpath patterns](#subpath-patterns)), it makes sense to add Metro-specific functionality to continue supporting this feature.
+
+We support existing config options that can be provided to customise how asset resolution behaves. These should remain load-bearing whether a file is resolved via `"exports"` or by filesystem resolution:
+
+- [`resolver.isAssetFile`](https://facebook.github.io/metro/docs/resolution/#isassetfile-string--boolean)
+- [`resolver.resolveAsset`](https://facebook.github.io/metro/docs/resolution/#resolveasset-dirpath-string-assetname-string-extension-string--readonlyarraystring)
+
+**Proposed**:
+
+- Handle asset resolutions by calling `isAssetFile` on the subpath mapped to by `"exports"`. If this returns `true`, then expand asset resolutions by calling `resolveAsset` against this path.
+- As with source files, if a subpath is not matched in `"exports"` and falls back to legacy resolution, a package encapsulation warning will be logged (using the base file name).
 
 ### Additional consideration: Jest
 
