@@ -45,7 +45,6 @@ The "complete" API involved is broken down into the following sections.
 * [Props API](#props-api-react-dom-subset). React DOM component props to add to new components, and existing React Native components as part of an incremental strategy.
 * [Styling API](#styles-api-css-subset). CSS APIs to add to the React Native environment.
 
-
 A simplified example of the user-space code we'd aim to support is as follows:
 
 ```js
@@ -231,7 +230,7 @@ Beyond props, there is also the opportunity to reduce fragementation in styling 
 
 To encourage React Native library and product developers to proactively migrate to these new APIs, React Native for Web plans to only support these W3C standards-based APIs in future versions. This will allow us to incrementally add APIs to React Native without needing to commit to simultaneously deprecating APIs and migrating existing React Native code. Existing React Native developers must adopt these APIs if they wish to support web.
 
-### Crate a separate package or export for DOM bindings
+### Create a separate package or export for DOM bindings
 
 The next step would be to begin exporting separate React DOM bindings from React Native. This would aim to allow code originally written with React DOM to run on React Native with only minor modifications. There would be no need to use React Native for Web, and the web layer in this scenario would be a lot smaller, limited mostly to implementing the modern W3C events API and integrating a style API that allows for static extraction to optimized CSS.
 
@@ -270,24 +269,25 @@ Aiming for a degree of React DOM compatibility shifts the burden of missing feat
 
 ### Properties
 
-* [ ] [`devicePixelRatio`](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
-* [ ] [`navigator`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator)
+* [ ] [`window.devicePixelRatio`](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
+* [ ] [`window.navigator`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator)
   * [ ] [`clipboard`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard)
   * [ ] [`languages`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages)
   * [ ] [`permissions`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/permissions)
   * [ ] [`vibrate()`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/vibrate)
-* [`performance`](https://developer.mozilla.org/en-US/docs/Web/API/performance_property)
+* [ ] [`window.performance`](https://developer.mozilla.org/en-US/docs/Web/API/performance_property)
 
 ### Methods
 
-* [ ] `addEventListener()`
-* [ ] `dispatchEvent()`
-* [ ] `removeEventListener()`
+* [ ] `window.addEventListener()`
+* [ ] `window.dispatchEvent()`
+* [ ] [`window.getSelection()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection)
+* [ ] `window.removeEventListener()`
 
 ### APIs
 
-* [ ] [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
-* [ ] [`matchMedia`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia). Resolves proposal [#350](https://github.com/react-native-community/discussions-and-proposals/issues/350).
+* [ ] [`window.fetch`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
+* [ ] [`window.matchMedia`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia). Resolves proposal [#350](https://github.com/react-native-community/discussions-and-proposals/issues/350).
 * [ ] [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) API for observing the intersection of target elements. This can also be used as a building block for performance tooling.
 * [ ] [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API for watching changes to the host node tree. This can also be used as a building block for performance tooling.
 * [ ] [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) API for responding the changes in the size of elements. Note that this API no longer includes positional coordinates and is optimized for width/height information.
@@ -296,6 +296,8 @@ Aiming for a degree of React DOM compatibility shifts the burden of missing feat
 
 Support the `document` object for common patterns such as listening to visibility changes, and listening to capture or bubble phase events for the entire application (e.g., "outside click" pattern), etc.
 
+The `document` object might not be exposed as a global, and would instead be accessed via `node.getRootNode()` to ensure code accounts for multi-window / multi-root scenarios that are more common for React Native apps than React DOM apps (rendering into sourceless iframes is a similar use case).
+
 ### Events
 
 * [ ] [`scroll`](https://developer.mozilla.org/en-US/docs/Web/API/Document/scroll_event).
@@ -303,12 +305,13 @@ Support the `document` object for common patterns such as listening to visibilit
 
 ### Properties
 
-- [ ] [`activeElement`](https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement).
-- [ ] [`visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState)
+- [ ] [`document.activeElement`](https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement).
+- [ ] [`document.defaultView`](https://developer.mozilla.org/en-US/docs/Web/API/Document/defaultView). Returns the `window` object associated with a `document`, or `null` if none is available.
+- [ ] [`document.visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState)
 
 ### Methods
 
-- [ ] [`getElementFromPoint(x,y)`](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint). Resolves proposal [#501](https://github.com/react-native-community/discussions-and-proposals/issues/501).
+- [ ] [`document.getElementFromPoint(x,y)`](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint). Resolves proposal [#501](https://github.com/react-native-community/discussions-and-proposals/issues/501).
 
 -----
 
@@ -338,50 +341,87 @@ The DOM Node interface is an abstract base class upon which many other DOM API o
 
 In some cases, a particular feature of the base Node interface may not apply to one of its child interfaces; in that case, the inheriting node may return null or throw an exception, depending on circumstances.
 
-### Methods
+### Static properties
+
+[Node type constants](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType#value)
+
+- [ ] `Node.ELEMENT_NODE` (1)
+- [ ] `Node.TEXT_NODE` (3)
+- [ ] `Node.DOCUMENT_NODE` (9)
+
+[Document position constants](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition#value)
+
+- [ ] `Node.DOCUMENT_POSITION_DISCONNECTED` (1)
+- [ ] `Node.DOCUMENT_POSITION_PRECEDING` (2)
+- [ ] `Node.DOCUMENT_POSITION_FOLLOWING` (4)
+- [ ] `Node.DOCUMENT_POSITION_CONTAINS` (8)
+- [ ] `Node.DOCUMENT_POSITION_CONTAINED_BY` (16)
+
+### Instance properties
+
+- [ ] [`node.childNodes`](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes). Not a live collection.
+- [ ] [`node.firstChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild)
+- [ ] [`node.isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected)
+- [ ] [`node.lastChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild)
+- [ ] [`node.nextSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling)
+- [ ] [`node.nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName)
+- [ ] [`node.nodeType`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+- [ ] [`node.nodeValue`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) (always null)
+- [ ] [`node.parentElement`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement)
+- [ ] [`node.parentNode`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode)
+- [ ] [`node.previousSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling)
+- [ ] [`node.textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent)
+
+### Instances methods
 
 Node inherits methods from its parent, EventTarget.
 
-- [ ] [`Node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
-- [ ] [`Node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
-- [ ] [`Node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
+- [ ] [`node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
+- [ ] [`node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
+- [ ] [`node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
+- [ ] [`node.hasChildNodes()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes).
 
 ## Element
 
 Element is the most general base class from which all element objects (i.e. objects that represent elements) in a Document inherit. It only has methods and properties common to all kinds of elements. More specific classes inherit from Element.
 
-### Properties
+### Instance properties
 
 Element inherits properties from its parent interface, Node, and by extension that interface's parent, EventTarget.
 
-- [ ] [`Element.clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight) [Read only]. Returns a number representing the inner height of the element.
-- [ ] [`Element.clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft) [Read only]. Returns a number representing the width of the left border of the element.
-- [ ] [`Element.clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop) [Read only]. Returns a number representing the width of the top border of the element.
-- [ ] [`Element.clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth) [Read only]. Returns a number representing the inner width of the element.
-- [ ] [`Element.id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) [Read only]. Is a DOMString representing the id of the element.
-- [ ] [`Element.scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) [Read only]. Returns a number representing the scroll view height of an element.
-- [ ] [`Element.scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft). Is a number representing the left scroll offset of the element.
-- [ ] [`Element.scrollLeftMax`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeftMax) [Read only]. Returns a number representing the maximum left scroll offset possible for the element.
-- [ ] [`Element.scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop). A number representing number of pixels the top of the element is scrolled vertically.
-- [ ] [`Element.scrollTopMax`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTopMax) [Read only]. Returns a number representing the maximum top scroll offset possible for the element.
-- [ ] [`Element.scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth) [Read only]. Returns a number representing the scroll view width of the element.
+- [ ] [`element.childElementCount`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount).
+- [ ] [`element.children`](https://developer.mozilla.org/en-US/docs/Web/API/Element/children). Not a live collection.
+- [ ] [`element.clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight) [Read only]. Returns a number representing the inner height of the element.
+- [ ] [`element.clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft) [Read only]. Returns a number representing the width of the left border of the element.
+- [ ] [`element.clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop) [Read only]. Returns a number representing the width of the top border of the element.
+- [ ] [`element.clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth) [Read only]. Returns a number representing the inner width of the element.
+- [ ] [`element.firstElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild).
+- [ ] [`element.id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) [Read only]. Is a DOMString representing the id of the element.
+- [ ] [`element.lastElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild).
+- [ ] [`element.nextElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling).
+- [ ] [`element.previousElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling).
+- [ ] [`element.scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) [Read only]. Returns a number representing the scroll view height of an element.
+- [ ] [`element.scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft). Is a number representing the left scroll offset of the element.
+- [ ] [`element.scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop). A number representing number of pixels the top of the element is scrolled vertically.
+- [ ] [`element.scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth) [Read only]. Returns a number representing the scroll view width of the element.
+- [ ] [`element.tagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) (alias for nodeName).
 
-### Methods
+### Instance methods
 
 Element inherits methods from its parents Node, and its own parent, EventTarget.
 
-- [ ] [`Element.computedStyleMap()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/computedStyleMap). Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
-- [ ] [`Element.getAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute). Returns the value of a specified attribute on the element.
-- [ ] [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Returns the size of an element and its position relative to the viewport.
-- [ ] [`Element.getClientRects()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects). Returns a collection of `DOMRect` objects that indicate the bounding rectangles for each CSS border box in a client.
-- [ ] [`Element.hasAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute). Returns a Boolean value indicating whether the specified element has the specified attribute or not.
-- [ ] [`Element.hasPointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasPointerCapture). Checks whether the element on which it is invoked has pointer capture for the pointer identified by the given pointer ID.
-- [ ] [`Element.scroll()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scroll). Scrolls to a particular set of coordinates inside a given element.
-- [ ] [`Element.scrollBy()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollBy). Scrolls an element by the given amount.
-- [ ] [`Element.scrollIntoView()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView). Scrolls the page until the element gets into the view.
-- [ ] [`Element.scrollTo()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo). Scrolls to a particular set of coordinates inside a given element.
-- [ ] [`Element.setPointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture). Used to designate a specific element as the capture target of future pointer events. Subsequent events for the pointer will be targeted at the capture element until capture is released.
-- [ ] [`Element.releasePointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/releasePointerCapture). Releases (stops) pointer capture that was previously set for a specific (PointerEvent) pointer.
+- [ ] [`element.computedStyleMap()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/computedStyleMap). Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
+- [ ] [`element.getAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute). Returns the value of a specified attribute on the element.
+- [ ] [`element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Returns the size of an element and its position relative to the viewport.
+- [ ] [`element.getClientRects()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects). Returns a collection of `DOMRect` objects that indicate the bounding rectangles for each CSS border box in a client.
+- [ ] [`element.hasAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute). Returns a Boolean value indicating whether the specified element has the specified attribute or not.
+- [ ] [`element.hasPointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasPointerCapture). Checks whether the element on which it is invoked has pointer capture for the pointer identified by the given pointer ID.
+- [ ] [`element.scroll()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scroll). Scrolls to a particular set of coordinates inside a given element. (Note that this would be async in React Native.)
+- [ ] [`element.scrollBy()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollBy). Scrolls an element by the given amount. (Note that this would be async in React Native.)
+- [ ] [`element.scrollIntoView()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView). Scrolls the page until the element gets into the view. (Note that this would be async in React Native.)
+- [ ] [`element.scrollTo()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo). Alias for `scroll()`.
+- [ ] [`element.setPointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture). Used to designate a specific element as the capture target of future pointer events. Subsequent events for the pointer will be targeted at the capture element until capture is released.
+- [ ] [`element.releasePointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/releasePointerCapture). Releases (stops) pointer capture that was previously set for a specific (PointerEvent) pointer.
 
 ### Events
 
@@ -727,9 +767,9 @@ Additional events for `<img>`.
 - [ ] [`on-error`](https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event)
 - [ ] `on-load`
 
-## `<input>` and `<textarea>` props
+## `<input>` props
 
-Additional props for `<input>` and `<textarea>`.
+Additional props for `<input>`.
 
 - [x] [`autoComplete`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete) is the same as mapped values for existing `autoComplete` (Android) and `textContentType` (iOS).
 - [ ] [`disabled`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/disabled).
@@ -749,7 +789,33 @@ Additional props for `<input>` and `<textarea>`.
 - [ ] [`placeholder`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder).
 - [x] [`readOnly`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#readonly) is the same as inverse `editable`.
 - [ ] [`required`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#required).
-- [x] [`rows`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-rows) is the same as `numberOfLines` (`<textarea>` only).
+- [ ] [`spellCheck`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-spellcheck).
+- [ ] [`type`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#type).
+- [ ] [`value`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#value).
+
+## `<textarea>` props
+
+Additional props for `<textarea>`.
+
+- [x] [`autoComplete`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete) is the same as mapped values for existing `autoComplete` (Android) and `textContentType` (iOS).
+- [ ] [`disabled`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/disabled).
+- [x] [`enterKeyHint`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/enterkeyhint) is the same as mapped values for `returnKeyType`.
+- [x] [`inputMode`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode)  is the same as mapped values for `keyboardType`.
+  - [x] `inputMode === 'decimal'` is the same as `keyboardType = 'decimal-pad'`.
+  - [x] `inputMode === 'email'` is the same as `keyboardType = 'email-address'`.
+  - [x] `inputMode === 'none'` is the same as `showSoftInputOnFocus = false`.
+  - [x] `inputMode === 'numeric'` is the same as `keyboardType = 'numeric'`.
+  - [x] `inputMode === 'search'` is the same as `keyboardType = 'search'`.
+  - [x] `inputMode === 'tel'` is the same as `keyboardType = 'phone-pad'`.
+  - [x] `inputMode === 'url'` is the same as `keyboardType = 'url'`.
+- [ ] [`max`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max).
+- [x] [`maxLength`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/maxlength).
+- [ ] [`min`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min).
+- [ ] [`minLength`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/minlength).
+- [ ] [`placeholder`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder).
+- [x] [`readOnly`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#readonly) is the same as inverse `editable`.
+- [ ] [`required`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#required).
+- [x] [`rows`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-rows) is the same as `numberOfLines`.
 - [ ] [`spellCheck`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-spellcheck).
 - [ ] [`value`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#value).
 
@@ -933,22 +999,18 @@ Proposed syntax:
 
 ```js
 // Either
-const styles = StyleSheet.create({
-  root: {
-    position: 'absolute',
-    '@media (max-width: 600px)': {
-      position: 'sticky',
-    }
+css({
+  position: 'absolute',
+  '@media (max-width: 600px)': {
+    position: 'sticky',
   }
 });
 
 // Or
-const styles = StyleSheet.create({
-  root: {
-    position: {
-      default: 'absolute',
-      '@media (max-width: 600px)': 'sticky',
-    }
+css({
+  position: {
+    default: 'absolute',
+    '@media (max-width: 600px)': 'sticky',
   }
 });
 ```
@@ -956,19 +1018,18 @@ const styles = StyleSheet.create({
 The benefit of the latter is clearer expectations (and greater constraints) about when properties are overridden. For example, it's not as clear what the value for `position` would be in the following:
 
 ```js
-const styles = StyleSheet.create({
-  root: {
+css(
+  {
     position: 'absolute',
     '@media (max-width: 600px)': {
       position: 'sticky',
     }
   },
-  override: {
+  {
     position: 'relative',
   }
-});
+);
 
-const style = [ styles.root, styles.override ];
 // {
 //   position: relative,
 //   '@media (max-width: 600px)': {
@@ -980,21 +1041,20 @@ const style = [ styles.root, styles.override ];
 Whereas in the next example we can set expectations that a property *and any previous conditions* are completed overridden by any declaration that later modifies the property in any way.
 
 ```js
-const styles = StyleSheet.create({
-  root: {
+css(
+  {
     position: {
       default: 'absolute',
       '@media (max-width: 600px)': 'sticky'
     }
   },
-  override: {
+  {
     position: {
       default: 'relative',
     }
   }
-});
+);
 
-const style = [ styles.root, styles.override ];
 // {
 //   position: relative
 // }
