@@ -34,7 +34,7 @@ Without lazy bundling, Metro's core bundling algorithm consists of:
 
 Lazy bundling will modify steps (3) and (4) above so that:
 * The bundler avoids traversing/transforming `import()` dependencies.
-* For each `import()` dependency, the serializer adds the dependency's module ID and an **opaque bundle path* to its dependents' `define()` calls.
+* For each `import()` dependency, the serializer adds the dependency's module ID and an *opaque bundle path* to its dependents' `define()` calls.
   * Conceptually, the bundle path may be any value that `__loadBundleAsync` (see below) knows how to handle.
   * As an implementation detail, the bundle path is a string, and contains a server-relative URL where the imported module can be fetched from Metro.
   * The serializer will add a `paths` object to the dependency map, containing a mapping from module IDs to bundle path.
@@ -108,7 +108,7 @@ Apart from these implementation differences, the underlying concept remains the 
 
 ## Adoption strategy / How we teach this
 
-Lazy bundling is not a breaking change: In development, all React Native apps already need to be connected to a working Metro server to support things like Fast Refresh, LogBox symbolication, and debugging.
+Lazy bundling is not a breaking change from the perspective of React Native apps, so we can ship and enable it by default in the course of a single release of React Native. In development, all React Native apps already need to be connected to a working Metro server to support things like Fast Refresh, LogBox symbolication, and debugging - and this same requirement is sufficient for lazy bundling to work.
 
 From user code's perspective the API for lazy bundling is `import()` + `React.lazy()`. These are APIs that already work in Metro (and in React web apps in general) so they do not need to be taught, but they are probably not used very often in existing React Native code (since they do not perform any form of bundle splitting by default).
 
