@@ -390,7 +390,7 @@ There are currently 2 [built-in animation systems in React Native](https://react
 
 With the current animation systems, the observable state from JavaScript would likely be out of sync, but still consistent within the same event or effect phase. We need to make sure this is communicated effectively to users.
 
-**Reanimated** is a widely used library for animations in React Native. In that case, all **animation ticks are defined in the shadow tree, but updates are not synchronized with the JavaScript thread**. That means the consistency guarantees defined in this proposal are not respected, so it would be possible to observe inconsistent values in the same JavaScript task. That is not the only problem we would have with this library. As we do not currently provide the necessary hooks to implement animations in userland, they had to inject a custom UIManager binding to JavaScript and fork our UIManager implementation. That means they would also have to propagate the changes we make to UIManager in the React Native codebase so their users can access these new APIs.
+**Reanimated** is a widely used library for animations in React Native. In that case, all **animation ticks are defined in the shadow tree, but updates are not synchronized with the JavaScript thread**. That means the consistency guarantees defined in this proposal are not respected, so it would be possible to observe inconsistent values in the same JavaScript task. They also extend certain core libraries in order to implement this animation libraries (like the `UIManager` binding in JavaScript), as we currently do not provide extension points to allow this. We would have to verify that their extensions continue working after we make these changes.
 
 These animation systems have known problems that do not seem solvable with incremental changes, and there have been talks about building a new system (integrated into React) to solve them. This new system could also solve the synchronization problems mentioned here. For example, it could force the animation state to be flushed to the shadow tree when executing JavaScript code that is synchronized with the UI thread, like synchronous events.
 
@@ -670,3 +670,4 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 |Date	|Author	|Change	|
 |---	|---	|---	|
 |2023-03-01	| [Rubén Norte](https://github.com/rubennorte)	|Initial version published	|
+|2023-03-02	| [Rubén Norte](https://github.com/rubennorte)	|Fixed information about Reanimated	|
