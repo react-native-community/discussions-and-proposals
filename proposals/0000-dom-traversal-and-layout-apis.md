@@ -2,6 +2,7 @@
 title: DOM traversal and layout APIs in React Native
 author: Rubén Norte
 date: 2023-03-01
+updated: 2023-03-10
 ---
 
 # RFC: DOM traversal and layout APIs in React Native
@@ -629,7 +630,9 @@ Another alternative would be to continue disallowing access to the host tree. Ma
 
 ## Adoption strategy
 
-The proposed APIs would only be available in the new React Native architecture, so its rollout and documentation should be done in parallel.
+The proposed APIs would only be available in the new React Native architecture, so its rollout and documentation should be done after it (or in parallel).
+
+Additionally, we would gate these APIs behind a feature flag until they are stable. This is to avoid having unstable APIs exposed direclty or having non-standard names for them (like `unstable_getBoundingClientRect`) that would have to be migrated after.
 
 We should document these APIs in the [React Native website](https://reactnative.dev/):
 
@@ -671,3 +674,4 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 |---	|---	|---	|
 |2023-03-01	| [Rubén Norte](https://github.com/rubennorte)	|Initial version published	|
 |2023-03-02	| [Rubén Norte](https://github.com/rubennorte)	|Fixed information about Reanimated	|
+|2023-03-10	| [Rubén Norte](https://github.com/rubennorte)	| Added rollout strategy with feature flag	|
