@@ -7,7 +7,7 @@ author:
 date: 2022-05-18
 ---
 
-# RFC0006: React Native as a monorepo
+# RFC0480: React Native as a monorepo
 
 ## Summary
 
