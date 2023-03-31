@@ -67,7 +67,7 @@ One of the primary driver of this proposal is the [New React Native Architecture
   * As of today, there is no way to enable New Architecture for an app project for both platforms
   * Moreover, the file vs environment variable leads to a scenario where you can't know if a app supports New Architecture or not by inspecting the code (as New Architecture support is known at  `pod install` time and is not codified in the codebase)
 
-Therefore we propose to add the `newArch` section to the `reactNativeManifest` of **both apps and libraries** with the following semantic:
+Therefore we propose to add the `newArch` section to the `reactNativeManifest.capabilities` of **both apps and libraries** with the following semantic:
 * For Apps: `newArch.enabled==true` implies that the app wants to use the New Architecture.
 * For Libraries: `newArch.enabled==true` implies that the library is compatible with the New Architecture.
 
@@ -78,8 +78,10 @@ The setup would look as follows for both apps and libraries:
 ```json
 {
   "reactNativeManifest": {
-    "newArch": {
-      "enabled": true
+    "capabilities": {
+      "newArch": {
+        "enabled": true
+      }
     }
   }
 }
@@ -90,12 +92,18 @@ This section will allows also for split configuration between platforms:
 ```json
 {
   "reactNativeManifest": {
-    "newArch": {
-      "ios": {
-        "enabled": true
-      },
-      "android": {
-        "enabled": false
+    "android": {
+      "capabilities": {
+        "newArch": {
+          "enabled": true
+        }
+      }
+    },
+    "ios": {
+      "capabilities": {
+        "newArch": {
+          "enabled": true
+        }
       }
     }
   }
@@ -107,16 +115,18 @@ This section will allows also for split configuration between platforms:
 Similarly to New Architecture support metadata, the `codegenConfig` is a key metadata of the New Architecture build pipeline.
 Currently the `codegenConfig` is a **top-level** key in the `package.json` of a project. 
 
-We propose to move this key under the `reactNativeManifest` section as follows:
+We propose to move this key under the `reactNativeManifest.capabilites` section as follows:
 ```json
 {
   "reactNativeManifest": {
-    "codegenConfig": {
-      "name": "MyLib",
-      "type": "all",
-      "jsSrcsDir": ".",
-      "android": {
-        "javaPackageName": "com.example.mypackage"
+    "capabilities": {
+      "codegenConfig": {
+        "name": "MyLib",
+        "type": "all",
+        "jsSrcsDir": ".",
+        "android": {
+          "javaPackageName": "com.example.mypackage"
+        }
       }
     }
   }
@@ -127,13 +137,15 @@ We propose to move this key under the `reactNativeManifest` section as follows:
 
 Similarly to New Architecture support, the current way to enable/disable the Hermes engine is toggled by using a Gradle Property `hermesEnabled` on Android and changing the `:hermes_enabled` property in the Podfile.
 
-We propose to add the `hermes` section under the `reactNativeManifest` section as follows:
+We propose to add the `hermes` section under the `reactNativeManifest.capabilities` section as follows:
 
 ```json
 {
   "reactNativeManifest": {
-    "hermes": {
-      "enabled": true
+    "capabilities": {
+      "hermes": {
+        "enabled": true
+      }
     }
   }
 }
@@ -144,12 +156,18 @@ which will also allow for split configuration between platforms as follows:
 ```json
 {
   "reactNativeManifest": {
-    "hermes": {
-      "ios": {
-        "enabled": true
-      },
-      "android": {
-        "enabled": false
+    "android": {
+      "capabilities": {
+        "hermes": {
+          "enabled": true
+        }
+      }
+    },
+    "ios": {
+      "capabilities": {
+        "hermes": {
+          "enabled": true
+        }
       }
     }
   }
@@ -210,7 +228,7 @@ The React Native direcotry can easily consume the `reactNativeManifest` by:
 ## Future proof and extensibility
 
 We believe that the `reactNativeManifest` section should be extensible as we believe new capabilities and features can be added there.
-Specifically, we envision to evolve `reactNativeManifest` as follows:
+Specifically, we envision to evolve `reactNativeManifest` or `reactNativeManifest.capabilites` as follows:
 
 1. Each addition of a new capability [requires a new RFC](https://github.com/react-native-community/discussions-and-proposals#proposals) to be approved.
 2. Each RFC should define a new section in the `reactNativeManifest` with what's the intended use case.
@@ -225,36 +243,28 @@ For an app the section will look as follows:
     
 ```json
 {
-    "name": "my-awesome-app",
-    "version": "1.2.3",
-    "reactNativeManifest": {
-        "version": "1.0",
-        "type": "app",
-        "hermes": {
-            "ios": {
-                "enabled": true
-            },
-            "android": {
-                "enabled": false
-            }
-        },
-        "newArch": {
-            "ios": {
-                "enabled": true
-            },
-            "android": {
-                "enabled": false
-            }
-        },
-        "codegenConfig": {
-            "name": "AppSpecs",
-            "type": "all",
-            "jsSrcsDir": ".",
-            "android": {
-                "javaPackageName": "com.facebook.fbreact.specs"
-            }
+  "name": "my-awesome-app",
+  "version": "1.2.3",
+  "reactNativeManifest": {
+    "version": "1.0",
+    "type": "app",
+    "capabilities": {
+      "hermes": {
+        "enabled": true
+      },
+      "newArch": {
+        "enabled": true
+      },
+      "codegenConfig": {
+        "name": "AppSpecs",
+        "type": "all",
+        "jsSrcsDir": ".",
+        "android": {
+          "javaPackageName": "com.facebook.fbreact.specs"
         }
+      }
     }
+  }
 }
 ```
 
@@ -262,26 +272,28 @@ For a library the section will look as follows:
 
 ```json
 {
-    "reactNativeManifest": {
-        "version": "1.0",
-        "type": "library",
-        "newArch": {
-            "ios": {
-                "enabled": true
-            },
-            "android": {
-                "enabled": false
-            }
-        },
-        "codegenConfig": {
-            "name": "AppSpecs",
-            "type": "all",
-            "jsSrcsDir": ".",
-            "android": {
-                "javaPackageName": "com.facebook.fbreact.specs"
-            }
+  "name": "my-awesome-library",
+  "version": "1.2.3",
+  "reactNativeManifest": {
+    "version": "1.0",
+    "type": "library",
+    "capabilities": {
+      "hermes": {
+        "enabled": true
+      },
+      "newArch": {
+        "enabled": true
+      },
+      "codegenConfig": {
+        "name": "LibrarySpecs",
+        "type": "all",
+        "jsSrcsDir": ".",
+        "android": {
+          "javaPackageName": "com.facebook.fbreact.specs"
         }
+      }
     }
+  }
 }
 ```
 
