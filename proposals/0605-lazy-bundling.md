@@ -2,7 +2,7 @@
 title: Lazy Bundling
 author:
 - Moti Zilberman
-date: today
+date: 2022-04-03
 ---
 
 # RFC0605: Lazy Bundling
@@ -63,6 +63,8 @@ The first time an `import()` call is evaluated with a given target, the default 
 // For lazy bundling: type SerializedBundlePath = string;
 declare function __loadBundleAsync(path: SerializedBundlePath): Promise<void>;
 ```
+
+`__loadBundleAsync` may be called multiple times with the same bundle path, including in parallel. It should implement caching as needed to avoid sending out unnecessary or duplicate requests. It is unspecified how `__loadBundleAsync` should derive its internal cache key from the provided bundle path.
 
 If there is no `__loadBundleAsync` implementation available, the bundled code may throw a runtime error upon attempting to evaluate an `import()` call.
 
