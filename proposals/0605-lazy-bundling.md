@@ -2,7 +2,7 @@
 title: Lazy Bundling
 author:
 - Moti Zilberman
-date: 2022-04-03
+date: 2023-04-03
 ---
 
 # RFC0605: Lazy Bundling
