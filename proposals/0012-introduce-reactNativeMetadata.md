@@ -227,6 +227,7 @@ Therefore we believe `align-deps` can benefit from this information and be exten
 ### React Native CLI support
 
 Ideally the CLI (or any other build tool) should be able to consume the `reactNativeManifest` section and warn at build time if a configuration is invalid (either by having an invalid value or by having a mixture of invalid configurations).
+For example, the CLI could use [jsonschema](https://npmjs.com/package/jsonschema) at build time and validate the `package.json` against the schema we provide.
 
 It's outside the scope of this RFC to delve into details of which tool will implement which logic and we defer this to a future discussion.
 
