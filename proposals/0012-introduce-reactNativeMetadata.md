@@ -207,6 +207,17 @@ Selectively toggling Fabric/TurboModule is a more advanced feature. We believe w
 
 This section lists the tooling we believe could be built on top of `reactNativeManifest` to improve the developer experience.
 
+### Build Logic support
+
+Build tools such as Gradle/CocoaPods or others should account for the `reactNativeManifest` section and use it to configure the build pipeline accordingly to this and future RFCs. Specifically they should follow this logic for a generic capability `foo`.
+
+1. If the capability `foo` is specificed in the `reactNativeManifest.capabilities` section, use the value specified in the `reactNativeManifest.capabilities.foo` section.
+   1. If the user is **also** specifying the capability `foo` in the build tool specific configuration (e.g. inside `gradle.properties` for Android) behave as follows:
+      1. If the two values are **compatible**, use them without notifying the user.
+      1. If the two values are **incompatible**, notify the user and use the value specified in the `reactNativeManifest.capabilities.foo` section will prevail and the value specified in the build tool specific configuration will be ignored.
+   1. If the user is **not** specifying the capability `foo` in the build tool specific configuration, honor the value specified in the `reactNativeManifest.capabilities.foo` section.
+1. If the capability `foo` is **not** specificed in the `reactNativeManifest.capabilities` section, honor the value specified in the build tool specific configuration or the default value if not specified.
+
 ### `align-deps` support
 
 This RFC originated from a [conversation between Meta and Microsoft](https://github.com/microsoft/rnx-kit/issues/1863) to use `align-deps` as key feature in the New Architecture rollout support, in helping developers understanding if a library they're using is New Architecture compatible or not. Very quickly it became clear that there is currently no straightforward way to know if a library indeed has that support.
