@@ -227,6 +227,8 @@ The React Native direcotry can easily consume the `reactNativeManifest` by:
 
 ## Future proof and extensibility
 
+We're versioning the schema using the `schema` key in the `reactNativeManifest` section. This allows us to evolve the schema in the future without breaking changes. We believe that the `schema` key should be a semver version string.
+
 We believe that the `reactNativeManifest` section should be extensible as we believe new capabilities and features can be added there.
 Specifically, we envision to evolve `reactNativeManifest` or `reactNativeManifest.capabilites` as follows:
 
@@ -246,7 +248,7 @@ For an app the section will look as follows:
   "name": "my-awesome-app",
   "version": "1.2.3",
   "reactNativeManifest": {
-    "version": "1.0",
+    "schema": "1.0.0",
     "type": "app",
     "capabilities": {
       "hermes": {
@@ -275,7 +277,7 @@ For a library the section will look as follows:
   "name": "my-awesome-library",
   "version": "1.2.3",
   "reactNativeManifest": {
-    "version": "1.0",
+    "schema": "1.0.0",
     "type": "library",
     "capabilities": {
       "hermes": {
