@@ -25,7 +25,7 @@ These problems lead to larger bundle sizes, worse runtime performance, and slow 
 
 The unstable `experimentalImportSupport: true` flag in Metro enables built-in ESM support similar to Babel's (notably, with the same `__esModule: true` interop) that solves the above problems. This has been in use at Meta for the last few years. This proposal aims to make this the default behaviour in Metro in a way that is least disruptive.
 
-Any change to the semantics and ordering of module initialisation is breaking, so this proposal also includes an opt-out mechanism and warnings when the build is misconfigured.
+Any change to the semantics and ordering of module initialisation is theoretically breaking, so this proposal also includes an opt-out mechanism and warnings when the build is misconfigured.
 
 ## Detailed design
 
@@ -49,7 +49,7 @@ As a result of these changes, we will no longer need to dynamically set `disable
 
 In case the new `import` inlining causes issues, users can revert to the old behaviour by manually adding `@babel/plugin-transform-modules-commonjs` to their Babel configs. Note that it may not be the *exact* old behaviour (because Metro currently has [custom defaults](https://github.com/facebook/metro/blob/main/packages/metro-react-native-babel-preset/src/configs/main.js#L66-L68) for the `lazy` Babel option), but it will be *possible* to configure the plugin to closely model the old behaviour as needed.
 
-For most users, a better option than reverting will be to blocklist specific modules from the inlining behaviour, or better yet, fix the reliance on implicit module side effects. We will provide easy-to-follow guidance and include in the release announcement.
+For most users, a better option than reverting will be to blocklist specific modules from the inlining behaviour, or better yet, fix the reliance on implicit module side effects. We will provide easy-to-follow guidance and include it in the release announcement.
 
 If any of the removed config flags (`experimentalImportSupport`, `disableImportExportTransform` and `lazyImportExportTransform`) are detected, Metro will show warnings in the terminal with relevant instructions on how to migrate the Metro config correctly. The flags will not have an effect on Metro's output.
 
@@ -72,7 +72,9 @@ There are tradeoffs to choosing any path. Attempt to identify them here.
 
 ## Alternatives
 
-What other designs have been considered? Why did you select your approach?
+Inlining `require` calls and `import`s is nonstandard behaviour. There's an argument to be made for migrating to a system akin to Webpack's tree shaking implementation, which has fine-grained hints about whether expressions and modules are side-effect free. Such a system would take longer to build and roll out, and might require more migration effort in common cases.
+
+We could also disable all `require` and `import` inlining by default, but this would likely be a performance regression in common cases.
 
 ## Adoption strategy
 
