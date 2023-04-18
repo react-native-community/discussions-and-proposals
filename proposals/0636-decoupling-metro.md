@@ -14,11 +14,12 @@ Put control of Metro versions in the hands of developers by decoupling it from t
 ## High-level
 
 ### Before
-<img width="470" alt="image" src="https://user-images.githubusercontent.com/2590098/232753387-5ac49576-be87-4ea4-bac8-906cb3322b7e.png">
+
+<img width="559" alt="image" src="https://user-images.githubusercontent.com/2590098/232757843-4a181007-d630-4510-8063-1e772def4392.png">
 
 ### After
 
-<img width="633" alt="image" src="https://user-images.githubusercontent.com/2590098/232753653-e1e31695-c9ef-45f7-ad5f-a224c4efe6ac.png">
+<img width="731" alt="image" src="https://user-images.githubusercontent.com/2590098/232756506-5e0c86e7-fe1b-496d-8020-3fd0b2c2a9e1.png">
 
 ## Motivation
 
