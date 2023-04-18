@@ -28,12 +28,10 @@ TODO
 
 ## Detailed design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
-
 ### Terminology
  - **Metro Packages**: NPM packages published from the [`facebook/metro` monorepo](https://github.com/facebook/metro), that is `metro`, packages with a `metro-` prefix, and `ob1`.
- - **RNCLI**: 
- - **Template**: The template used for projects initialised with `react-native-community/cli`, distributed as part of `react-native`.
+ - **RNCLI**: Project/packages under [`react-native-community/cli`](https://github.com/react-native-community/cli)
+ - **Template**: The template used for projects initialised with RNCLI, distributed as part of `react-native`.
  - **RN Monorepo**: The monorepo at [`facebook/react-native`](https://github.com/facebook/react-native), the source of `react-native` and `@react-native/*` NPM packages.
 
 ### Stage 1 - Move RN-coupled Metro packages to the RN Monorepo.
@@ -56,23 +54,24 @@ This is the bulk of the RFC. Explain the design in enough detail for somebody fa
 
 *Why does it belong in the RN Monorepo?*
 
- - Uses `metro-react-native-babel-preset`
+ - Uses `metro-react-native-babel-preset` (see above).
  - Must apply `react-refresh/babel` using the same version of `react-refresh` as is injected into the React Native runtime within `react-native` (details below).
- - Implements the Metro Babel transformer "interface" with customisations specific to React Native - these may change with React Native's capabilities.
+ - Implements the Metro Babel transformer "interface" with customisations specific to React Native - these may change with React Native's capabilities, and may wish to depend on other RN Monorepo concerns (eg., static viewconfig).
 
 *Decoupling from Metro*
 
-`metro-react-native-babel-transformer` has runtime and type dependencies on `metro-source-map`, and type dependencies on `metro-babel-transformer`. These may be eliminated by inversion or injection to allow the package to move to the RN monorepo.
+`metro-react-native-babel-transformer` has runtime and type dependencies on `metro-source-map`, and type dependencies on `metro-babel-transformer`. These may be eliminated by inversion or injection to allow the package to move to the RN Monorepo.
 
 **Note on Fast Refresh - dependencies on `react-refresh`**
 
 Currently, each of `metro-runtime`, `metro-react-native-babel-transformer` and `react-native` have dependencies on `react-refresh` that *must align* - this has made upgrading it problematic in the past. 
 
-The concrete dependencies are in the transformer (for `react-refresh/babel`) and in [`react-native/Libraries/Core`](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L22) (to inject `react-refresh/runtime`). `metro-runtime`'s two dependencies are:
- 1. Indirect, via calls to the `__ReactRefresh` global API [defined in RN](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L24-L50) (or other Metro clients) and,
- 2. Explicit, to re-export `metro-runtime/refresh-runtime` for RN's benefit.
+The concrete dependencies are in the transformer (for `react-refresh/babel`) and in [`react-native/Libraries/Core`](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L22) (to inject `react-refresh/runtime`). `metro-runtime`'s dependencies are:
+ 1. Indirect, via calls to the `__ReactRefresh` global API [defined in RN](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L24-L50) (or other Metro clients),
+ 2. Implicit, for the signatures of `$RefreshReg$` and `$RefreshSig$`, and,
+ 3. Explicit, to re-export `metro-runtime/refresh-runtime` for RN's benefit.
 
-(1) can remain as-is since the contract is between Metro and client runtime, which abstracts and extends `react-refresh`, rather than with `react-refresh` directly. (2) is not yet in used and can be removed, though it will do no harm if its version diverges.
+(1) can remain as-is since the contract is between Metro and client runtime, which abstracts and extends `react-refresh`, rather than with `react-refresh` directly. (2) seems stable enough to be resilient to `react-refresh` updates (and where it does change, we can ultimately reflect incompatibily in peer dependency constraints). (3) is not yet used and can be deprecated (by implementing this RFC it won't matter if `metro-runtime`'s re-export of `react-refresh` is of a different version) and ultimately removed.
 
 ### Stage 2 - Eliminate direct dependencies on `metro-*` subpackages.
 ***Goal: Minimise impact to user template and allow for a single "source of truth" for Metro's version in a given project.***
