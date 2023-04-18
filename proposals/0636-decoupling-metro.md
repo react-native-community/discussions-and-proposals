@@ -11,9 +11,14 @@ date: 2023-04-17
 
 Put control of Metro versions in the hands of developers by decoupling it from the `react-native-community/cli` and `facebook/react-native` release schedules, and making it a project-level dependency. Allow features and fixes to reach React Native users faster, and shorten the feedback loop.
 
-## Basic example
+## High-level
 
-TODO
+### Before
+<img width="470" alt="image" src="https://user-images.githubusercontent.com/2590098/232753387-5ac49576-be87-4ea4-bac8-906cb3322b7e.png">
+
+### After
+
+<img width="633" alt="image" src="https://user-images.githubusercontent.com/2590098/232753653-e1e31695-c9ef-45f7-ad5f-a224c4efe6ac.png">
 
 ## Motivation
 
@@ -103,4 +108,8 @@ TODO
 
 ## Unresolved questions
 
-There are various alternatives in the details of the design - for example, either or both of `@react-native/babel-preset` and `@react-native/metro-babel-transformer` could, instead of being new packages, simply be directories within `react-native`. The tradeoffs here are mostly "internal" to contributors and the release process.
+ - ***Separate packages?*** Either or both of `@react-native/babel-preset` and `@react-native/metro-babel-transformer` could, instead of being new packages, simply be directories within `react-native`. The tradeoffs here are mostly "internal" to contributors and the release process.
+
+ - ***Re-export babel-preset?*** If `@react-native/babel-preset` *is* a separate package, we could either make it a Template dependency - a direct swap for the current `metro-react-native-babel-preset` dependency, or re-export it from `react-native/babel-preset`.
+
+ - ***`@react-native/metro-config`*** Similarly, it's unclear whether this needs to be a Template dependency under the current setup or whether we could re-export the necessary APIs from `metro` and `react-native`.
