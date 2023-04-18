@@ -25,21 +25,79 @@ Please focus on explaining the motivation so that if this RFC is not accepted, t
 
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
 
+### Terminology
+ - **Metro Packages**: NPM packages published from the [`facebook/metro` monorepo](https://github.com/facebook/metro), that is `metro`, packages with a `metro-` prefix, and `ob1`.
+ - **RNCLI**: 
+ - **Template**: The template used for projects initialised with `react-native-community/cli`, distributed as part of `react-native`.
+ - **RN Monorepo**: The monorepo at [`facebook/react-native`](https://github.com/facebook/react-native), the source of `react-native` and `@react-native/*` NPM packages.
+
+### Stage 1 - Move RN-coupled Metro packages to the RN Monorepo.
+
+***Goal: Relocate Metro Packages that are tied to React Native versioning to allow for loose RN-Metro coupling***
+
+**`metro-react-native-babel-preset` -> `@react-native/babel-preset`**
+
+*Why does it belong in the RN Monorepo?*
+
+ - It's a conformant [Babel preset](https://babeljs.io/docs/presets#creating-a-preset) not inherently coupled to Metro in any way (hence proposed name does not include "metro").
+ - Used by Jest in the RN Monorepo to test React Native code, unrelated to Metro.
+ - Designed so that the output is minimally downlevelled to support all React Native target runtimes / compilers. When the preset is modified it's either to reflect changes in those capabilities or to accommodate new features for RN developers.
+
+ *Decoupling from Metro*
+
+ This package has no dependencies on Metro Packages, and is only depended upon by `metro-react-native-babel-transformer` and the Template, so it can be moved alongside the transformer.
+
+**`metro-react-native-babel-transformer` -> `@react-native/metro-babel-transformer`**
+
+*Why does it belong in the RN Monorepo?*
+
+ - Uses `metro-react-native-babel-preset`
+ - Must apply `react-refresh/babel` using the same version of `react-refresh` as is injected into the React Native runtime within `react-native` (details below).
+ - Implements the Metro Babel transformer "interface" with customisations specific to React Native - these may change with React Native's capabilities.
+
+*Decoupling from Metro*
+
+`metro-react-native-babel-transformer` has runtime and type dependencies on `metro-source-map`, and type dependencies on `metro-babel-transformer`. These may be eliminated by inversion or injection to allow the package to move to the RN monorepo.
+
+**Note on Fast Refresh - dependencies on `react-refresh`**
+
+Currently, each of `metro-runtime`, `metro-react-native-babel-transformer` and `react-native` have dependencies on `react-refresh` that *must align* - this has made upgrading it problematic in the past. 
+
+The concrete dependencies are in the transformer (for `react-refresh/babel`) and in [`react-native/Libraries/Core`](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L22) (to inject `react-refresh/runtime`). `metro-runtime`'s two dependencies are:
+ 1. Indirect, via calls to the `__ReactRefresh` global API [defined in RN](https://github.com/facebook/react-native/blob/72d2880999a64957156f80ca61254af991252f51/packages/react-native/Libraries/Core/setUpReactRefresh.js#L24-L50) (or other Metro clients) and,
+ 2. Explicit, to re-export `metro-runtime/refresh-runtime` for RN's benefit.
+
+(1) can remain as-is since the contract is between Metro and client runtime, which abstracts and extends `react-refresh`, rather than with `react-refresh` directly. (2) is not yet in used and can be removed, though it will do no harm if its version diverges.
+
+### Stage 2 - Eliminate direct dependencies on `metro-*` subpackages.
+***Goal: Minimise impact to user template and allow for a single "source of truth" for Metro's version in a given project.***
+
+Example: `@react-native-community/cli-plugin-metro` depends on `metro`, `metro-runtime`, and `metro-config` - these are listed separately in its `package.json` and should always align. If we were to move these to `peerDependencies` (stage 3) they would have to all be individually listed in the user project's `package.json`, which creates noise and the potential for mismatch.
+
+Design: Re-export necessary types and APIs from `metro` and use it as an umbrella package, at least for the needs of RNCLI and RN.
+
+### Stage 3 - Add `metro` to Template dependencies and make it a peer dependency of RN and RNCLI.
+***Goal: User control of Metro version, within peer constraints set by React Native/Metro***
+
+Design: Add `metro` to Template `package.json` under `dependencies`. Within RN and RNCLI, move `metro` from `dependencies` or `devDependencies` into `peerDependencies` with a reasonably permissive version constraint.
+
+### Stage 3 - Add `metro` to Template dependencies and make it a peer dependency of RN and RNCLI.
+
 ## Drawbacks
 
-Why should we _not_ do this? Please consider:
+### Template churn
+Any change to the Template increases the friction of upgrading React Native, which is already a commonly-reported pain point.
 
-- implementation cost, both in term of code size and complexity
-- whether the proposed feature can be implemented in user space
-- the impact on teaching people React Native
-- integration of this feature with other existing and planned features
-- cost of migrating existing React Native applications (is it a breaking change?)
-
-There are tradeoffs to choosing any path. Attempt to identify them here.
+### Fewer batteries included
+React Native effectively comes with an integrated bundler
 
 ## Alternatives
 
-What other designs have been considered? Why did you select your approach?
+### High level
+Rather than `metro` being a project dependency, it could instead be a `react-native` dependency.
+
+### Details
+There are various alternatives in the details of the design - for example, either or both of `@react-native/babel-preset` and `@react-native/metro-babel-transformer` may be 
 
 ## Adoption strategy
 
