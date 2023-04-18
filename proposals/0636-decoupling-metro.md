@@ -8,8 +8,9 @@ date: 2023-04-17
 # RFC0636: Decoupling Metro
 
 ## Summary
-
-Put control of Metro versions in the hands of developers by decoupling it from the `react-native-community/cli` and `facebook/react-native` release schedules, and making it a project-level dependency. Allow features and fixes to reach React Native users faster, and shorten the feedback loop.
+ - Put control of Metro versions in the hands of developers by decoupling it from the `react-native-community/cli` and `facebook/react-native` release schedules, and making it a project-level dependency. 
+ - Allow features and fixes to reach React Native users faster, and shorten the feedback loop. 
+ - Ensure there is a single source of truth for the "Metro version" in a given project, without multiple projects having to agree pinned dependencies.
 
 ## High-level
 
