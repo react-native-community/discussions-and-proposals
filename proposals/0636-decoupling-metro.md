@@ -13,13 +13,11 @@ Put control of Metro versions in the hands of developers by decoupling it from t
 
 ## Basic example
 
-If the proposal involves a new or changed API, include a basic code example. Omit this section if it's not applicable.
+TODO
 
 ## Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
-
-Please focus on explaining the motivation so that if this RFC is not accepted, the motivation could be used to develop alternative solutions. In other words, enumerate the constraints you are trying to solve without coupling them too closely to the solution you have in mind.
+TODO
 
 ## Detailed design
 
@@ -81,36 +79,28 @@ Design: Re-export necessary types and APIs from `metro` and use it as an umbrell
 
 Design: Add `metro` to Template `package.json` under `dependencies`. Within RN and RNCLI, move `metro` from `dependencies` or `devDependencies` into `peerDependencies` with a reasonably permissive version constraint.
 
-### Stage 3 - Add `metro` to Template dependencies and make it a peer dependency of RN and RNCLI.
-
 ## Drawbacks
 
-### Template churn
-Any change to the Template increases the friction of upgrading React Native, which is already a commonly-reported pain point.
-
-### Fewer batteries included
-React Native effectively comes with an integrated bundler
+- **Template churn**: Any change to the Template increases the friction of upgrading React Native, which is already a commonly-reported pain point.
+- **Fewer batteries included**: React Native effectively has an "integrated" bundler, this would loosen the integration and perhaps perceived cohesion. However, in practice the barrier to installing Metro as a peer of RN is low, and installing a bundler alongside a UI framework is closer to the industry norm.
 
 ## Alternatives
 
 ### High level
-Rather than `metro` being a project dependency, it could instead be a `react-native` dependency.
-
-### Details
-There are various alternatives in the details of the design - for example, either or both of `@react-native/babel-preset` and `@react-native/metro-babel-transformer` may be 
+  - **`metro` as a `react-native` dependency rather than a Template dependency**: This addresses the Template churn and integration drawbacks above, but falls short of the goal of getting Metro releases to users as soon as they're available.
 
 ## Adoption strategy
 
-If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries?
+Stage 1 is not a breaking change - though we would cease publishing new versions of `metro-react-native-babel-preset` (etc.), existing users would be able to continue to use the published versions. There would be no immediate need to update their projects.
+
+Stage 2 is an internal change with no impact on users.
+
+Stage 3 will require that users update their projects to add `metro` to their `dependencies` - we could only introduce this with a major React Native release. However, package managers that don't auto-install peers (pnpm, yarn, npm<7) should clearly alert users to a missing peer dependency, and we can additionally mitigate by checking for the presence of Metro on RNCLI (or Expo CLI) launch, failing gracefully with instructions.
 
 ## How we teach this
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing React patterns?
-
-Would the acceptance of this proposal mean the React Native documentation must be re-organized or altered? Does it change how React Native is taught to new developers at any level?
-
-How should this feature be taught to existing React Native developers?
+TODO
 
 ## Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still TBD?
+There are various alternatives in the details of the design - for example, either or both of `@react-native/babel-preset` and `@react-native/metro-babel-transformer` could, instead of being new packages, simply be directories within `react-native`. The tradeoffs here are mostly "internal" to contributors and the release process.
