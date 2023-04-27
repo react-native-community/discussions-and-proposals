@@ -280,6 +280,7 @@ This approach would also make it possible to extend config plugins with other pl
 
 ## Alternatives
 
+- installing Expo to the project and using `npx expo prebuild` - RN version is dependend on Expo SDK release cycle, however there is a `--template` flag which unlocks possibility of using any template with other version. This solution is not recommended by Expo because of making some undocumented assumptions about the template.
 - integrating `@expo/config-plugins` with React Native CLI to unlock a path for developers to run `yarn add @expo/config-plugins` in their non-Expo projects and use it - we might end up with a misalignment between what parts of Expo Config Plugins we want to support in the CLI (everything that is not related to Expo) and what developers will be able to use in their projects (everything, even if it's Expo-specific). This may lead to many misunderstandings why some of the properties in `app.json` or some mods are not working.
 - creating a new library based on Expo Config Plugins, exposing only stuff not related to Expo - it's not making Config Plugins a standard in the RN ecosystem, as it makes it totally optional to have it as a dependency in projects and libraries
 - creating a brand new CLI supporting Config Plugins - we won't fix the major problem of the apps currently running on React Native CLI - easy RN upgrades. It would be another tool existing in the RN ecosystem, still requiring to add a new dependency to projects/libraries and working only when using it with specific tool.
