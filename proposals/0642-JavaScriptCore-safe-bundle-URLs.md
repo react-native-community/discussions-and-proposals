@@ -10,7 +10,7 @@ date: 2023-05-02
 
 ## Summary
 
-Add support for a query-string-free URL format to bundlers, so that symbolication (etc.) is not broken by JavaScriptCore error stack manipulation.
+Add support for a query-string-free URL format to bundlers, so that symbolication (etc.) is not broken by JavaScriptCore error stack manipulation introduced in https://github.com/WebKit/WebKit/commit/71985aa1520560154a329e5b54159fff3173cf22 (first appearing in iOS 16.4).
 
 ## Basic example
 
@@ -22,9 +22,9 @@ Should be supported by Metro (and other bundlers) equivalently and in addition t
 
 ## Motivation
 
-Recent versions of JavaScriptCore strip query strings from source URLs in stack traces (`Error.prototype.stack`).
+Recent versions of JavaScriptCore strip query strings from source URLs in stack traces (`Error.prototype.stack`). This had led to issues for React Native and Expo users
 
-To implement features such as Metro's `/symbolicate` endpoint correctly, we must be able to derive (a close approximation of) the source that was executed the client. To do so correctly we need to know the build parameters the client used originally.
+To implement features such as Metro's `/symbolicate` endpoint, we must be able to derive (a close approximation of) the source that was executed the client. To do so correctly we need to know the build parameters the client used originally. Those parameters being stripped (and defaults used instead) has manifested as obscure resolution errors for React Native users, on both Expo and the community CLI ([1](https://github.com/facebook/react-native/issues/36794), [2](https://github.com/expo/expo/issues/22008)).
 
 Ideally, for maximal compatibility with debuggers (etc.) that may intercept the raw error stack, the source URLs in the error stack should be sufficient, and should be valid URLs, without any post-processing or external context.
 
@@ -46,7 +46,7 @@ Because the alternative delimiter is made of reserved characters, it does not cr
 
 ## Alternatives
 
-## Encode+decode within React Native runtime
+### Encode+decode within React Native runtime
 Encode the source URL passed to JavaScriptCore to a format that won't be stripped, and need not be a URL (e.g., base64-encode the entire URL), catch errors within the runtime close to where they are thrown, and post-process stacks to decode and restore the original URLs before sending a `/symbolicate` request.
 
 Pros:
