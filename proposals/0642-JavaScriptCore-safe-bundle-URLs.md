@@ -22,7 +22,7 @@ Should be supported by Metro (and other bundlers) equivalently and in addition t
 
 ## Motivation
 
-Recent versions of JavaScriptCore strip query strings from source URLs in stack traces (`Error.prototype.stack`). This had led to issues for React Native and Expo users
+Recent versions of JavaScriptCore strip query strings from source URLs in stack traces (`Error.prototype.stack`).
 
 To implement features such as Metro's `/symbolicate` endpoint, we must be able to derive (a close approximation of) the source that was executed the client. To do so correctly we need to know the build parameters the client used originally. Those parameters being stripped (and defaults used instead) has manifested as obscure resolution errors for React Native users, on both Expo and the community CLI ([1](https://github.com/facebook/react-native/issues/36794), [2](https://github.com/expo/expo/issues/22008)).
 
@@ -30,7 +30,7 @@ Ideally, for maximal compatibility with debuggers (etc.) that may intercept the 
 
 ## Detailed design
 
-Use a character sequence from the "reserved" set specified in RFC 3986, namely `;&`, as an alternative delimiter in place of `?`, and URL-encode any `?` characters appearing within the subsequent query string, so that the result is a valid [`path`](https://www.rfc-editor.org/rfc/rfc3986#section-3.3).
+Use a character sequence from the "reserved" set specified in RFC 3986, namely `;&`, as an alternative delimiter in place of `?`, and percent-encode any `?` characters appearing within the subsequent query string, so that the result is a valid [`path`](https://www.rfc-editor.org/rfc/rfc3986#section-3.3).
 
 If the client sends a URL in this format, Metro should respond as if `?` was seen in place of the alternative delimiter, with the following exceptions:
  - Wherever the bundle itself encodes its own URL, source map URL, or the URLs of other bundles on the same server (such as for lazy bundling), those should use the alternative format for any included query strings *if and only if* the original bundle request used the alternative format. Otherwise, standard query strings starting with `?` should be emitted.
