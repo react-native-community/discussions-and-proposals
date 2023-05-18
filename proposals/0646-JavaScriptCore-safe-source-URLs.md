@@ -1,12 +1,12 @@
 ---
-title: JavaScriptCore-safe bundle URLs
+title: JavaScriptCore-safe source URLs
 authors:
 - Rob Hogan (@robhogan)
 - Moti Zilberman (@motiz88)
 date: 2023-05-02
 ---
 
-# RFC0642: JavaScriptCore-safe source URLs
+# RFC0646: JavaScriptCore-safe source URLs
 
 ## Summary
 
