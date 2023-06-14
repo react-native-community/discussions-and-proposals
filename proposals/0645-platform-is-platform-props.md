@@ -1,11 +1,11 @@
 ---
-title: Platform isPlatform props
+title: Platform isAndroid, isIOS, and isNative properties
 author:
   - Ryan Linton
 date: 2023-06-14
 ---
 
-# RFC0645: Platform isPlatform props
+# RFC0645: Platform isAndroid, isIOS, and isNative properties
 
 ## Summary
 
