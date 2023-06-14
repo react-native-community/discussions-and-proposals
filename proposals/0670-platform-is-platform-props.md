@@ -5,7 +5,7 @@ author:
 date: 2023-06-14
 ---
 
-# RFC0645: Platform isAndroid, isIOS, and isNative properties
+# RFC0670: Platform isAndroid, isIOS, and isNative properties
 
 ## Summary
 
