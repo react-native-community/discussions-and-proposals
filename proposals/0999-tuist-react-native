@@ -1,0 +1,85 @@
+---
+title: Tuist.io in React Native
+author:
+- Riccardo Cipolleschi
+date: 2023-06-19
+---
+
+# RFC0999: Tuist.io in React Native 
+
+## Summary
+
+Managing Xcodeproj files is error prone and time consuming. 
+
+The current proposal suggests to move away from manually managing `Xcodeproj` files in favor of a declarative description leveraging [Tuist.io](https://tuist.io) as tool.
+
+## Basic example
+
+You can have a look at it in action in this PR:
+
+- https://github.com/facebook/react-native/pull/37952
+
+The idea is to describe the project with a declarative approach using Swift. Tuist allows you to load the `Project.swift` file in an instance of Xcode, leveraging also code completion and type checking to ensure the correctness of the project.
+
+## Motivation
+
+Managing Xcodeproj files is error prone and time consuming. Those files are source of frustrations for teams using them and they have been reported as one of the main pain point when users have to migrate to a new version of React Native.
+
+They are also an old way to manage projects. Even Apple realized that they are not the best approach and started developing Swift Package Manager (SwiftPM) that replace the project for developing libraries.
+
+Moder approaches relies on declarative syntax to describe how the project should look like and tools that can generate a valid Xcodeproj starting from that description.
+
+There are several tools that we can use, but the proposed one is [Tuist.io](https://tuist.io).
+
+[Tuist.io](https://tuist.io) is OSS and currently maintained by several companies, among which Shopify, which is already a React Native partner.
+
+It allows the users to describe their Apple projects in Swift (the default language for iOS), and it also leverage Xcode for type checking and code completion, ensuring that the project definition is valid at compile time.
+
+## Detailed design
+
+To adopt Tuist in React Native, we need to follow some steps:
+
+1. Land https://github.com/facebook/react-native/pull/37952. This PR already contains a functioning project which passed all the iOS tests in CI.
+2. Update the CLI to install Tuist in the user machine. Tuist comes directly with a `tuistenv`additional tool, which handle the environment and version for the user.
+3. Update the CLI and instruct it to swap the `HelloWorld` strings in the `template/ios/Package.swift` to  the AppName chosen by the user.
+4. Update the CLI to run `tuist generate` to create the project
+5. Update doctor to check that the user have tuist installed
+6. Remove the old Xcodeproj file and set the right `.gitignore` settings.
+
+## Drawbacks
+
+- Prioritization: I think that the only reason NOT to do this is for prioritization and time. Implementing this system will take some time which we can devote to other, maybe more impactful, activities.
+- Impact: This work could simplify updates, but recently we have started pushing all the changes to the Xcodeproj into the Cocoapods scripts. This means that the users don't have to touch the project file at all, and Cocoapods takes care of modifying the project when needed. It is still useful to have a laid-out description of the project, especially for brownfield projects that have to mimic the same configurations of a template app.
+- Workflow changes: there is an extra step that user has to run when modifying the project: after every change in the `Project.swift`, users have to run `tuist generate`. This is a minor issue as we do not expect for the user to manually update the `Project.swift` file at all, and we can bake most of the tuist invocations in th e CLI. 
+
+## Alternatives
+
+### [XCodeGen](https://github.com/yonaskolb/XcodeGen)
+
+This tool allows to describe the Xcodeproj using a YAML file.
+
+If we go for this approach, the drawbacks are:
+
+- a new language to teach our users
+- more verbose project description
+- no code completion.
+
+### [Xcake](https://github.com/igor-makarov/xcake/)
+
+This tool allow to describe a project in Ruby.
+
+If we go for this approach, the drawbacks are:
+
+- a new language to teach our users
+- no type checking
+
+## Adoption strategy
+
+- Implement all the changes before 0.73.
+- Communicate with a BlogPost the change, explaining the implications for new apps and updates.
+
+## How we teach this
+
+- Add the requirement to the website
+- Blogposts
+- Automating the workflow as much as possible.
