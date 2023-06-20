@@ -5,7 +5,7 @@ date: 2023-03-01
 updated: 2023-03-10
 ---
 
-# RFC: DOM traversal and layout APIs in React Native
+# RFC0607: DOM traversal and layout APIs in React Native
 
 ## Summary
 
@@ -670,8 +670,8 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 
 ## Changelog
 
-|Date	|Author	|Change	|
-|---	|---	|---	|
-|2023-03-01	| [Rubén Norte](https://github.com/rubennorte)	|Initial version published	|
-|2023-03-02	| [Rubén Norte](https://github.com/rubennorte)	|Fixed information about Reanimated	|
-|2023-03-10	| [Rubén Norte](https://github.com/rubennorte)	| Added rollout strategy with feature flag	|
+| Date | Author | Change |
+|---|---|---|
+| 2023-03-01 | [Rubén Norte](https://github.com/rubennorte) | Initial version published |
+| 2023-03-02 | [Rubén Norte](https://github.com/rubennorte) | Fixed information about Reanimated |
+| 2023-03-10 | [Rubén Norte](https://github.com/rubennorte) | Added rollout strategy with feature flag |
