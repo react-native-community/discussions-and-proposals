@@ -202,7 +202,7 @@ There are different ways in which we can adopt a Tuist within the template. I'll
 ### Not Managed flow
 
 1. Update the template using Tuist (landing https://github.com/facebook/react-native/pull/37952) This PR already contains a functioning project which passed all the iOS tests in CI.
-2. We don not modify the CLI at all and we do not ask our users to install or use Tuist at all. We don't even ship the Project.swift to the final user. Instead, we update the release pipeline so that it run tuist while releasing a new version of React Native.
+2. We do not modify the CLI at all and we do not ask our users to install or use Tuist at all. We don't even ship the Project.swift to the final user. Instead, we update the release pipeline so that it run tuist while releasing a new version of React Native.
 
 With this approach, we minimize changes and users who want to keep working with Xcodeproj won't feel any difference.
 We will have a clearer description of the build API in the React Native repo and we will use it to generate the Xcodeproj for the user.
