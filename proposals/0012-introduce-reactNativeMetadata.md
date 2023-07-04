@@ -1,8 +1,8 @@
 ---
-title: [DRAFT] Introducing `reactNativeManifest` to `package.json` for React Native specific metadata
+title: Draft | Introducing `reactNativeManifest` to `package.json` for React Native specific metadata
 author:
-  - Lorenzo Sciandra
-  - Nicola Corti
+- Lorenzo Sciandra
+- Nicola Corti
 date: 25-01-2021
 ---
 
