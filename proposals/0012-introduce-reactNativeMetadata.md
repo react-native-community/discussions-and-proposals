@@ -1,8 +1,8 @@
 ---
-title: [DRAFT] Introducing `reactNativeManifest` to `package.json` for React Native specific metadata
+title: DRAFT | Introducing `reactNativeManifest` to `package.json` for React Native specific metadata
 author:
-  - Lorenzo Sciandra
-  - Nicola Corti
+- Lorenzo Sciandra
+- Nicola Corti
 date: 25-01-2021
 ---
 
@@ -27,24 +27,24 @@ As of today, there is no simple programmatic way to know if a NPM package is a R
 Those indicators are all non-exhaustive. 
 
 Similarly, there is no easy way to understand if a library is exposing a native module or not. 
-The React Native CLI is facing this difficulty and tries to circumvent it by inspecting the native code and search for subclasses of `*ReactPackage` using complex regular expressions ([example](https://github.com/react-native-community/cli/blob/605c542d18efcb02f217d3c85726fa73a79054c2/packages/cli-platform-android/src/config/findPackageClassName.ts#L35)) due to the lack of a declarative way to express this information.
+The React Native CLI is facing this difficulty and tries to circumvent it by inspecting the native code and searching for subclasses of `*ReactPackage` using complex regular expressions ([example](https://github.com/react-native-community/cli/blob/605c542d18efcb02f217d3c85726fa73a79054c2/packages/cli-platform-android/src/config/findPackageClassName.ts#L35)) due to the lack of a declarative way to express this information.
 
-Another practical examples of this need are the [React Native Directory](https://reactnative.directory/) attempting to [programmatically infer](https://github.com/react-native-community/directory/pull/870) New Architecture support from the presence of the `codegenConfig` fields in the `package.json` of a library. The `codegenConfig` filed is not intended to carry semantic information about New Architecture support, and is definitely a non-exhaustive solution for this problem.
+Another practical example of this need is the [React Native Directory](https://reactnative.directory/) attempting to [programmatically infer](https://github.com/react-native-community/directory/pull/870) the New Architecture support from the presence of the `codegenConfig` fields in the `package.json` of a library. The `codegenConfig` field is not intended to carry semantic information about New Architecture support, and is definitely a non-exhaustive solution for this problem.
 
-While we can continue to build tooling that tries to infer metadata and capabilities of a library, providing a declarative way to declared such capabilites provides a series of benefit:
+While we can continue to build tooling that tries to infer metadata and capabilities of a library, providing a declarative way to describe such capabilities yields a series of benefit:
 * **predictability**: developers can easily understand what a library is capable of doing and if such capability matches their app.
 * **tooling**: tooling can easily consume this information and provide a better experience to developers.
 * **single source of thruth**: a single manifest will act as a source of truth for all those capabilities and flag definition, that can easily be consumed by different platforms to provide a unified way to enable/disable capabilities.
-* **verifiability**: the manifest can be easily verified & linted by tooling to ensure that app & library are not using an incompatible set of compatibilites. Similarly, the JSON schema we publish can be used to validate the `reactNativeManifest` section.
+* **verifiability**: the manifest can be easily verified and linted by tooling to ensure that apps and libraries are not using an incompatible set of dependencies. Similarly, the JSON schema we publish can be used to validate the `reactNativeManifest` section.
 
 ## Use Cases
 
-This section lists the use case we envision for the `reactNativeManifest` section.
+This section lists the use cases we envision for the `reactNativeManifest` section.
 
 ### Declaring the type of a project
 
 For the sake of this RFC, we consider a React Native project as either an app or a library.
-While an app project can contain native modules and components, it's **not** possible for a app to "consume" another app as a library as this would break the native build system invariants (i.e. a single `AndroidManifest.xml` and `Info.plist` file per app, etc.). If an app projects wishes to distribute some of its native modules or components, they need to be extracted into a library project.
+While an app project can contain native modules and components, it's **not** possible for an app to "consume" another app as a library. This would break the native build system invariants (i.e. a single `AndroidManifest.xml` and `Info.plist` file per app, etc.). If an app projects wishes to distribute some of its native modules or components, they need to be extracted into a library project.
 
 We're proposing to declare if a project is either a library or an app by adding the `type` field (as `"app"` or `"library"`) to the `reactNativeManifest` section of the `package.json` file.
 
@@ -59,19 +59,19 @@ We're proposing to declare if a project is either a library or an app by adding 
 ### New Architecture support
 
 One of the primary driver of this proposal is the [New React Native Architecture support](https://reactnative.dev/docs/the-new-architecture/landing-page). Specifically we believe that the ecosystem is currently affected by:
-* Lack of a declarative way to define if a library is compatible with New Architecture
-  * As described in the [rationale](#rationale), tooling needs to infer this information from the presence of the `codegenConfig` field in the `package.json` of a library. Libraries might decide to don't use codegen and still be compatible with New Architecture, so this method is not exhaustive.
-  * The alternative at this stage is to inspect the code and check the API callsites if they are New Architecture or Old Architecture compatible.
-* Lack of a declarative way to enable New Architecture on both platforms
-  * Currently New Architecture is enabled by a Gradle Property `newArchEnabled` on Android in the `gradle.properties` file and by invokign `RCT_NEW_ARCH_ENABLED pod install` on iOS.
-  * As of today, there is no way to enable New Architecture for an app project for both platforms
-  * Moreover, the file vs environment variable leads to a scenario where you can't know if a app supports New Architecture or not by inspecting the code (as New Architecture support is known at  `pod install` time and is not codified in the codebase)
+* Lack of a declarative way to define if a library is compatible with the New Architecture
+  * As described in the [rationale](#rationale), tooling needs to infer this information from the presence of the `codegenConfig` field in the `package.json` of a library. Libraries might decide not to use Codegen and still be compatible with the New Architecture, so this method is not exhaustive.
+  * The alternative at this stage is to inspect the code and check whether the API callsites are New Architecture or Old Architecture compatible.
+* Lack of a declarative way to enable the New Architecture on both platforms
+  * Currently the New Architecture is enabled by a Gradle Property `newArchEnabled` on Android in the `gradle.properties` file and by invoking `RCT_NEW_ARCH_ENABLED=1 bundle exec pod install` on iOS.
+  * As of today, there is no way to enable the New Architecture for an app project for both platforms
+  * Moreover, the difference in how the New Architecture is enabled leads to a scenario where you can't statically know if an app supports New Architecture or not (as the New Architecture support is known at  `pod install` time and is not codified in the codebase)
 
 Therefore we propose to add the `newArch` section to the `reactNativeManifest.capabilities` of **both apps and libraries** with the following semantic:
-* For Apps: `newArch.enabled==true` implies that the app wants to use the New Architecture.
-* For Libraries: `newArch.enabled==true` implies that the library is compatible with the New Architecture.
+* For Apps: `newArch.enabled==true` means that the app wants to use the New Architecture.
+* For Libraries: `newArch.enabled==true` means that the library is compatible with the New Architecture.
 
-Tools can be built on top of this information to check that a app with `newArch.enabled==true` is not accepting libraries with `newArch.enabled==false` and warning against library that don't have the key specified.
+Tools can be built on top of this information to check that an app with `newArch.enabled==true` is not accepting libraries with `newArch.enabled==false` and to warn against library that don't have the key specified.
 
 The setup would look as follows for both apps and libraries:
 
@@ -87,7 +87,7 @@ The setup would look as follows for both apps and libraries:
 }
 ```
 
-This section will allows also for split configuration between platforms:
+This section will allow also for split configuration between platforms:
 
 ```json
 {
@@ -112,7 +112,7 @@ This section will allows also for split configuration between platforms:
 
 #### `codegenConfig` support
 
-Similarly to New Architecture support metadata, the `codegenConfig` is a key metadata of the New Architecture build pipeline.
+Similarly to the New Architecture support metadata, the `codegenConfig` is a key metadata of the New Architecture build pipeline.
 Currently the `codegenConfig` is a **top-level** key in the `package.json` of a project. 
 
 We propose to move this key under the `reactNativeManifest.capabilites` section as follows:
@@ -135,7 +135,7 @@ We propose to move this key under the `reactNativeManifest.capabilites` section 
 
 ### Hermes Support
 
-Similarly to New Architecture support, the current way to enable/disable the Hermes engine is toggled by using a Gradle Property `hermesEnabled` on Android and changing the `:hermes_enabled` property in the Podfile.
+Similarly to the New Architecture support, the current way to enable/disable the Hermes engine is toggled by using a Gradle Property `hermesEnabled` on Android and changing the `:hermes_enabled` property in the Podfile.
 
 We propose to add the `hermes` section under the `reactNativeManifest.capabilities` section as follows:
 
@@ -200,8 +200,8 @@ For the time being, we're not planning to add a `version` section to the `reactN
 
 ### TurboModule/Fabric toggles
 
-At the time of writing, we prefer to don't offer a dedicated section to toggle Fabric/TurboModule capability inside `reactNativeManifest`. The rationale is that we believe that the `newArch` section is sufficient to expose the New Architecture to users.
-Selectively toggling Fabric/TurboModule is a more advanced feature. We believe we'll still be offering a more advanced way to feature toggle such infrastructure pieces, but at the current state, our preference is to not expose such capability in the top level `reactNativeManifest` section.
+At the time of writing, we prefer not to offer a dedicated section to toggle Fabric/TurboModule capability inside `reactNativeManifest`. The rationale is that we believe that the `newArch` section is sufficient to expose the New Architecture to users.
+Selectively toggling Fabric/TurboModule is a more advanced feature. We believe we'll still be offering a more advanced way to enable or disable those pieces of the New Architecture infrastructure, but at the current state, our preference is not to expose such capability in the top level `reactNativeManifest` section.
 
 ## Proposed Tooling
 
@@ -220,9 +220,9 @@ Build tools such as Gradle/CocoaPods or others should account for the `reactNati
 
 ### `align-deps` support
 
-This RFC originated from a [conversation between Meta and Microsoft](https://github.com/microsoft/rnx-kit/issues/1863) to use `align-deps` as key feature in the New Architecture rollout support, in helping developers understanding if a library they're using is New Architecture compatible or not. Very quickly it became clear that there is currently no straightforward way to know if a library indeed has that support.
+This RFC originated from a [conversation between Meta and Microsoft](https://github.com/microsoft/rnx-kit/issues/1863) to use `align-deps` as key feature in the New Architecture rollout support, in helping developers understand if a library they're using is compatible with the New Architecture or not. Very quickly it became clear that there is currently no straightforward way to know if a library indeed has that support.
 
-Therefore we believe `align-deps` can benefit from this information and be extended to offer New Architecture support information.
+Therefore we believe `align-deps` can benefit from this information and can be extended to offer New Architecture support information.
 
 ### React Native CLI support
 
@@ -247,7 +247,7 @@ Specifically, we envision to evolve `reactNativeManifest` or `reactNativeManifes
 1. Each addition of a new capability [requires a new RFC](https://github.com/react-native-community/discussions-and-proposals#proposals) to be approved.
 2. Each RFC should define a new section in the `reactNativeManifest` with what's the intended use case.
 3. Each RFC should define what are the sensible defaults and should refrain from breaking changes.
-4. Each RFC should define the deprecation strategy for previous flags/features related to the same capability.
+4. Each RFC should define the deprecation strategy for previous flags/features related to the same capability, if needed.
 
 ## Complete Example
 
@@ -324,7 +324,7 @@ The JSON Schema will be published as soon as we find an agreement on the key nam
 If we decide to adopt this proposal, we'll have to broadcast this change to the ecosystem.
 Ideally, we'll start by adding the `reactNativeManifest` section to the app template and to `create-react-native-library`.
 
-We foresee a phase in which only a part of the userbase has this section configured and tool developers need to account for the absence of this section.
+We foresee a phase in which only a part of the userbase has this section configured, and tool and developers need to account for the absence of this section.
 
 Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in various tools mentioned in [Proposed Tooling](#proposed-tooling) section. This first wave of support would have to be aligned around a given React Native release, say in 0.73 (which branch has not been cut).
 
