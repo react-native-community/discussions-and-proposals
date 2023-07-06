@@ -1,4 +1,4 @@
-# RFC0673: Standard Library Template
+# RFC0683: Standard Library Template
 
 | title | author | date |
 | ----- | ------ | ---- |
