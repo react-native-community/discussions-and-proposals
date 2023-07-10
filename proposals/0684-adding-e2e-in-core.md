@@ -1,10 +1,10 @@
 ---
 title: Introducing E2E testing in React Native core
 author:
-- Lorenzo Sciandra
-- Nicola Corti
-- Riccardo Cipolleschi
-- <Callstack folks>
+  - Lorenzo Sciandra
+  - Nicola Corti
+  - Riccardo Cipolleschi
+  - <Callstack folks>
 date: 2023-07-06
 ---
 
@@ -16,58 +16,82 @@ Testing is how we validate that the code is good, and ensure that what we build 
 
 For the longest time, in React Native core this validation has been done in a few ways:
 
-* via Meta using the source code in their own products first
-* via internal testing with custom tooling in the Meta monorepo
-* via (mostly) unit testing on the CircleCI GitHub react-native repo
-* via local testing by the release crew ahead of generating new releases
-* via "pre-stable" releases (AKA Release Candidates and nightlies) that members from the community could use to test and report back
+- via Meta using the source code in their own products first
+- via internal testing with custom tooling in the Meta monorepo
+- via (mostly) unit testing on the CircleCI GitHub `react-native` repo
+- via local testing by the release crew ahead of generating new releases
+- via "pre-stable" releases (AKA Release Candidates and nightlies) that members from the community could use to test and report back
 
-There is a great opportunity for improvement here, by introducing End-to-End (E2E) testing in the CircleCI GitHub react-native repository to introduce one more level of validation that aims to replace the need for (at least) the local testing from the release crew. By adding tooling that spins up the RNTester app in the codebase, and "black box" (the RNTester app is not aware that the agent using it is not a human) testing it, we can trust that the code is more solid.
+There is a great opportunity for improvement here, by introducing End-to-End (E2E) testing in the CircleCI GitHub `react-native` repository to introduce one more level of validation that aims to replace the need for (at least) the local testing from the release crew. By adding tooling that spins up the RNTester app in the codebase, and "black box" (the RNTester app is not aware that the agent using it is not a human) testing it, we can trust that the code is more solid.
 
 This will make the codebase more stable, surface issues rapidly to the commit authors, and reduce the workload for the release crew.
 
 ## Basic example
 
-If the proposal involves a new or changed API, include a basic code example. Omit this section if it's not applicable.
+On a basic level, the idea is to have fully automated end-to-end testing running on CircleCI on `react-native`'s every single commit to flag if any code change is inadvertently introducing a regression of some form.
+
+The code and tests to do so will live in a new dedicated monorepo package, `packages/rn-tester-e2e` and rely on the existing `RNTester` test app.
+
+The tooling combination selected for this is composed of [Appium](https://appium.io/) and [WebDriverIO](https://webdriver.io/) and [Jest](https://jestjs.io/).
 
 ## Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
+The main "why" has already been explained above: introducing more solid automation to thoroughly verify that code changes don't introduce regressions. This will lead to removing the need for the release crew to do local testing to validate the code before a release.
 
-Please focus on explaining the motivation so that if this RFC is not accepted, the motivation could be used to develop alternative solutions. In other words, enumerate the constraints you are trying to solve without coupling them too closely to the solution you have in mind.
+Another explanation necessary is the stack decision: the reason is that it's the combination that gets the closest to the specific requirements of React Native's unique structure. We needed to fulfil these needs:
+
+- had to be "vanilla Jest" based
+  - in order to very closely match the internal Meta monorepo tooling used by the engineers, and in doing so lower the barrier to entry to add tests for this set too
+- had to not touch RNTester code (pure black box testing)
+- needed to support device farm
+  - while in a first phase the testing will run on CI on emulator/simulators, we are aware of the inherit flakyness so we want to start using a device farm relatively soon during the work on this effort
+- easy to extend to out of tree platforms (ex. Windows, macOS)
+  - RNWindows already uses [a very similar stack](https://github.com/microsoft/react-native-windows/blob/main/docs/e2e-testing.md).
+
+With that specific combination of needs, Appium+WBIO+Jest came out as the only viable option.
 
 ## Detailed design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
+### ADD ME
 
 ## Drawbacks
 
-Why should we _not_ do this? Please consider:
-
-- implementation cost, both in term of code size and complexity
-- whether the proposed feature can be implemented in user space
-- the impact on teaching people React Native
-- integration of this feature with other existing and planned features
-- cost of migrating existing React Native applications (is it a breaking change?)
-
-There are tradeoffs to choosing any path. Attempt to identify them here.
+- CI will get slower because we are introducing new jobs to the pipelines.
+- during the first iteration, only on CI, tests might be flaky.
+- it will take a lot of time before the whole RNTester surface area will be covered with E2E tests.
 
 ## Alternatives
 
-What other designs have been considered? Why did you select your approach?
+There are not many tools in the end to end space when it comes to React Native; of the known alternatives, neither of the following fitted our needs:
+
+- [Detox by Wix](https://github.com/wix/Detox)
+  - greybox testing
+  - no support for device farms
+- [Maestro](https://github.com/mobile-dev-inc/maestro)
+  - yaml based testing
+  - only iOS/Android
+  - doesn't support device farms (unclear?)
+
+> ⚠️ This does not mean, obviously, that these are not good tools and you should not use them in your projects! But that simply for our specific requirements, they weren't viable options.
 
 ## Adoption strategy
 
-If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries?
+This proposal doesn't directly affect consumers of React Native, only contributors and commit authors.
+
+The current roadmap is as follows:
+
+- a first PR, introducing the core infrastructure for E2E with documentation and CI integration, is prepared and merged
+  - This is already in the works, check out [the dedicated PR](https://github.com/facebook/react-native/pull/36267)
+- after that one is merged, an umbrella issue is created (similar to the one for [the codegen](https://github.com/facebook/react-native/issues/34872), or [Kotlin](https://github.com/facebook/react-native/issues/37708)) to ask the community to contribute by adding tests in order to cover the whole RNTester surface area.
+- while the test get added and the coverage grows, there are two stretch goals that will be pursued:
+  - adding a device farm as testing environment so to replace the need for using emulators and simulators on CI
+  - expand the toolset to cover also for screenshot testing
+    - this is current still being investigated (might end up having its own RFC), some tooling that was looked at was [`jest-image-snapshot`](https://github.com/americanexpress/jest-image-snapshot)
 
 ## How we teach this
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing React patterns?
-
-Would the acceptance of this proposal mean the React Native documentation must be re-organized or altered? Does it change how React Native is taught to new developers at any level?
-
-How should this feature be taught to existing React Native developers?
+### ADD ME
 
 ## Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still TBD?
+This proposal lives in a bit of a peculiar state because it's been written 6 months after the core investigation and decision have been taken - so there isn't much unresolved at this point. Leaving this phrase here anyway in case on the RFC someone wants to add something.
