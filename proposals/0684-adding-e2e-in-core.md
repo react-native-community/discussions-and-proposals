@@ -8,21 +8,21 @@ author:
 date: 2023-07-06
 ---
 
-# RFC0000: Introducing E2E testing in React Native core
+# RFC0684: Introducing E2E testing in React Native core
 
 ## Summary
 
-Testing is how we validate that the code is solid, and ensure that what we build our products on top of is solid and our customers are happy.
+Testing is how we validate that the code is good, and ensure that what we build our products on top of is solid and our customers are happy.
 
 For the longest time, in React Native core this validation has been done in a few ways:
 
 * via Meta using the source code in their own products first
-* via internal testing in the Meta monorepo
+* via internal testing with custom tooling in the Meta monorepo
 * via (mostly) unit testing on the CircleCI GitHub react-native repo
 * via local testing by the release crew ahead of generating new releases
 * via "pre-stable" releases (AKA Release Candidates and nightlies) that members from the community could use to test and report back
 
-There is a great opportunity for improvement here, by introducing End-to-End testing in the CircleCI GitHub react-native repository to introduce one more level of validation that aims to replace the need for (at least) the local testing from the release crew. By adding tooling that spins up the RNTester app in the codebase, and "black box" (the RNTester app is not aware that the agent using it is not a human) testing it, we can trust that the code is more solid.
+There is a great opportunity for improvement here, by introducing End-to-End (E2E) testing in the CircleCI GitHub react-native repository to introduce one more level of validation that aims to replace the need for (at least) the local testing from the release crew. By adding tooling that spins up the RNTester app in the codebase, and "black box" (the RNTester app is not aware that the agent using it is not a human) testing it, we can trust that the code is more solid.
 
 This will make the codebase more stable, surface issues rapidly to the commit authors, and reduce the workload for the release crew.
 
