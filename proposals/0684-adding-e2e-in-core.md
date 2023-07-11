@@ -52,7 +52,27 @@ With that specific combination of needs, Appium+WBIO+Jest came out as the only v
 
 ## Detailed design
 
-### ADD ME
+As already mentioned, the core stack involved is composed of [Appium](https://appium.io/) and [WebDriverIO](https://webdriver.io/) and [Jest](https://jestjs.io/).
+
+The dedicated code configuring the tooling and the tests will be in its own private package in `packages/rn-tester-e2e`. The app used for testing is RNTester (in `packages/rn-tester`), an app already present in the codebase which contains code for every component and API with sample implementations.
+
+In it, the `tests` folder is where the tests and referencing files all live. The substructure is as follows:
+
+- `screens` -> in this folder, you will find `*.screen.js` files, where each file represents a navigation screen for RNTester. So there are 3 root ones (`apis`, `bookmarks`, `components`) and then for subscreens, there's a folder with the same name. Each of these files provide an easy way to define all elements present in said screen, so that they can be used for tests.
+  - for each element of a given screen there will be a platform-specific reference in the form of
+
+    ```js
+    btnSubmitElement: Utils.platformSelect({
+      ios: iOSLabel('Press to submit your application!'),
+      android: androidWidget('Button', 'resource-id', 'button_default_styling'),
+    }),
+    ```
+
+    we did, during early investigations, attempt to figure out more streamlined and universal solutions, such as relying on accessibility labels like `testID`s, but it created inconsistent scenarios nor every element on screen always had a `testID` available.
+- `specs` -> this folder follows a similar 1:1 mapping to the RNTester screens, but for the tests: for each screen (or subscreen) there's a dedicated `*.test.js` file (such as `buttonComponentScreen.test.js`). Ideally, in this file the Jest tests are standard, leveraging the `*.screen.js` counterpart for the details of defining how Appium/WDIO can reach those elements on screen.
+- `helpers` -> where utility code, such as methods for checking element existence, clicking interaction, etc. will live
+
+These tests will be ran on the existing CircleCI infrastructure already set up for `react-native` on GitHub, so we will need to add two new dedicated jobs for E2E testing, `test_e2e_ios` and `test_e2e_android` and add them to the existing workflows that run on every commit.
 
 ## Drawbacks
 
@@ -93,7 +113,7 @@ The current roadmap is as follows:
 
 Because this proposal doesn't directly affect consumers of React Native, the need for "teaching content" is scoped to people who wants to learn more about this infrastructure is set up and they want to contribute with more tests.
 
-The first place where this type of documentation will be added is the readme of the dedicated new folder, `packages/rn-tester-e2e/README.md` *(you can already check out a draft of it [in the first PR](https://github.com/mateuszm22/react-native/blob/k+m/new-rn-tester-E2E/packages/rn-tester-e2e/README.md) already in the works)*. In this file, there are going to be information on how the setup works, how to test it locally and how to add new tests.
+The first place where this type of documentation will be added is the readme of the dedicated new folder, `packages/rn-tester-e2e/README.md` _(you can already check out a draft of it [in the first PR](https://github.com/mateuszm22/react-native/blob/k+m/new-rn-tester-E2E/packages/rn-tester-e2e/README.md) already in the works)_. In this file, there are going to be information on how the setup works, how to test it locally and how to add new tests.
 
 Building on top of that, an umbrella issue will be created to coordinate and provide actionable examples for how to add new tests. In it, a streamlined explanation will be provided that will then reference back to the dedicated `packages/rn-tester-e2e/README.md`.
 
