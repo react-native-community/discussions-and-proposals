@@ -67,10 +67,11 @@ There are not many tools in the end to end space when it comes to React Native; 
 - [Detox by Wix](https://github.com/wix/Detox)
   - greybox testing
   - no support for device farms
+  - no desktop platforms support
 - [Maestro](https://github.com/mobile-dev-inc/maestro)
   - yaml based testing
-  - only iOS/Android
-  - doesn't support device farms (unclear?)
+  - no desktop platforms support
+  - no support for device farms (unclear?)
 
 > ⚠️ This does not mean, obviously, that these are not good tools and you should not use them in your projects! But that simply for our specific requirements, they weren't viable options.
 
@@ -90,7 +91,13 @@ The current roadmap is as follows:
 
 ## How we teach this
 
-### ADD ME
+Because this proposal doesn't directly affect consumers of React Native, the need for "teaching content" is scoped to people who wants to learn more about this infrastructure is set up and they want to contribute with more tests.
+
+The first place where this type of documentation will be added is the readme of the dedicated new folder, `packages/rn-tester-e2e/README.md` *(you can already check out a draft of it [in the first PR](https://github.com/mateuszm22/react-native/blob/k+m/new-rn-tester-E2E/packages/rn-tester-e2e/README.md) already in the works)*. In this file, there are going to be information on how the setup works, how to test it locally and how to add new tests.
+
+Building on top of that, an umbrella issue will be created to coordinate and provide actionable examples for how to add new tests. In it, a streamlined explanation will be provided that will then reference back to the dedicated `packages/rn-tester-e2e/README.md`.
+
+And, of course, we can also point people to this RFC for more context/historical details.
 
 ## Unresolved questions
 
