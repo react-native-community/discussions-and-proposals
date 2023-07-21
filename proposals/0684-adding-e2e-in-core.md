@@ -60,13 +60,11 @@ The dedicated code configuring the tooling and the tests will be in its own priv
 
 In it, the `tests` folder is where the tests and referencing files all live. The substructure is as follows:
 
-        ```md
-        rn-tester-e2e
-        └──tests
-            ├── screens
-            ├── specs
-            └── helpers
-        ```
+      rn-tester-e2e
+      └──tests
+          ├── screens
+          ├── specs
+          └── helpers
 
 - `screens` -> in this folder, you will find `*.screen.js` files, where each file represents a navigation screen for RNTester. So there are 3 root ones (`apis`, `bookmarks`, `components`) and then for subscreens, there's a folder with the same name. Each of these files provide an easy way to define all elements present in said screen, so that they can be used for tests.
   - for each element of a given screen there will be a platform-specific reference in the form of
