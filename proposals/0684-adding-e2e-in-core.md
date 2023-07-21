@@ -36,7 +36,9 @@ The tooling combination selected for this is composed of [Appium](https://appium
 
 ## Motivation
 
-The main "why" has already been explained above: introducing more solid automation to thoroughly verify that code changes don't introduce regressions. This will lead to removing the need for the release crew to do local testing to validate the code before a release.
+The main "why" has already been explained above: introducing more solid automation to thoroughly verify that code changes don't introduce regressions.
+
+This will lead to removing the need for the release crew to do manual local testing to validate the code before a release, which by being an human operation can lead to flukes. Additionally, this means that the time-to-release will get shorter because the release crew won't need to run those tests.
 
 Another explanation necessary is the stack decision: the reason is that it's the combination that gets the closest to the specific requirements of React Native's unique structure. We needed to fulfil these needs:
 
@@ -58,6 +60,14 @@ The dedicated code configuring the tooling and the tests will be in its own priv
 
 In it, the `tests` folder is where the tests and referencing files all live. The substructure is as follows:
 
+        ```md
+        rn-tester-e2e
+        └──tests
+            ├── screens
+            ├── specs
+            └── helpers
+        ```
+
 - `screens` -> in this folder, you will find `*.screen.js` files, where each file represents a navigation screen for RNTester. So there are 3 root ones (`apis`, `bookmarks`, `components`) and then for subscreens, there's a folder with the same name. Each of these files provide an easy way to define all elements present in said screen, so that they can be used for tests.
   - for each element of a given screen there will be a platform-specific reference in the form of
 
@@ -69,6 +79,9 @@ In it, the `tests` folder is where the tests and referencing files all live. The
     ```
 
     we did, during early investigations, attempt to figure out more streamlined and universal solutions, such as relying on accessibility labels like `testID`s, but it created inconsistent scenarios nor every element on screen always had a `testID` available.
+
+    *sidenote: `iOSLabel` and `androidWidget` are utility functions created while working on [the first PR](https://github.com/facebook/react-native/pull/36267). More utility functions to further simply writing tests can be added as work progresses.*
+
 - `specs` -> this folder follows a similar 1:1 mapping to the RNTester screens, but for the tests: for each screen (or subscreen) there's a dedicated `*.test.js` file (such as `buttonComponentScreen.test.js`). Ideally, in this file the Jest tests are standard, leveraging the `*.screen.js` counterpart for the details of defining how Appium/WDIO can reach those elements on screen.
 - `helpers` -> where utility code, such as methods for checking element existence, clicking interaction, etc. will live
 
@@ -113,7 +126,7 @@ The current roadmap is as follows:
 
 Because this proposal doesn't directly affect consumers of React Native, the need for "teaching content" is scoped to people who wants to learn more about this infrastructure is set up and they want to contribute with more tests.
 
-The first place where this type of documentation will be added is the readme of the dedicated new folder, `packages/rn-tester-e2e/README.md` _(you can already check out a draft of it [in the first PR](https://github.com/mateuszm22/react-native/blob/k+m/new-rn-tester-E2E/packages/rn-tester-e2e/README.md) already in the works)_. In this file, there are going to be information on how the setup works, how to test it locally and how to add new tests.
+The first place where this type of documentation will be added is the readme of the dedicated new folder, `packages/rn-tester-e2e/README.md` *(you can already check out a draft of it [in the first PR](https://github.com/mateuszm22/react-native/blob/k+m/new-rn-tester-E2E/packages/rn-tester-e2e/README.md) already in the works)*. In this file, there are going to be information on how the setup works, how to test it locally and how to add new tests.
 
 Building on top of that, an umbrella issue will be created to coordinate and provide actionable examples for how to add new tests. In it, a streamlined explanation will be provided that will then reference back to the dedicated `packages/rn-tester-e2e/README.md`.
 
