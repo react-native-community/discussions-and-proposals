@@ -28,7 +28,7 @@ This will make the codebase more stable, surface issues rapidly to the commit au
 
 ## Basic example
 
-On a basic level, the idea is to have fully automated end-to-end testing running on CircleCI on `react-native`'s every single commit to flag if any code change is inadvertently introducing a regression of some form.
+On a basic level, the idea is to have fully automated end-to-end testing running on CircleCI on `react-native`'s to flag if any code change is inadvertently introducing a regression of some form.
 
 The code and tests to do so will live in a new dedicated monorepo package, `packages/rn-tester-e2e` and rely on the existing `RNTester` test app.
 
