@@ -130,6 +130,3 @@ Building on top of that, an umbrella issue will be created to coordinate and pro
 
 And, of course, we can also point people to this RFC for more context/historical details.
 
-## Unresolved questions
-
-This proposal lives in a bit of a peculiar state because it's been written 6 months after the core investigation and decision have been taken - so there isn't much unresolved at this point. Leaving this phrase here anyway in case on the RFC someone wants to add something.
