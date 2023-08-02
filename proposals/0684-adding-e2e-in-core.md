@@ -4,7 +4,12 @@ author:
   - Lorenzo Sciandra
   - Nicola Corti
   - Riccardo Cipolleschi
-  - <Callstack folks>
+  - Mateusz Ulańczyk
+  - Adrian Orszulik
+  - Mateusz Michalec
+  - Elżbieta Berger
+  - Michał Pierzchała
+  - Szymon Rybczak
 date: 2023-07-06
 ---
 
