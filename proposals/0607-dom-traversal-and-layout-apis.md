@@ -58,7 +58,7 @@ function Component(props) {
     const rect = firstChildElement.getBoundingClientRect();
     const offsetTop = firstChildElement.offsetTop;
     const scrollHeight = firstChildElement.scrollHeight;
-    const tagName = firstChildElement.tagName; // 'View'
+    const tagName = firstChildElement.tagName; // 'RN:View'
 
     // Accessing text data and nodes
     const textContent = textNode.textContent; // 'Some text'
@@ -140,7 +140,7 @@ This is a reference of the API provided by those classes:
         * `get `[`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) (indicates if the node is currently mounted)
         * `get `[`lastChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild)
         * `get `[`nextSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling)
-        * `get `[`nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName) (name to use in built-in RN components is TBD)
+        * `get `[`nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName) (the name of the component prefixed with "RN:" to avoid conflicts with existing DOM elements)
         * `get `[`nodeType`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType) (always `Node.ELEMENT_NODE (1)`)
         * `get `[`nodeValue`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) (always `null`)
         * `get `[`parentElement`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement) (alias for [`parentNode`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode), as text nodes cannot have children)
@@ -653,10 +653,6 @@ Additionally, we can consider adding React Native to the [browser compatibility 
 
 We would leverage the familiarity of users with DOM APIs to teach this. In the case of semantic differences, we would try to signal those at runtime with links to the React Native documentation for easy discoverability.
 
-## Unresolved questions
-
-* Definition of [`tagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) (and [`nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName)) for built-in components in React Native and custom components defined in userland.
-
 ## Future extensions
 
 This is a **non-exhaustive** list of **possible** future extensions to the framework related to this proposal:
@@ -675,3 +671,4 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 | 2023-03-01 | [Rubén Norte](https://github.com/rubennorte) | Initial version published |
 | 2023-03-02 | [Rubén Norte](https://github.com/rubennorte) | Fixed information about Reanimated |
 | 2023-03-10 | [Rubén Norte](https://github.com/rubennorte) | Added rollout strategy with feature flag |
+| 2023-09-04 | [Rubén Norte](https://github.com/rubennorte) | Defined semantics for nodeName/tagName |
