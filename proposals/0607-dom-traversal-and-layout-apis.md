@@ -180,7 +180,6 @@ This is a reference of the API provided by those classes:
         * ⚠️/💣  `set `[`scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop) (noop with a warning, or exception if in strict mode)
     * Instance methods:
         * [`getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
-        * [`getClientRects()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects)
 * `ReactNativeElement`, with the following definition from [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement):
     * Instance properties:
         * ⚠️ `get `[`offsetHeight`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight) (spec-compliant implementation with warning about the loss of precision)
@@ -660,6 +659,7 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 * Synchronized access to the host tree with synchronous events and APIs like [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame).
 * Support for APIs like [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver), [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) and [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
 * Support for methods to access attributes (e.g.: [`getAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute), [`getAttributeNames()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames), etc.).
+* Support for `getClientRects()` with concrete semantics in existing React Native core components.
 * Support for `ReadOnlyElement` subclasses in built-in and custom components (e.g.: `ReadOnlyImageElement` with methods to access information about the image).
 * Support for imperatively attaching event listeners (implementing the [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) API).
 * Support for a subset of the [`Document`](https://developer.mozilla.org/en-US/docs/Web/API/Document) API with properties like [`activeElement`](https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement), [`visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState),  [`elementFromPoint()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint), etc.
@@ -671,4 +671,5 @@ This is a **non-exhaustive** list of **possible** future extensions to the frame
 | 2023-03-01 | [Rubén Norte](https://github.com/rubennorte) | Initial version published |
 | 2023-03-02 | [Rubén Norte](https://github.com/rubennorte) | Fixed information about Reanimated |
 | 2023-03-10 | [Rubén Norte](https://github.com/rubennorte) | Added rollout strategy with feature flag |
-| 2023-09-04 | [Rubén Norte](https://github.com/rubennorte) | Defined semantics for nodeName/tagName |
+| 2023-09-04 | [Rubén Norte](https://github.com/rubennorte) | Defined `nodeName`/`tagName` for native components (registered name of the component prefixed with "RN:") |
+| 2023-09-04 | [Rubén Norte](https://github.com/rubennorte) | Removed `getClientRects` from proposal due to the complexity of its definition in RN (will be handled separately) |
