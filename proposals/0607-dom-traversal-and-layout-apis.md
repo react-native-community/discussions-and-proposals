@@ -2,7 +2,7 @@
 title: DOM traversal and layout APIs in React Native
 author: Rubén Norte
 date: 2023-03-01
-updated: 2023-03-10
+updated: 2023-09-04
 ---
 
 # RFC0607: DOM traversal and layout APIs in React Native
