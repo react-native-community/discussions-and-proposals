@@ -345,41 +345,41 @@ In some cases, a particular feature of the base Node interface may not apply to 
 
 [Node type constants](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType#value)
 
-- [ ] `Node.ELEMENT_NODE` (1)
-- [ ] `Node.TEXT_NODE` (3)
-- [ ] `Node.DOCUMENT_NODE` (9)
+- [x] `Node.ELEMENT_NODE` (1)
+- [x] `Node.TEXT_NODE` (3)
+- [x] `Node.DOCUMENT_NODE` (9)
 
 [Document position constants](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition#value)
 
-- [ ] `Node.DOCUMENT_POSITION_DISCONNECTED` (1)
-- [ ] `Node.DOCUMENT_POSITION_PRECEDING` (2)
-- [ ] `Node.DOCUMENT_POSITION_FOLLOWING` (4)
-- [ ] `Node.DOCUMENT_POSITION_CONTAINS` (8)
-- [ ] `Node.DOCUMENT_POSITION_CONTAINED_BY` (16)
+- [x] `Node.DOCUMENT_POSITION_DISCONNECTED` (1)
+- [x] `Node.DOCUMENT_POSITION_PRECEDING` (2)
+- [x] `Node.DOCUMENT_POSITION_FOLLOWING` (4)
+- [x] `Node.DOCUMENT_POSITION_CONTAINS` (8)
+- [x] `Node.DOCUMENT_POSITION_CONTAINED_BY` (16)
 
 ### Instance properties
 
-- [ ] [`node.childNodes`](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes). Not a live collection.
-- [ ] [`node.firstChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild)
-- [ ] [`node.isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected)
-- [ ] [`node.lastChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild)
-- [ ] [`node.nextSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling)
-- [ ] [`node.nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName)
-- [ ] [`node.nodeType`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
-- [ ] [`node.nodeValue`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) (always null)
-- [ ] [`node.parentElement`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement)
-- [ ] [`node.parentNode`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode)
-- [ ] [`node.previousSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling)
-- [ ] [`node.textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent)
+- [x] [`node.childNodes`](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes). Not a live collection.
+- [x] [`node.firstChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild)
+- [x] [`node.isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected)
+- [x] [`node.lastChild`](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild)
+- [x] [`node.nextSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling)
+- [x] [`node.nodeName`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName)
+- [x] [`node.nodeType`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+- [x] [`node.nodeValue`](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) (always null)
+- [x] [`node.parentElement`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement)
+- [x] [`node.parentNode`](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode)
+- [x] [`node.previousSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling)
+- [x] [`node.textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent)
 
 ### Instances methods
 
 Node inherits methods from its parent, EventTarget.
 
-- [ ] [`node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
-- [ ] [`node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
-- [ ] [`node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
-- [ ] [`node.hasChildNodes()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes).
+- [x] [`node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
+- [x] [`node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
+- [-] [`node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
+- [x] [`node.hasChildNodes()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes).
 
 ## Element
 
@@ -389,22 +389,22 @@ Element is the most general base class from which all element objects (i.e. obje
 
 Element inherits properties from its parent interface, Node, and by extension that interface's parent, EventTarget.
 
-- [ ] [`element.childElementCount`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount).
-- [ ] [`element.children`](https://developer.mozilla.org/en-US/docs/Web/API/Element/children). Not a live collection.
-- [ ] [`element.clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight) [Read only]. Returns a number representing the inner height of the element.
-- [ ] [`element.clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft) [Read only]. Returns a number representing the width of the left border of the element.
-- [ ] [`element.clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop) [Read only]. Returns a number representing the width of the top border of the element.
-- [ ] [`element.clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth) [Read only]. Returns a number representing the inner width of the element.
-- [ ] [`element.firstElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild).
-- [ ] [`element.id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) [Read only]. Is a DOMString representing the id of the element.
-- [ ] [`element.lastElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild).
-- [ ] [`element.nextElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling).
-- [ ] [`element.previousElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling).
-- [ ] [`element.scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) [Read only]. Returns a number representing the scroll view height of an element.
-- [ ] [`element.scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft). Is a number representing the left scroll offset of the element.
-- [ ] [`element.scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop). A number representing number of pixels the top of the element is scrolled vertically.
-- [ ] [`element.scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth) [Read only]. Returns a number representing the scroll view width of the element.
-- [ ] [`element.tagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) (alias for nodeName).
+- [x] [`element.childElementCount`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount).
+- [x] [`element.children`](https://developer.mozilla.org/en-US/docs/Web/API/Element/children). Not a live collection.
+- [x] [`element.clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight) [Read only]. Returns a number representing the inner height of the element.
+- [x] [`element.clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft) [Read only]. Returns a number representing the width of the left border of the element.
+- [x] [`element.clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop) [Read only]. Returns a number representing the width of the top border of the element.
+- [x] [`element.clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth) [Read only]. Returns a number representing the inner width of the element.
+- [x] [`element.firstElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild).
+- [x] [`element.id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) [Read only]. Is a DOMString representing the id of the element.
+- [x] [`element.lastElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild).
+- [x] [`element.nextElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling).
+- [x] [`element.previousElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling).
+- [x] [`element.scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) [Read only]. Returns a number representing the scroll view height of an element.
+- [x] [`element.scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft). Is a number representing the left scroll offset of the element.
+- [x] [`element.scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop). A number representing number of pixels the top of the element is scrolled vertically.
+- [x] [`element.scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth) [Read only]. Returns a number representing the scroll view width of the element.
+- [x] [`element.tagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) (alias for nodeName).
 
 ### Instance methods
 
@@ -412,7 +412,7 @@ Element inherits methods from its parents Node, and its own parent, EventTarget.
 
 - [ ] [`element.computedStyleMap()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/computedStyleMap). Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
 - [ ] [`element.getAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute). Returns the value of a specified attribute on the element.
-- [ ] [`element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Returns the size of an element and its position relative to the viewport.
+- [x] [`element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Returns the size of an element and its position relative to the viewport.
 - [ ] [`element.getClientRects()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects). Returns a collection of `DOMRect` objects that indicate the bounding rectangles for each CSS border box in a client.
 - [ ] [`element.hasAttribute()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute). Returns a Boolean value indicating whether the specified element has the specified attribute or not.
 - [ ] [`element.hasPointerCapture()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasPointerCapture). Checks whether the element on which it is invoked has pointer capture for the pointer identified by the given pointer ID.
@@ -476,11 +476,11 @@ The HTMLElement interface represents any HTML element. Some elements directly im
 Inherits properties from its parent, Element, and implements those from DocumentAndElementEventHandlers, GlobalEventHandlers, and TouchEventHandlers.
 
 - [ ] [`HTMLElement.hidden`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidden) [Read only]. A boolean value indicating if the element is hidden or not.
-- [ ] [`HTMLElement.offsetHeight`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight) [Read only]. Returns a double containing the height of an element, relative to the layout.
-- [ ] [`HTMLElement.offsetLeft`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft) [Read only]. Returns a double, the distance from this element's left border to its offsetParent's left border.
-- [ ] [`HTMLElement.offsetParent`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent) [Read only]. Returns a Element that is the element from which all offset calculations are currently computed.
-- [ ] [`HTMLElement.offsetTop`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop) [Read only]. Returns a double, the distance from this element's top border to its offsetParent's top border.
-- [ ] [`HTMLElement.offsetWidth`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetWidth) [Read only]. Returns a double containing the width of an element, relative to the layout.
+- [x] [`HTMLElement.offsetHeight`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight) [Read only]. Returns a double containing the height of an element, relative to the layout.
+- [x] [`HTMLElement.offsetLeft`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft) [Read only]. Returns a double, the distance from this element's left border to its offsetParent's left border.
+- [x] [`HTMLElement.offsetParent`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent) [Read only]. Returns a Element that is the element from which all offset calculations are currently computed.
+- [x] [`HTMLElement.offsetTop`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop) [Read only]. Returns a double, the distance from this element's top border to its offsetParent's top border.
+- [x] [`HTMLElement.offsetWidth`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetWidth) [Read only]. Returns a double containing the width of an element, relative to the layout.
 
 ### Methods
 
@@ -834,19 +834,25 @@ Additional events for `<input>` and `<textarea>`.
 
 # Styles API (CSS subset)
 
-Significantly expanded styling capabilities to cover more of the features that are heavily relied upon by web engineers. Styles are used with the `css()` function and are passed to the `style` prop on elements.
+Significantly expanded styling capabilities to cover more of the features that are heavily relied upon by web engineers. Styles are used with the `css.create()` function and are passed to the `style` prop on elements.
 
 ## `css()` function
 
 Styles must be wrapped in `css()`.
 
 ```js
-<div style={css({ width: 100, color: props.color })} />
+const styles = css.create({
+  foo: {
+    width: 100
+  },
+  bar: (color) => ({
+    color
+  })
+});
+
+<div style={styles.foo} />
+<div style={styles.bar(props.color)} />
 ```
-
-### `css.apply()` function
-
-A function that returns native props, e.g., `const nativeProps = css.apply(...styles)`. On web, this is used to generate DOM `className` and `style` props, whereas on native it can be used to pass flattened/transformed styles and any other other native props to custom native components.
 
 ## CSS Compatibility
 
@@ -865,7 +871,7 @@ Existing properties that can be adjusted to align with the CSS spec.
 
 Existing logical properties that can be adjusted to adopt the CSS standard names. In addition, React Native will need to add native support for subtree-level writing direction controls. Setting the `dir` prop (or `direction` style) to `ltr` or `rtl` on an element should alter the way logical properties are resolved in the subtree.
 
-* [ ] (`direction`. But it is [not recommended](https://w3c.github.io/csswg-drafts/css-writing-modes/#propdef-direction) on web, and we should consider removing it in favor of the `dir` prop.)
+* [ ] (`direction`. But it is [not recommended](https://w3c.github.io/csswg-drafts/css-writing-modes/#propdef-direction) for most use cases on web.)
 * [x] `borderEndEndRadius` is equivalent to `borderBottomEndRadius`.
 * [x] `borderEndStartRadius` is equivalent to `borderBottomStartRadius`.
 * [x] `borderStartEndRadius` is equivalent to `borderTopEndRadius`.
@@ -907,6 +913,12 @@ Existing logical properties that can be adjusted to adopt the CSS standard names
 * [x] `insetInline` is equivalent to `right` & `left`.
 * [x] `insetInlineEnd` is equivalent to `right` or `left`.
 * [x] `insetInlineStart` is equivalent to `right` or `left`.
+* [ ] `blockSize` is equivalent to `height`.
+* [ ] `minBlockSize` is equivalent to `minHeight`.
+* [ ] `maxBlockSize` is equivalent to `maxHeight`.
+* [ ] `inlineSize` is equivalent to `width`.
+* [ ] `minInlineSize` is equivalent to `minWidth`.
+* [ ] `maxInlineSize` is equivalent to `maxWidtht`.
 
 ## CSS Animations
 
