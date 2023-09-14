@@ -378,7 +378,7 @@ Node inherits methods from its parent, EventTarget.
 
 - [x] [`node.compareDocumentPosition()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
 - [x] [`node.contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains). Returns true or false value indicating whether or not a node is a descendant of the calling node.
-- [-] [`node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
+- [ ] [`node.getRootNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode). Returns the context object's root which optionally includes the shadow root if it is available..
 - [x] [`node.hasChildNodes()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes).
 
 ## Element
@@ -498,6 +498,30 @@ Listen to these events using `addEventListener()` or by assigning an event liste
 - [ ] [`change`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/change_event). Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed and committed by the user. Unlike the input event, the change event is not necessarily fired for each alteration to an element's value. Also available via the `on-change` property.
 - [ ] [`input`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event). Fired when the value of an `<input>`, `<select>`, or `<textarea>` element has been changed. Also available via the `on-input` property.
 
+## HTMLDialogElement
+
+The HTMLDialogElement interface represents an HTML `<dialog>` element, providing the properties and methods used to manipulate image elements.
+
+### Properties
+
+Inherits properties from its parent, HTMLElement.
+
+- [ ] [`HTMLDialogElement.open`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/open). A boolean value representing the state of the open HTML attribute. true means it is set, and therefore the dialog is shown. false means it not set, and therefore the dialog is not shown.
+- [ ] [`HTMLDialogElement.returnValue`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/returnValue). A string representing the returnValue of the dialog.
+
+### Methods
+
+Inherits properties from its parent, HTMLElement.
+
+- [ ] [`HTMLDialogElement.close()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/close). Closes the dialog. An optional string may be passed as an argument, updating the returnValue of the dialog.
+- [ ] [`HTMLDialogElement.show()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/show).Displays the dialog modelessly, i.e. still allowing interaction with content outside of the dialog.
+- [ ] [`HTMLDialogElement.showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal). Displays the dialog as a modal, over the top of any other dialogs that might be present. Everything outside the dialog are inert with interactions outside the dialog being blocked.
+
+### Events
+
+- [ ] `cancel`. Also available via the `on-cancel` prop.
+- [ ] `close`. Also available via the `on-close` prop.
+
 ## HTMLImageElement
 
 The HTMLImageElement interface represents an HTML `<img>` element, providing the properties and methods used to manipulate image elements.
@@ -526,7 +550,7 @@ Properties that apply only to visible elements containing text or numbers
 
 - [ ] [`disabled`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/disabled).
 - [ ] [`selectionEnd`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectionend). unsigned long: Returns / Sets the end index of the selected text. When there's no selection, this returns the offset of the character immediately following the current text input cursor position.
-- [ ] [`selectionStart`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectionstart). unsigned long: Returns / Sets the beginning index of the selected text. When nothing is selected, this returns the position of the text input cursor (caret) inside of the <input> element. (Resolves issue (#35616)[https://github.com/facebook/react-native/pull/35616].)
+- [ ] [`selectionStart`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectionstart). unsigned long: Returns / Sets the beginning index of the selected text. When nothing is selected, this returns the position of the text input cursor (caret) inside of the <input> element. (Resolves issue [#35616](https://github.com/facebook/react-native/pull/35616).)
 - [ ] [`selectionDirection`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#selectiondirection). string: Returns / Sets the direction in which selection occurred. Possible values are: forward (the selection was performed in the start-to-end direction of the current locale), backward (the opposite direction) or none (the direction is unknown).
 - [ ] [`value`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#value). string: Returns / Sets the current value of the control. If the user enters a value different from the value expected, this may return an empty string.
 
@@ -582,6 +606,7 @@ Content sectioning elements allow you to organize the document content into logi
 
 * [ ] [`article`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/article) is equivalent to `View` with `display:block` layout and `role="article"`.
 * [ ] [`aside`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside).
+* [ ] [`dialog`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog)
 * [ ] [`div`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div) is equivalent to `View` with `display:block` layout.
 * [ ] [`footer`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/footer).
 * [ ] [`h1-6`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements).
@@ -738,11 +763,19 @@ Resolves proposal [#492](https://github.com/react-native-community/discussions-a
 
 ## `<a>` props
 
+Additional props for `<a>`.
+
 - [ ] [`download`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download).
 - [ ] [`href`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href). Clicking will always attempt to open the URL in a browser, mail client, etc. Use of `e.preventDefault()` in an event handler will disable this behavior and allow custom routing logic to handle the interaction.
 - [ ] [`referredPolicy`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-referrerpolicy).
 - [ ] [`rel`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-rel).
 - [ ] [`target`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
+
+## `<dailog>` props
+
+Additional props for `<dialog>`.
+
+- [ ] [`open`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog#open).
 
 ## `<img>` props
 
@@ -1011,7 +1044,7 @@ Proposed syntax:
 
 ```js
 // Either
-css({
+css.create({
   position: 'absolute',
   '@media (max-width: 600px)': {
     position: 'sticky',
@@ -1019,7 +1052,7 @@ css({
 });
 
 // Or
-css({
+css.create({
   position: {
     default: 'absolute',
     '@media (max-width: 600px)': 'sticky',
@@ -1030,7 +1063,7 @@ css({
 The benefit of the latter is clearer expectations (and greater constraints) about when properties are overridden. For example, it's not as clear what the value for `position` would be in the following:
 
 ```js
-css(
+css.create(
   {
     position: 'absolute',
     '@media (max-width: 600px)': {
@@ -1053,7 +1086,7 @@ css(
 Whereas in the next example we can set expectations that a property *and any previous conditions* are completed overridden by any declaration that later modifies the property in any way.
 
 ```js
-css(
+css.create(
   {
     position: {
       default: 'absolute',
@@ -1078,16 +1111,16 @@ Consideration is also required to determine what the final value of a property i
 
 Miscellaneous CSS properties and values that should be supported on native.
 
-* [ ] [`backgroundImage`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-image). Add support for setting background images via `url()`. Stretch: support CSS gradients.
+* [ ] [`backgroundImage`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-image). Add support for setting background images via `url()`. Stretch: support CSS gradients, e.g., `linear-gradient()`.
 * [ ] [`backgroundOrigin`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin).
 * [ ] [`backgroundPosition`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position).
 * [ ] [`backgroundRepeat`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat).
 * [ ] [`backgroundSize`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size).
 * [ ] [`boxSizing`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing).
-* [ ] [`boxShadow`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow). Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles. Resolves issue (#26110)[https://github.com/facebook/react-native/pull/26110] and [multiple other issues](https://github.com/facebook/react-native/search?q=ios+shadow&type=issues).
+* [ ] [`boxShadow`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow). Add native support for CSS box shadows to replace buggy, iOS-specific `shadow*` styles. Resolves issue [#26110](https://github.com/facebook/react-native/pull/26110) and [multiple other issues](https://github.com/facebook/react-native/search?q=ios+shadow&type=issues).
 * [ ] [`caretColor`](https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color).
 * [ ] [`clipPath`](https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path).
-* [ ] [`display`](https://developer.mozilla.org/en-US/docs/Web/CSS/display) values of `block`, `contents` (resolves proposal [#348](https://github.com/react-native-community/discussions-and-proposals/issues/348)), `inline`, `inline-block`, `inline-flex`.
+* [ ] [`display`](https://developer.mozilla.org/en-US/docs/Web/CSS/display) values of `block`, `contents` (resolves proposal [#348](https://github.com/react-native-community/discussions-and-proposals/issues/348)), `inline`, `inline-block`, `inline-flex`, and `grid`.
 * [ ] [`float`](https://developer.mozilla.org/en-US/docs/Web/CSS/float).
 * [ ] [`justifySelf`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self). Sets the way a box is justified inside its alignment container along the appropriate axis.
 * [ ] ([`lineClamp`](https://www.w3.org/TR/css-overflow-3/#propdef-line-clamp) is equivalent to `numberOfLines` prop on `<Text>` components).
@@ -1102,8 +1135,9 @@ Miscellaneous CSS properties and values that should be supported on native.
 * [ ] [`rotate`](https://developer.mozilla.org/en-US/docs/Web/CSS/rotate).
 * [ ] [`scale`](https://developer.mozilla.org/en-US/docs/Web/CSS/scale).
 * [ ] [`scrollSnap*`](https://drafts.csswg.org/css-scroll-snap-1/#overview)
-* [ ] `textShadow`. Add native support for CSS text shadows. Resolves issue (#26110)[https://github.com/facebook/react-native/pull/26110].
+* [ ] `textShadow`. Add native support for CSS text shadows. Resolves issue [#26110](https://github.com/facebook/react-native/pull/26110).
 * [ ] [`touchAction`](https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action).
+* [x] [`transformOrigin`](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin).
 * [ ] [`transformStyle`](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style). Resolves proposal [#425](https://github.com/react-native-community/discussions-and-proposals/issues/425).
 * [ ] [`translate`](https://developer.mozilla.org/en-US/docs/Web/CSS/translate).
 * [ ] [`visibility`](https://developer.mozilla.org/en-US/docs/Web/CSS/visibility). Add support for visually hiding elements.
