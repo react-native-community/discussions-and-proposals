@@ -25,7 +25,7 @@ This new section will allow developers to follow a declarative approach to expre
 
 ## Rationale
 
-The need to specify **capabilities and metadata** for a react-native library is inherent to the React Native ecosystem. This need is so evident that various frameworks provided their own ways to specify those values. Look at `react-native.config.js` for the CLI or `expo.config.js` for Expo.
+The need to specify **capabilities and metadata** for a react-native library is inherent to the React Native ecosystem. This need is so evident that various frameworks provided their own ways to specify those values. Look at `react-native.config.js` for the CLI or `app.json` for Expo.
 
 Another issue is that, as of today, there is no simple programmatic way to know if a NPM package is a React Native library.
 We have some heuristics, though:
@@ -387,6 +387,8 @@ We foresee a phase in which only a part of the user base has this section config
 Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in various tools mentioned in [Proposed Tooling](#proposed-tooling) section. This first wave of support would have to be aligned around a given React Native release, say in 0.73 (which branch has not been cut).
 
 After adding this first wave of support, and related documentation, we could more broadly communicate to the community and the maintainers how adding this section would benefit them too.
+
+Furthermore, we will provide validation scripts to verify that the new field do respect the schema described by its version.
 
 ### Documentation update needed
 
