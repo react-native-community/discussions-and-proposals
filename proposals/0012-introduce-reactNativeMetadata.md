@@ -27,6 +27,8 @@ This new section will allow developers to follow a declarative approach to expre
 
 The need to specify **capabilities and metadata** for a react-native library is inherent to the React Native ecosystem. This need is so evident that various frameworks provided their own ways to specify those values. Look at `react-native.config.js` for the CLI or `app.json` for Expo.
 
+Notice that we do not expect that frameworks stop using those files to configure **framework-specific** settings. What we would like to enforce with this proposal is to have single source of truth for what concern the React Native core settings.
+
 Another issue is that, as of today, there is no simple programmatic way to know if a NPM package is a React Native library.
 We have some heuristics, though:
 * Presence of a `react-native:*` dependency in the `peerDependencies` section of the `package.json` ([example](https://github.com/RonRadtke/react-native-blob-util/blob/80628d418a5c81439dc2c1a1f05fae6406f0ba7f/package.json#L46C10-L49))
@@ -43,7 +45,7 @@ While we can continue to build tooling that tries to infer metadata and capabili
 We suggest to provide a declarative way to describe such capabilities.
 This approach would yield several benefits:
 * **predictability**: developers can easily understand what a library is capable of doing and if such capability matches their app.
-* **tooling**: tooling can easily consume this information and provide a better experience to developers.
+* **tooling**: tooling can easily consume this information and provide a better experience to developers. For example, we could tailor `microsoft/rnx-kit`'s align-deps tool to consume this information to help users double-check whether all their dependencies are supporting the New Architecture. See [`align-deps` support](#align-deps) below
 * **single source of thruth**: a single manifest will act as a source of truth for all those capabilities and flag definition, that can easily be consumed by different platforms to provide a unified way to enable/disable capabilities.
 * **verifiability**: the manifest can be easily verified and linted by tooling to ensure that apps and libraries are not using an incompatible set of dependencies. Similarly, the JSON schema we publish can be used to validate the `reactNativeManifest` section.
 
@@ -147,6 +149,22 @@ The precedence rules are that platform-specific settings override general settin
 
 would means that, in general, the app/library support the New Architecture, but not for Android.
 
+##### Planning forward: what happen when the New Architecture will be the default?
+
+The manifest is versioned, and we will use the versioning system to track breaking changes and different semantics.
+
+For version `1.0.0` the semantic would be:
+* `newArchitecture` default value set to `false`
+
+In a future version, let's say `K.0.0`, the semantic would be:
+* `newArchitecture` default value set to `true`
+* `newArchitecture` field deprecated
+
+In a more future version, let's say `N.0.0` (where N > K), the semantic would be:
+* `newArchitecture` field removed, together with the Old Architecture code.
+
+Notice that this system can also help us to track unmaintained/old packages: they would either not have the manifest at all or have old version of the manifest with its version's semantic.
+
 #### `codegenConfig` support
 
 Similarly to the New Architecture support metadata, the `codegenConfig` is a key metadata of the New Architecture build pipeline.
@@ -170,7 +188,7 @@ We propose to move this key under the `reactNativeManifest.capabilites` section 
 }
 ```
 
-### Hermes Support
+#### Hermes Support
 
 Similarly to the New Architecture support, the current way to enable/disable the Hermes engine is toggled by using a Gradle Property `hermesEnabled` on Android and changing the `:hermes_enabled` property in the Podfile.
 
@@ -236,7 +254,7 @@ The precedence rules are that platform-specific settings override general settin
 
 would means that the app will run with Hermes for all the platforms it supports but not for Android.
 
-### React Native Release feature flagging
+#### React Native Release feature flagging
 
 We currently have a number of different files where capabilities of React Native can be toggled to enable/disable features in the runtime.
 For example we have:
@@ -251,6 +269,32 @@ Most of those config flags are undocumented and they're not verified for invalid
 We propose to define `reactNativeManifest` as the **preferred entry point** for all the user facing entry points. All the tooling should be adapted to consume the information from the `reactNativeManifest` section and have sensible defaults defined by the tooling itself.
 
 It's outside the scope of this RFC to declare all the new sections we intend to add, and we defer to the [Future proof and extensibility](#future-proof-and-extensibility) section for the process on how to include a new key to the `reactNativeManifest` section.
+
+#### Out-of-Tree Platforms
+
+Although this proposal does not cover directly out-of-tree platforms, we strongly suggests maintainers of out-of-tree platforms to follow the same path.
+
+Tools written on top of the React Native Manifest would be able to work with iOS, Android and all the out of tree platforms that they support. They should follow the same precedence rules: if there is no platform specified, then the main flag would take precedence. If there is a platform specified, then that platform setup would have precedence.
+
+So, for example, given the manifest:
+
+```json
+{
+  "reactNativeManifest": {
+    "windows": {
+      "capabilities": {
+        "hermes": {
+          "enabled": false
+        }
+      }
+    },
+  }
+}
+```
+
+It means that for all the platforms but Windows, React Native will use Hermes as JS engine (`hermes.enabled` default value is `true`). For Windows specifically, it would be disabled.
+
+As an extra note, please be careful to **follow the same semantics** as the React Native Core: in this way we can avoid confusion for our users.
 
 ## Excluded use cases
 
@@ -279,7 +323,7 @@ Build tools such as Gradle/CocoaPods or others should account for the `reactNati
       1. If the two values are **incompatible**, notify the user and use the value specified in the `reactNativeManifest.capabilities.foo` section will prevail and the value specified in the build tool specific configuration will be ignored.
 1. If the capability `foo` is **not** specificed in the `reactNativeManifest.capabilities` section, honor the value specified in the build tool specific configuration or the default value if not specified.
 
-### `align-deps` support
+### <a name="align-deps"></a>`align-deps` support
 
 This RFC originated from a [conversation between Meta and Microsoft](https://github.com/microsoft/rnx-kit/issues/1863) to use `align-deps` as key feature in the New Architecture rollout support, in helping developers understand if a library they're using is compatible with the New Architecture or not. Very quickly it became clear that there is currently no straightforward way to know if a library indeed has that support.
 
@@ -294,9 +338,9 @@ It's outside the scope of this RFC to delve into details of which tool will impl
 
 ### React Native Directory
 
-The React Native direcotry can easily consume the `reactNativeManifest` by:
+The React Native directory can easily consume the `reactNativeManifest` by:
 1. Query the NPM registry with [their API](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md) to obtain the repository information.
-2. Query the repository information to obtain the `packge.json` and read the `reactNativeManifest` section.
+2. Query the repository information to obtain the `packge.json` and read the `reactNativeManifest` section. By putting these configurations in the package.json, React Native Directory can fetch only this file, rather than downloading the whole package and crawling its files.
 
 ## Future proof and extensibility
 
@@ -384,7 +428,7 @@ Ideally, we'll start by adding the `reactNativeManifest` section to the app temp
 
 We foresee a phase in which only a part of the user base has this section configured, and tool and developers need to account for the absence of this section.
 
-Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in various tools mentioned in [Proposed Tooling](#proposed-tooling) section. This first wave of support would have to be aligned around a given React Native release, say in 0.73 (which branch has not been cut).
+Once the v1.0.0 version of the shape is finalised, we can start integrating it across the board in various tools mentioned in [Proposed Tooling](#proposed-tooling) section. This first wave of support would have to be aligned around a given React Native release, say in 0.74 (which branch has not been cut).
 
 After adding this first wave of support, and related documentation, we could more broadly communicate to the community and the maintainers how adding this section would benefit them too.
 
