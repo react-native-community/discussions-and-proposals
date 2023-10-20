@@ -9,7 +9,7 @@ authors:
 date: 2023-10-20
 ---
 
-# Golden Template for create-react-native-library
+# RFC0721: Golden Template for create-react-native-library
 
 ## **Summary**
 
