@@ -42,7 +42,7 @@ To maintain consistency within the React Native ecosystem, the technical decisio
 
 ### Programming languages
 
-The official template will support **Java** and **Objc** initially, as these are the languages used in the official React Native app template. However, there are plans to incorporate **Kotlin** to replace **Java** with the release of **React Native 0.73**.
+The official template will support **Java**, **Objc**, and **TypeScript** initially, as these are the languages used in the official React Native app template. However, there are plans to incorporate **Kotlin** to replace **Java** with the release of **React Native 0.73**.
 
 ### **Architecture support**
 
