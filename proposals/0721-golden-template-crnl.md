@@ -57,7 +57,7 @@ The official library template will consist of four main folders:
 - `src`: Javascript source code.
 - `example`: An example app to test the library, created by running `npx react-native init` and making necessary changes for correct library linking.
 
-React Native Builder Bob will come pre-installed with the template for **building**, **generating the changelog**, and **publishing** the library.
+[React Native Builder Bob](https://github.com/callstack/react-native-builder-bob) will come pre-installed with the template for **building**, **generating the changelog**, and **publishing** the library.
 
 Apart from the necessary library code, the template will also include a *GitHub Actions* workflow to **lint**, **type-check**, and **build** the library. The workflow will also **build the example app** for Android and iOS.
 
