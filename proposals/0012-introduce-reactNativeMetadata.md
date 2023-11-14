@@ -70,7 +70,7 @@ We're proposing to declare if a project is either a library or an app by adding 
 
 This is a mandatory field that needs to be specified in all the apps and libraries.
 
-### New Architecture support
+### New and Old Architecture support
 
 One of the primary driver of this proposal is the [New React Native Architecture support](https://reactnative.dev/docs/the-new-architecture/landing-page). Specifically we believe that the ecosystem is currently affected by:
 * Lack of a declarative way to define if a library is compatible with the New Architecture
@@ -125,6 +125,26 @@ This section will allow also for split configuration between platforms:
 ```
 
 If omitted, the `newArchitecture.enabled` would have a value of `false` (this may change in the future).
+
+Notice that **libraries** might be supporting both architecture. So, the `capabilities` field can also support an `oldArchitecture` field of the same shape of the `newArchitecture`. The following example shows how to use both properties.
+
+```json
+"reactNativeManifest": {
+  "capabilities": {
+    "newArchitecture": {
+      "enabled": true
+    },
+    "oldArchitecture": {
+      "enabled": true
+    }
+  }
+}
+```
+
+If omitted, the `oldArchitecture.enabled` would have a value of `true` (this may change in the future), to simplify the adoption of the manifest. In fact, the vast majority of React Native libraries are now supporting the Old Architecture and only a subset support both of them.
+
+The `oldArchitecture` property is **ignored** by apps: this is needed to avoid ambiguous setup where an app declares both architectures as enabled.
+In other words, the `newArchitecture` property has always precedence in an app.
 
 The precedence rules are that platform-specific settings override general settings. So, for example:
 
