@@ -23,7 +23,7 @@ StyleSheet.create({
 
 ## Motivation
 
-Since most new devices support wider gamut color spaces React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://drafts.csswg.org/css-color/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
+Since most new devices support wider gamut color spaces, React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://drafts.csswg.org/css-color/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
 
 ## Detailed design
 
@@ -58,7 +58,7 @@ return { ["display-p3"]: true, r, g, b, a };
 
 2. Update [RCTConversions](https://github.com/facebook/react-native/blob/16ad818d21773cdf25156642fae83592352ae534/packages/react-native/React/Fabric/RCTConversions.h#L37) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
-3. Update [RCTConversions](https://github.com/facebook/react-native/blob/ac1cdaa71620d5bb4860237cafb108f6aeae9aef/packages/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTTextPrimitivesConversions.h#L116) to handle setting new color values for color space. If color space is not included preserve existing behavior.
+3. Update [RCTTextPrimitivesConversions](https://github.com/facebook/react-native/blob/ac1cdaa71620d5bb4860237cafb108f6aeae9aef/packages/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTTextPrimitivesConversions.h#L116) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
 ```objc
 [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha]
@@ -85,7 +85,7 @@ Color opaqueYellow = Color.valueOf(p3);
 
 ## Drawbacks
 
-Colors will be a bit more complicated than before.
+There should be no breaking changes for users but the color implementation will be a bit more complicated than before.
 
 ## Alternatives
 
@@ -101,5 +101,5 @@ We should document the inclusion of the color function in the [official color re
 
 ## Unresolved questions
 
-- While Android does support wide color gamut do [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it? These methods take `int`s while the Android color reference states wide gamut colors are `long`s.
-- Do we need to do additional work to support interpolating wide-gamut colors for animations?
+- While Android does support wide color gamut, do [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it? These methods take `int`s while the Android color reference states wide gamut colors are `long`s.
+- Do we need to do additional work to support interpolating colors for animations?
