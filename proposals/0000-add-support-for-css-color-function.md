@@ -10,7 +10,7 @@ date: 2023-11-20
 
 ## Summary
 
-React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide color gamut color spaces (e.g. display-p3). This proposal discusses adding support for the CSS color() function enabling support for additional wide-gamut color spaces.
+React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide color gamut color spaces (i.e. display-p3). This proposal discusses adding support for the CSS color() function enabling support for additional wide-gamut color spaces.
 
 ## Basic example
 
@@ -23,40 +23,31 @@ StyleSheet.create({
 
 ## Motivation
 
-Since most new devices support wide-gamut color spaces React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://drafts.csswg.org/css-color/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
+Since most new devices support wider gamut color spaces React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://drafts.csswg.org/css-color/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
 
 ## Detailed design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
+1. Parse color() function in [normalizeColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/normalize-color/index.js#L235)
+2. Include the color space info in the return value of [processColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/react-native/Libraries/StyleSheet/processColor.js) (i.e. display-p3 or rgba)
+3. Update iOS to handle new color values (UIColor colorWithDisplayP3Red:green:blue:alpha:)
+4. Update Android to handle new color values (??)
 
 ## Drawbacks
 
-Why should we _not_ do this? Please consider:
-
-- implementation cost, both in term of code size and complexity
-- whether the proposed feature can be implemented in user space
-- the impact on teaching people React Native
-- integration of this feature with other existing and planned features
-- cost of migrating existing React Native applications (is it a breaking change?)
-
-There are tradeoffs to choosing any path. Attempt to identify them here.
+- Color parsing will be slightly more complicated than before.
 
 ## Alternatives
 
-What other designs have been considered? Why did you select your approach?
+We could do nothing and require users to patch package for Display P3 color support. But this is a disappointing developer experience and not a satisfying solution.
 
 ## Adoption strategy
 
-If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries?
+This is intended to be a non-breaking change with zero impact to existing users. Adoption is entirely opt-in by using the color function in styles to start using display-p3 colors.
 
 ## How we teach this
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing React patterns?
-
-Would the acceptance of this proposal mean the React Native documentation must be re-organized or altered? Does it change how React Native is taught to new developers at any level?
-
-How should this feature be taught to existing React Native developers?
+We should document the inclusion of the color function in the [official color reference](https://reactnative.dev/docs/colors). Developers can then start using it if they choose.
 
 ## Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still TBD?
+While Android does support wide color gamut do [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it? These methods take `int`s while the Android color reference states wide gamut colors are `long`s.
