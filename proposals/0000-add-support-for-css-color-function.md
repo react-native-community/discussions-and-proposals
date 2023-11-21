@@ -28,9 +28,9 @@ Since most new devices support wider gamut color spaces React Native should supp
 ## Detailed design
 
 1. Parse color() function in [normalizeColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/normalize-color/index.js#L235)
-2. Include the color space info in the return value of [processColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/react-native/Libraries/StyleSheet/processColor.js) (i.e. display-p3 or rgba)
+2. Include the color space info in the return value of [processColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/react-native/Libraries/StyleSheet/processColor.js) (i.e. display-p3)
 3. Update iOS to handle new color values (UIColor colorWithDisplayP3Red:green:blue:alpha:)
-4. Update Android to handle new color values (??)
+4. Update Android to handle new color values (@ColorLong long p3 = pack(1.0f, 1.0f, 0.0f, 1.0f, ColorSpace.Named.DISPLAY_P3); Color opaqueYellow = Color.valueOf(p3);)
 
 ## Drawbacks
 
