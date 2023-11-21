@@ -83,6 +83,10 @@ if (isScreenWideColorGamut) {
 Color opaqueYellow = Color.valueOf(p3);
 ```
 
+### Docs
+
+Update the [Color Reference](https://github.com/facebook/react-native-website/blob/main/docs/colors.md) to document color function usage in React Native.
+
 ## Drawbacks
 
 There should be no breaking changes for users but the color implementation will be a bit more complicated than before.
