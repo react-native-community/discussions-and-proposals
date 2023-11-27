@@ -118,7 +118,11 @@ This is intended to be a non-breaking change with zero impact to existing users.
 
 ## How we teach this
 
-We should document the inclusion of the color function in the [official color reference](https://reactnative.dev/docs/colors). Developers can then start using it if they choose.
+Developers familiar with [color() on web](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color) should find this feature familiar and straightforward to use. To ensure that this feature is easily accessible to all developers we should do the following:
+
+1. Document the inclusion of the color function in the [official color reference](https://reactnative.dev/docs/colors).
+1. Partner with the Release Crew to make sure the new feature is included in a release blog post.
+1. Publish a blog post on the [Infinite Red blog](https://shift.infinite.red/)
 
 ## Unresolved questions
 
