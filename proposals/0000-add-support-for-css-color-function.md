@@ -10,7 +10,9 @@ date: 2023-11-20
 
 ## Summary
 
-React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide color gamut color spaces (i.e. display-p3). This proposal discusses adding support for the CSS color() function enabling support for additional wide-gamut color spaces.
+React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide gamut color spaces (i.e. display-p3). This proposal discusses adding support for this color space in React Native, covering:
+- JS implementation
+- platform changes
 
 ## Basic example
 
