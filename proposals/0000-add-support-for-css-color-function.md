@@ -1,12 +1,12 @@
 ---
-title: Add support for CSS color() function
+title: Add Support for Wide Gamut (DisplayP3) Colors to React Native
 author:
   - Ryan Linton
   - Yulian Glukhenko
 date: 2023-11-20
 ---
 
-# RFC0000: Add support for CSS color() function
+# RFC0000: Add Support for Wide Gamut (DisplayP3) Colors to React Native
 
 ## Summary
 
