@@ -17,6 +17,8 @@ React Native does [not currently support](https://github.com/facebook/react-nati
 ## Basic example
 
 ```js
+() => <View style={{ backgroundColor: "color(display-p3 1 0.5 0)" }} />;
+
 StyleSheet.create({
   backgroundColor: "color(display-p3 1 0.5 0)",
   color: "color(display-p3 1 0.5 0 / .5)",
