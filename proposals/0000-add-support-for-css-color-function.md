@@ -11,23 +11,36 @@ date: 2023-11-20
 ## Summary
 
 React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide gamut color spaces (i.e. display-p3). This proposal discusses adding support for this color space in React Native, covering:
+
 - JS implementation
 - platform changes
 
 ## Basic example
 
-```js
-() => <View style={{ backgroundColor: "color(display-p3 1 0.5 0)" }} />;
+Add a DisplayP3 background color and text color using color() function syntax per the [W3C CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function) spec.
 
+### Using StyleSheet
+
+```js
 StyleSheet.create({
-  backgroundColor: "color(display-p3 1 0.5 0)",
-  color: "color(display-p3 1 0.5 0 / .5)",
+  view: { backgroundColor: "color(display-p3 1 0.5 0)" },
+  text: { color: "color(display-p3 0 0.5 1)" },
 });
+```
+
+### Using inline styles
+
+```jsx
+const MyComp = () => (
+  <View style={{ backgroundColor: "color(display-p3 1 0.5 0)" }}>
+    <Text style={{ color: "color(display-p3 0 0.5 1)"  }}>
+  </View>
+)
 ```
 
 ## Motivation
 
-Since most new devices support wider gamut color spaces, React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://drafts.csswg.org/css-color/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
+Since most new devices support wider gamut color spaces, React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
 
 ## Detailed design
 
