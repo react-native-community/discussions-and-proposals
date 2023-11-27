@@ -40,7 +40,7 @@ const MyComp = () => (
 
 ## Motivation
 
-Since most new devices support wider gamut color spaces, React Native should support them as well. The Display P3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function), much of which is already implemented in React Native. Also Flutter [recently added support](https://github.com/flutter/flutter/issues/55092) for Display P3 on iOS with plans to follow up with support for Android and then the framework itself.
+Since most new devices support wider gamut color spaces, React Native should support them as well. The DisplayP3 color space has had native support since Android 8.0 and iOS 9.3. The color() function was introduced with [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function), much of which is already implemented in React Native. Flutter also [recently added support](https://github.com/flutter/flutter/issues/55092) for DisplayP3 on iOS with plans to follow up with support for Android and then the framework itself. Support for DisplayP3 colors can improve the quality of React Native apps by providing developers a wider range of available colors to use and is aligned with React Native's mission to provide the same look and feel as the underlying native platforms.
 
 ## Detailed design
 
