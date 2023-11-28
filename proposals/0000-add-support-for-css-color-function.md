@@ -66,20 +66,46 @@ function getMatchers() {
 2. Include the color space in the return value of [StyleSheet processColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/react-native/Libraries/StyleSheet/processColor.js) and [Animated processColor](https://github.com/facebook/react-native/blob/main/packages/react-native/Libraries/Animated/nodes/AnimatedColor.js)
 
 ```js
-return { ["display-p3"]: true, r, g, b, a };
+return { ["display-p3"]: true, red, green, blue, alpha };
 ```
 
 ### iOS Changes
 
 1. Update [RCTConvert](https://github.com/facebook/react-native/blob/781b637db4268ad7f5f3910d99ebb5203467840b/packages/react-native/React/Base/RCTConvert.m#L881) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
+```objc
++ (UIColor *)UIColor:(id)json
+{
+  if (!json) {
+    return nil;
+  }
+  if ([json isKindOfClass:[NSArray class]]) {
+    NSArray *components = [self NSNumberArray:json];
+    CGFloat alpha = components.count > 3 ? [self CGFloat:components[3]] : 1.0;
+    return [UIColor colorWithRed:[self CGFloat:components[0]]
+                           green:[self CGFloat:components[1]]
+                            blue:[self CGFloat:components[2]]
+                           alpha:alpha];
+  } else if ([json isKindOfClass:[NSNumber class]]) {
+    // ...
+  } else if ([json isKindOfClass:[NSDictionary class]]) {
+    NSDictionary *dictionary = json;
+    id value = nil;
+
+    // handle json with srgb color space specified
+    if ((value = [dictionary objectForKey:@"srgb"])) {
+      return [RCTConvert @[value.red, value.green, value.blue, value.alpha]];
+
+    // handle json with display-p3 color space specified
+    } else if ((value = [dictionary objectForKey:@"display-p3"])) {
+      return [UIColor colorWithDisplayP3Red:value.red green:value.green blue:value.blue alpha:value.alpha];
+
+    // ...
+```
+
 2. Update [RCTConversions](https://github.com/facebook/react-native/blob/16ad818d21773cdf25156642fae83592352ae534/packages/react-native/React/Fabric/RCTConversions.h#L37) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
 3. Update [RCTTextPrimitivesConversions](https://github.com/facebook/react-native/blob/ac1cdaa71620d5bb4860237cafb108f6aeae9aef/packages/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTTextPrimitivesConversions.h#L116) to handle setting new color values for color space. If color space is not included preserve existing behavior.
-
-```objc
-[UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha]
-```
 
 ### Android Changes
 
