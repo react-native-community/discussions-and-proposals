@@ -165,7 +165,7 @@ if (value instanceof ReadableMap) {
   int colorSpace = map.getInt("colorSpace")
 
   if (colorSpace === 1) {
-@ColorLong long p3 = pack(red, green, blue, alpha, ColorSpace.Named.DISPLAY_P3);
+    @ColorLong long p3 = pack(red, green, blue, alpha, ColorSpace.Named.DISPLAY_P3);
     return Color.valueOf(p3);
   } else {
     // ...
@@ -179,7 +179,7 @@ Update the [Color Reference](https://github.com/facebook/react-native-website/bl
 
 ## Drawbacks
 
-There should be no breaking changes for users but the color implementation will be a bit more complicated than before.
+There should be no breaking changes for users but the color implementation will be a bit more complicated than before. On iOS colors specified using existing methods will still use the same code paths and UIColor constructor. On Android colors specified using existing methods will still default to sRGB and only if DisplayP3 is specified will they be packed into a ColorLong.
 
 ## Alternatives
 
