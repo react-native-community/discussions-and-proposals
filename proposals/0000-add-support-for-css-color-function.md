@@ -145,6 +145,14 @@ if (isScreenWideColorGamut) {
 }
 ```
 
+This is prerequisite per [Android documentation](https://developer.android.com/training/wide-color-gamut) but they note:
+
+> When wide color gamut mode is enabled, the activity's window uses more memory and GPU processing for screen composition. Before enabling wide color gamut mode, you should carefully consider if the activity truly benefits from it. For example, an activity that displays photos in fullscreen is a good candidate for wide color gamut mode, but an activity that shows small thumbnails is not.
+
+So we'll likely want to provide a way to disable this as well.
+
+This won't impact any existing 32-bit integer colors since those will continue to be in sRGB color space. To actually use DisplayP3 colors it is necessary to pack the color space and 4 color components into a 64-bit long value.
+
 2. Update [ColorUtil](https://github.com/facebook/react-native/blob/a6964b36294c3bfea09c0cdd65c5d0e3949f2dae/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/ColorUtil.java#L17) and [ColorPropConverter](https://github.com/facebook/react-native/blob/781b637db4268ad7f5f3910d99ebb5203467840b/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/bridge/ColorPropConverter.java#L27) to return new color values for color space as longs.
 
 ```java
