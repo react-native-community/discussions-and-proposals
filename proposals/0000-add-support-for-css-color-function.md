@@ -156,8 +156,21 @@ This won't impact any existing 32-bit integer colors since those will continue t
 2. Update [ColorUtil](https://github.com/facebook/react-native/blob/a6964b36294c3bfea09c0cdd65c5d0e3949f2dae/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/ColorUtil.java#L17) and [ColorPropConverter](https://github.com/facebook/react-native/blob/781b637db4268ad7f5f3910d99ebb5203467840b/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/bridge/ColorPropConverter.java#L27) to return new color values for color space as longs.
 
 ```java
-@ColorLong long p3 = pack(1.0f, 1.0f, 0.0f, 1.0f, ColorSpace.Named.DISPLAY_P3);
-Color opaqueYellow = Color.valueOf(p3);
+if (value instanceof ReadableMap) {
+  ReadableMap map = (ReadableMap) value;
+  float red = (float) map.getDouble("red");
+  float green = (float) map.getDouble("green");
+  float blue = (float) map.getDouble("blue");
+  float alpha = (float) map.getDouble("alpha");
+  int colorSpace = map.getInt("colorSpace")
+
+  if (colorSpace === 1) {
+@ColorLong long p3 = pack(red, green, blue, alpha, ColorSpace.Named.DISPLAY_P3);
+    return Color.valueOf(p3);
+  } else {
+    // ...
+  }
+}
 ```
 
 ### Docs
