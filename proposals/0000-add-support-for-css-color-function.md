@@ -103,9 +103,35 @@ return { ["display-p3"]: true, red, green, blue, alpha };
     // ...
 ```
 
-2. Update [RCTConversions](https://github.com/facebook/react-native/blob/16ad818d21773cdf25156642fae83592352ae534/packages/react-native/React/Fabric/RCTConversions.h#L37) to handle setting new color values for color space. If color space is not included preserve existing behavior.
+2. Update [ColorComponents.h](https://github.com/facebook/react-native/blob/528f97152b7e0a7465c5b5c02e96c2c4306c78fe/packages/react-native/ReactCommon/react/renderer/graphics/ColorComponents.h) to include color space.
 
-3. Update [RCTTextPrimitivesConversions](https://github.com/facebook/react-native/blob/ac1cdaa71620d5bb4860237cafb108f6aeae9aef/packages/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTTextPrimitivesConversions.h#L116) to handle setting new color values for color space. If color space is not included preserve existing behavior.
+```cpp
+enum class ColorSpace {
+  sRGB,
+  DisplayP3
+};
+
+struct ColorComponents {
+  float red{0};
+  float green{0};
+  float blue{0};
+  float alpha{0};
+  ColorSpace colorSpace{ColorSpace::sRGB};  // Default to sRGB
+};
+```
+
+3. Update [RCTConversions](https://github.com/facebook/react-native/blob/16ad818d21773cdf25156642fae83592352ae534/packages/react-native/React/Fabric/RCTConversions.h#L37) to handle setting new color values for color space. If color space is not included preserve existing behavior.
+
+4. Update [RCTTextPrimitivesConversions](https://github.com/facebook/react-native/blob/ac1cdaa71620d5bb4860237cafb108f6aeae9aef/packages/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTTextPrimitivesConversions.h#L116) to handle setting new color values for color space. If color space is not included preserve existing behavior.
+
+```cpp
+auto components = facebook::react::colorComponentsFromColor(sharedColor);
+if (components.colorSpace == ColorSpace::DisplayP3) {
+  return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
+} else {
+  return [UIColor colorWithRed:components.red green:components.green blue:components.blue alpha:components.alpha];
+}
+```
 
 ### Android Changes
 
