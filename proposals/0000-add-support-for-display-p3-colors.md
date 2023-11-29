@@ -173,7 +173,7 @@ if (value instanceof ReadableMap) {
 }
 ```
 
-3. Determine how to utilize wide gamut color in Android. It's not clear if [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it directly.
+3. Determine how best to utilize wide gamut color in Android. It's not clear if [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it directly. It is supported by [Paint](<https://developer.android.com/reference/android/graphics/Paint#setColor(long)>) so perhaps it's possible via [setLayerPaint](<https://developer.android.com/reference/android/view/View#setLayerPaint(android.graphics.Paint)>)?
 
 ### Docs
 
@@ -206,3 +206,4 @@ Developers familiar with [color() on web](https://developer.mozilla.org/en-US/do
 ## Unresolved questions
 
 - Do we need to do additional work to support interpolating colors for animations?
+- Is there additional work we need to do to support wide gamut color in images?
