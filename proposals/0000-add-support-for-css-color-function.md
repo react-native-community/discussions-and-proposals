@@ -183,7 +183,11 @@ There should be no breaking changes for users but the color implementation will 
 
 ## Alternatives
 
-We could do nothing and require users to patch package for Display P3 color support. But this is a disappointing developer experience and not a satisfying solution.
+1. **Alternatives to CSS Color Module Level 4:** <br/> We could use a different standard for displaying wide gamut color. For example we could follow the [Color.js](https://github.com/color-js/color.js) API: `new Color({space: "p3", coords: [0, 1, 0], alpha: .9})`. However this deviates from the existing color implementation which mostly implements [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function) and would be surprising to existing React Native developers.
+
+2. **Utilizing Swizzling on iOS:** <br/> As an alternative to the proposed iOS changes, swizzling could be considered similar to [RN #41517](https://github.com/facebook/react-native/issues/41517). This has a major downside of being an all or nothing breaking change forcing all React Native users into the DisplayP3 color space as well as being a more confusing and less maintainable solution.
+
+3. **Full switch to DisplayP3:** <br/> In a similar vein we could just update the constructors directly without preserving existing behavior. While this would be a simpler implementation it would be a breaking change. Any existing visual regression tests would likely break and React Native users would now be required to specify all colors in a wider gamut.
 
 ## Adoption strategy
 
