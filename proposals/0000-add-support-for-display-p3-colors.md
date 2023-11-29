@@ -13,7 +13,7 @@ date: 2023-11-20
 React Native does [not currently support](https://github.com/facebook/react-native/issues/41517) wide gamut color spaces (i.e. display-p3). This proposal discusses adding support for this color space in React Native, covering:
 
 - JS implementation
-- platform changes
+- Platform changes
 
 ## Basic example
 
@@ -173,6 +173,8 @@ if (value instanceof ReadableMap) {
 }
 ```
 
+3. Determine how to utilize wide gamut color in Android. It's not clear if [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it directly.
+
 ### Docs
 
 Update the [Color Reference](https://github.com/facebook/react-native-website/blob/main/docs/colors.md) to document color function usage in React Native.
@@ -203,5 +205,4 @@ Developers familiar with [color() on web](https://developer.mozilla.org/en-US/do
 
 ## Unresolved questions
 
-- While Android does support wide color gamut, do [Android View](<https://developer.android.com/reference/android/view/View#setBackgroundColor(int)>)'s actually support it? These methods take `int`s while the Android color reference states wide gamut colors are `long`s.
 - Do we need to do additional work to support interpolating colors for animations?
