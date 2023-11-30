@@ -142,7 +142,7 @@ This is prerequisite per [Android documentation](https://developer.android.com/t
 
 > When wide color gamut mode is enabled, the activity's window uses more memory and GPU processing for screen composition. Before enabling wide color gamut mode, you should carefully consider if the activity truly benefits from it. For example, an activity that displays photos in fullscreen is a good candidate for wide color gamut mode, but an activity that shows small thumbnails is not.
 
-So we'll likely want to provide a way to disable this as well.
+So we'll likely want to leave this disabled by default on Android allow React Native developers to opt-in via a feature flag.
 
 This won't impact any existing 32-bit integer colors since those will continue to be in sRGB color space. To actually use DisplayP3 colors it is necessary to pack the color space and 4 color components into a 64-bit long value.
 
