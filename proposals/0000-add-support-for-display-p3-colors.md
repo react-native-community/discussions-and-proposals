@@ -80,13 +80,6 @@ return { ["display-p3"]: true, red, green, blue, alpha };
     return nil;
   }
   if ([json isKindOfClass:[NSArray class]]) {
-    NSArray *components = [self NSNumberArray:json];
-    CGFloat alpha = components.count > 3 ? [self CGFloat:components[3]] : 1.0;
-    return [UIColor colorWithRed:[self CGFloat:components[0]]
-                           green:[self CGFloat:components[1]]
-                            blue:[self CGFloat:components[2]]
-                           alpha:alpha];
-  } else if ([json isKindOfClass:[NSNumber class]]) {
     // ...
   } else if ([json isKindOfClass:[NSDictionary class]]) {
     NSDictionary *dictionary = json;
@@ -94,7 +87,7 @@ return { ["display-p3"]: true, red, green, blue, alpha };
 
     // handle json with srgb color space specified
     if ((value = [dictionary objectForKey:@"srgb"])) {
-      return [RCTConvert @[value.red, value.green, value.blue, value.alpha]];
+      return [UIColor colorWithRed:value.red green:value.green blue:value.blue alpha:value.alpha];
 
     // handle json with display-p3 color space specified
     } else if ((value = [dictionary objectForKey:@"display-p3"])) {
