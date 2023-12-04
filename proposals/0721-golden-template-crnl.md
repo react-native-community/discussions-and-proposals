@@ -98,7 +98,7 @@ The primary purpose of the library upgrade helper is to reduce the burden on lib
 
 The proposal suggests adding a CI pipeline to the [core React Native repository](https://github.com/facebook/react-native) to test compatibility with `create-react-native-library`. This ensures that every change in React Native is tested against the library template.
 
-Practically we’ll be adding four new CI jobs on React Native CircleCI’s setup as follows:
+Practically we’ll be adding four new CI jobs on React Native CI’s setup as follows:
 
 - `test_android_template_withlibrary_OldArc` - This will test the Android New App template against the Golden Template from CRNL with the Old Architecture
 - `test_android_template_withlibrary_NewArc` - This will test the Android New App template against the Golden Template from CRNL with the New Architecture
