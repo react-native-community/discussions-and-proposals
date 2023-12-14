@@ -21,14 +21,14 @@ The motivation for this change is threefold:
 
 ## Detailed design
 
-### TODO: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated
+### TODO: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated.
 
-The general idea is that the code we have for Apple platforms should be consistent of three primary parts:
+The general idea is that the code we have for Apple platforms should be consistent of three primary parts by the end of this migration:
 - The Swift API layer that is in charge of the platform specific operations that can not be shared across other platforms (the View Delegate, the Scene Delegate, anything that has to do with Apple specific frameworks like UIKit)
 - The Shared C++ code that is platform agnostic and used by all React Native target platforms (Yoga, Hermes, the event handlers, the bridge (if applicable), etc)
 - The optional intermidery C++ code, with Swift specific annotations for certain APIs that help Swift interact with C++ in a more efficient and correct manner (To learn more, please refer to [Swift's documentation of interop with C++](https://www.swift.org/documentation/cxx-interop/#exposing-swift-apis-to-c) under "Customizing How C++ Maps to Swift")
 
-The third step is marked as optional. The idea is that the Swift compiler makes certain assumptions when interacting directly with the C++ modules that may not necessarily be correct (C++ types being imported as value types by default, for instance). But we can override those behaviours by explicitly marking certain sections with the annotations provided to us by <swift/bridging> (Marking things to be imported as reference types, Mapping getters and setters, etc)
+The third step is marked as optional. The idea is that the Swift compiler makes certain assumptions when interacting directly with the C++ modules that may not necessarily be correct (C++ types being imported as value types by default, for instance). But we can override those behaviours by explicitly marking certain sections with the annotations provided to us by `<swift/bridging>` (Marking things to be imported as reference types, Mapping getters and setters, etc)
 
 Much like our current setup with Obj-C, The Apple platform section of any new project template created will simply expose the Swift files for developers to extend and add functionalities to. The React Native APIs can be simply imported via a swift import and consumed by the Swift parts, giving us control over our API surface and hiding away any specific pieces that will not be needed on a day to day basis. Example:
 
@@ -62,34 +62,37 @@ class AppDelegate: RCTAppDelegate {
 }
 ```
 
-
-
-
-
-
-
-
-This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
-
 ## Drawbacks
 
-Why should we _not_ do this? Please consider:
-
-- implementation cost, both in term of code size and complexity
-- whether the proposed feature can be implemented in user space
-- the impact on teaching people React Native
-- integration of this feature with other existing and planned features
-- cost of migrating existing React Native applications (is it a breaking change?)
-
-There are tradeoffs to choosing any path. Attempt to identify them here.
+The biggest drawback can be boiled down to certain key elements:
+- It is a massive undertaking, that will likely take years to fully complete
+- The Swift API is not yet fully compatible with everything we will need on the C++ side of things
+- Libraries will need to update their documentation and probably some changes to their imports as well (ideally, the API should not change, unless it is related to the Platform specific side of things and the Swift implementation simplifies the existing API for them to consume) and as [previously established](https://github.com/react-native-community/discussions-and-proposals/issues/671) not all libraries adapt and maintainers may not update
+- Users will need to upgrade their templates and the libraries they use to Switch over
 
 ## Alternatives
 
-What other designs have been considered? Why did you select your approach?
+### Leaving things as is
+The overhead of this option is much much lower in the short term, and while it creates a bad user experience for the smaller subsection of the user base that want to be able to do more (and library maintainers who would probably benefit from this new found access), the cost is undeniably lower. The problem is that eventually, Apple either push for this change directly, or will make it very hard to continue, so unless we take initiative now, We will be forced to it down the road, and in the mean time React Native will have to resort to more and more custom solutions to deal with any APIs that might become unavailable
 
 ## Adoption strategy
 
-If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries?
+The core idea is to still be able to deliver feature and changes that users and library maintainers have been asking for while doing the migration. One strategy that comes to mind for achieving this result is as follows:
+- (If needed) Isolating the OSS bits that are user facing from the internals as much as possible (Like AppDelegate and the tests)
+- (If needed) Updating Cocopods infra
+- (If needed) Communicating with third party libraries to adjust
+- (If needed) Rolling out a new version
+- Migrating the OSS parts from Obj-C -> Swift
+- Updating CLI to support the new files and structures
+- Updating React Native Helper to support people trying to migrate their templates from Obj-C to Swift
+- Updating the docs
+- Communicating with library maintainers if help is needed updating their documentation to support the setup for both Swift and Obj-C for older users
+- Rolling out a new version
+- Moving as much shared logic as possible to C++ and away from Obj-C, separating them as distinctly as possible while adding new features and capabilities and continuing to roll out new versions (**Users should not be affected, and ideally the Library maintainers should not be affected either**)
+- Beginning the transition from Obj-C to Swift from the tests in the internals (**No effect on users or library maintainers**)
+- Moving the rest of the modules one at a time from Obj-C to Swift (**Library maintainers may need to update, if they wish to take advantage of the newer APIs or if we break change an APIs signiture, but ideally it should only be in the direction of making it easier to maintain libraries and better APIs**)
+- Updating Cocopods infra
+- ? (Please add any more steps that come to mind, at the end or anywhere else in the list)
 
 ## How we teach this
 
