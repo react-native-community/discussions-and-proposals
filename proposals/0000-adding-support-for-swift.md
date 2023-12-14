@@ -21,6 +21,54 @@ The motivation for this change is threefold:
 
 ## Detailed design
 
+### TODO: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated
+
+The general idea is that the code we have for Apple platforms should be consistent of three primary parts:
+- The Swift API layer that is in charge of the platform specific operations that can not be shared across other platforms (the View Delegate, the Scene Delegate, anything that has to do with Apple specific frameworks like UIKit)
+- The Shared C++ code that is platform agnostic and used by all React Native target platforms (Yoga, Hermes, the event handlers, the bridge (if applicable), etc)
+- The optional intermidery C++ code, with Swift specific annotations for certain APIs that help Swift interact with C++ in a more efficient and correct manner (To learn more, please refer to [Swift's documentation of interop with C++](https://www.swift.org/documentation/cxx-interop/#exposing-swift-apis-to-c) under "Customizing How C++ Maps to Swift")
+
+The third step is marked as optional. The idea is that the Swift compiler makes certain assumptions when interacting directly with the C++ modules that may not necessarily be correct (C++ types being imported as value types by default, for instance). But we can override those behaviours by explicitly marking certain sections with the annotations provided to us by <swift/bridging> (Marking things to be imported as reference types, Mapping getters and setters, etc)
+
+Much like our current setup with Obj-C, The Apple platform section of any new project template created will simply expose the Swift files for developers to extend and add functionalities to. The React Native APIs can be simply imported via a swift import and consumed by the Swift parts, giving us control over our API surface and hiding away any specific pieces that will not be needed on a day to day basis. Example:
+
+```swift
+import React
+
+@main
+class AppDelegate: RCTAppDelegate {
+    override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        self.moduleName = "HelloWorld"
+        // You can add your custom initial props in the dictionary below.
+        // They will be passed down to the ViewController used by React Native.
+        self.initialProps = [:]
+
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    override func sourceURL(for bridge: RCTBridge!) -> URL! {
+        return self.getBundleURL()
+    }
+
+    func getBundleURL() -> URL {
+        #if DEBUG
+        return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+        #else
+        return Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
+        #endif
+    }
+
+    /// Native bits of functionality that users may extend and add on their own
+}
+```
+
+
+
+
+
+
+
+
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with React Native to understand, and for somebody familiar with the implementation to implement. This should get into specifics and corner-cases, and include examples of how the feature is used. Any new terminology should be defined here.
 
 ## Drawbacks
