@@ -21,7 +21,7 @@ The motivation for this change is threefold:
 
 ## Detailed design
 
-### TODO: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated.
+### HELP WANTED: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated.
 
 The general idea is that the code we have for Apple platforms should be consistent of three primary parts by the end of this migration:
 - The Swift API layer that is in charge of the platform specific operations that can not be shared across other platforms (the View Delegate, the Scene Delegate, anything that has to do with Apple specific frameworks like UIKit)
@@ -73,7 +73,7 @@ The biggest drawback can be boiled down to certain key elements:
 ## Alternatives
 
 ### Leaving things as is
-The overhead of this option is much much lower in the short term, and while it creates a bad user experience for the smaller subsection of the user base that want to be able to do more (and library maintainers who would probably benefit from this new found access), the cost is undeniably lower. The problem is that eventually, Apple either push for this change directly, or will make it very hard to continue, so unless we take initiative now, We will be forced to it down the road, and in the mean time React Native will have to resort to more and more custom solutions to deal with any APIs that might become unavailable
+The overhead of this option is much much lower in the short term, and while it creates a bad user experience for the smaller subsection of the user base that want to be able to do more (and library maintainers who would probably benefit from this new found access), the cost is undeniably lower. The problem is that eventually, Apple will either push for this change directly, or will make it very hard to continue, so unless we take initiative now, We will be forced to it down the road, and in the mean time React Native will have to resort to more and more custom solutions to deal with any APIs that might become unavailable
 
 ## Adoption strategy
 
@@ -96,12 +96,16 @@ The core idea is to still be able to deliver feature and changes that users and 
 
 ## How we teach this
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing React patterns?
+This should be a pretty welcome step for the user base (and even the maintainers, if done correctly and without too many breaking changes). The docs for creating Native module will need to be updated to add support for Swift, and we can simply mention the change in React Native EU or similar conferences.
 
-Would the acceptance of this proposal mean the React Native documentation must be re-organized or altered? Does it change how React Native is taught to new developers at any level?
+The idea is to make it very un-noticable to the vast majority of the user base who simply want to use the React side for creating their mobile applications, and the part of the community that is capable of creating native modules should simply feel like it is just another native Apple app that they can extend using whatever it is that they need (perhaps adding a watchOS target support for their app, or using CoreML or AppClips or making a SwiftUI based widget)
 
-How should this feature be taught to existing React Native developers?
+It should be presented as React Native keeping up with changes and lowering the barrier of entry for all devs and that we are simply making part of the work that is duplicated across platforms easy to reuse, using the same tools that our industry is using and without sacrificing the experience.
 
 ## Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still TBD?
+- What other parts of the infra need to be changed for this transition to work?
+- How will this affect other targets such as React Native MacOS, React Native visionOS, etc?
+- Is our current separation of internals from the OSS template enough that we can simply change the template directly without any of the first four steps needed? (I managed to get a [test repo](https://github.com/TheRogue76/React-Native-Template-With-Swift) to work as a proof of concept with these changes, but i am not sure if that means that the app will work for all situations (new arch, bridgless, etc). I also submitted [a PR](https://github.com/facebook/react-native/pull/41896) to test out the current tests we had and those passed, but that might not be enough). And what about Expo? Will it continue to function if this change is done to the base template, or would it interfere with any of the work done on their side
+- Can we create a separation between the base template of the app and rest of the internals in a way that would allow us to switch over the template without breaking the everything in the process?
+
