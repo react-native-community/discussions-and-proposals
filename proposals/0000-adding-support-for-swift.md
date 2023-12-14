@@ -1,25 +1,23 @@
 ---
-title: Title goes here
+title: Adding support for Swift / Moving away from Obj-C on Apple platforms
 author:
-- Jane Doe
-date: today
+- Parsa Nasirimehr
+date: 2023-12-14
 ---
 
-# RFC0000: Title goes here
+# RFC0000: Adding support for Swift / Moving away from Obj-C on Apple platforms
 
 ## Summary
 
-Brief explanation of the change.
-
-## Basic example
-
-If the proposal involves a new or changed API, include a basic code example. Omit this section if it's not applicable.
+React Native's base code on Apple's platfroms has been written in a mix of Obj-C, Obj-C++ and C++. This proposal discuses what path we might have to migrate the codebase to using just C++ and Swift, Apple's current standard language for developing apps on their platforms, and what areas we need to be to mindful of (including tooling, various architectures that would need to be supported, documentation updates and the impact on third party libraries)
 
 ## Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
+The motivation for this change is threefold:
+- As of Swift 5.9, Swift is now capable of direct interop with C++, Which was one of the primary reasons Obj-C and Obj-C++ were still required within the repository. While the development [is still ongoing](https://www.swift.org/documentation/cxx-interop/status/) and there are [constraints that still exist](https://github.com/apple/swift/issues/66159), Apple's end goal is to reach the needed API parity to work seemlesssly between Swift and C++
+- Obj-C is relatively hard to write and maintain for, and it is reflected by the [community](https://github.com/react-native-community/discussions-and-proposals/issues/104). Having a modern language that is more readable, more performant(in some cases) and [safer from certain class of errors](https://developer.apple.com/swift/#safety) means that users and library maintainers alike can produce better quality code and take advantage of the underlying platforms easier if they need it
+- As Swift evolves and becomes more feature rich, there is a possibility that Apple will begin to remove support for Obj-C in it's toolchain. The documentation for the various APIs that Apple provides may also be moved to simply having Swift as the supported language.
 
-Please focus on explaining the motivation so that if this RFC is not accepted, the motivation could be used to develop alternative solutions. In other words, enumerate the constraints you are trying to solve without coupling them too closely to the solution you have in mind.
 
 ## Detailed design
 
