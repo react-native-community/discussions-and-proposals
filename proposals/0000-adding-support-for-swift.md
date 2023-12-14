@@ -9,7 +9,7 @@ date: 2023-12-14
 
 ## Summary
 
-React Native's base code on Apple's platforms has been written in a mix of Obj-C, Obj-C++ and C++. This proposal discuses what path we might have to migrate the codebase to using just C++ and Swift, Apple's current standard language for developing apps on their platforms, and what areas we need to be mindful of (including tooling, various architectures that would need to be supported, documentation updates and the impact on third party libraries)
+React Native's codebase on Apple's platforms has been written in a mix of Obj-C, Obj-C++ and C++. This proposal discuses what path we might have to migrate the codebase to using just C++ and Swift, Apple's current standard language for developing apps on their platforms, and what areas we need to be mindful of (including tooling, various architectures that would need to be supported, documentation updates and the impact on third party libraries)
 
 ## Motivation
 
