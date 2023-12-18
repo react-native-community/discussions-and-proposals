@@ -101,6 +101,23 @@ return { ["display-p3"]: true, red, green, blue, alpha };
 1. Update [RCTConvert](https://github.com/facebook/react-native/blob/781b637db4268ad7f5f3910d99ebb5203467840b/packages/react-native/React/Base/RCTConvert.m#L881) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
 ```objc
+enum ColorSpace: NSInteger {
+  case sRGB = 0
+  case displayP3 = 1
+};
+
++ (UIColor *) createColorFrom:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha andColorSpace:(ColorSpace)colorSpace
+{
+  if (colorSpace == displayP3) {
+    return [UIColor colorWithDisplayP3Red:red green:green blue:blue alpha:alpha];
+  }
+#if RCT_WIDE_GAMUT_ENABLED
+  return [UIColor colorWithDisplayP3Red:red green:green blue:blue alpha:alpha];
+#else
+  return [UIColor red:red green:green blue:blue alpha:alpha];
+#endif
+}
+
 + (UIColor *)UIColor:(id)json
 {
   if (!json) {
@@ -114,11 +131,11 @@ return { ["display-p3"]: true, red, green, blue, alpha };
 
     // handle json with srgb color space specified
     if ((value = [dictionary objectForKey:@"srgb"])) {
-      return [UIColor colorWithRed:value.red green:value.green blue:value.blue alpha:value.alpha];
+      return [self createColorFrom:value.red green:value.green blue:value.blue alpha:value.alpha andColorSpace:ColorSpace.sRGB];
 
     // handle json with display-p3 color space specified
     } else if ((value = [dictionary objectForKey:@"display-p3"])) {
-      return [UIColor colorWithDisplayP3Red:value.red green:value.green blue:value.blue alpha:value.alpha];
+      return [UIColor colorWithDisplayP3Red:value.red green:value.green blue:value.blue alpha:value.alpha andColorSpace:ColorSpace.displayP3];
 
     // ...
 ```
@@ -136,7 +153,11 @@ struct ColorComponents {
   float green{0};
   float blue{0};
   float alpha{0};
+#if RCT_WIDE_GAMUT_ENABLED
+  ColorSpace colorSpace{ColorSpace::DisplayP3};  // Default to DisplayP3
+#else
   ColorSpace colorSpace{ColorSpace::sRGB};  // Default to sRGB
+#endif
 };
 ```
 
@@ -149,7 +170,11 @@ auto components = facebook::react::colorComponentsFromColor(sharedColor);
 if (components.colorSpace == ColorSpace::DisplayP3) {
   return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
 } else {
+#if RCT_WIDE_GAMUT_ENABLED
+  return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
+#else
   return [UIColor colorWithRed:components.red green:components.green blue:components.blue alpha:components.alpha];
+#endif
 }
 ```
 
