@@ -38,6 +38,33 @@ const MyComp = () => (
 )
 ```
 
+### Using a feature flag
+
+Opt-in to using DisplayP3 as the default color space by using a feature flag.
+
+```sh
+# in ios/Podfile
+ENV['RCT_WIDE_GAMUT_ENABLED'] = '1'
+
+# in android/gradle.properties
+wideGamutEnabled=true
+```
+
+Then specify colors as before but now they will be in the DisplayP3 color space.
+
+```jsx
+StyleSheet.create({
+  view: { backgroundColor: "rgb(255, 128, 0)" },
+  text: { color: "#0080FF" },
+});
+
+const MyComp = () => (
+  <View style={{ backgroundColor: "#FF8000" }}>
+    <Text style={{ color: "rgb(0, 128, 255)" }}>
+  </View>
+)
+```
+
 ## Motivation
 
 Since most new devices support wider gamut color spaces, React Native should support them as well. The DisplayP3 color space has had native support since Android 8.0 and iOS 9.3. The `color()` function was introduced with [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#color-function), much of which is already implemented in React Native. Flutter also [recently added support](https://github.com/flutter/flutter/issues/55092) for DisplayP3 on iOS with plans to follow up with support for Android and then the framework itself. Support for DisplayP3 colors can improve the quality of React Native apps by providing developers a wider range of available colors to use and is aligned with React Native's mission to provide the same look and feel as the underlying native platforms.
