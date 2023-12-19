@@ -75,6 +75,20 @@ The biggest drawback can be boiled down to certain key elements:
 ### Leaving things as is
 The overhead of this option is much lower in the short term, and while it creates a bad user experience for the smaller subsection of the user base that want to be able to do more (and library maintainers who would probably benefit from this new-found access), the cost is undeniably lower. The problem is that eventually, Apple will either push for this change directly, or will make it very hard to continue, so unless we take initiative now, We will be forced to it down the road, and in the meantime React Native will have to resort to more and more custom solutions to deal with any APIs that might become unavailable
 
+### Creating a wrapper Objective-C(++) around C++ pure code
+Another approach could be to create wrappers around our C++ code base using Objective-C and Objective-C++ and only exposing APIs that are Swift compatible through this wrapper.
+
+To make this work, we will need to clearly define which APIs fall under that category, which might require quite a bit of work.
+
+This approach has several pros which should be taken into consideration:
+ - Avoid a rewrite of some internals
+ - Allow contributors to start using Swift only, making the process much easier for everyone involved
+ - Allow us to work around the current Swift <-> C++ interop limitations and unblock the work
+ - Take a much shorter amount of time to do
+
+ It also has one con that we would need to consider as well:
+ - It does not address the issue of Apple removing support for Objective-C in the toolchain (Though perhaps, given how long it might take for Apple to make this change, this might end up not being too big of a problem)
+
 ## Adoption strategy
 
 The core idea is to still be able to deliver feature and changes that users and library maintainers have been asking for while doing the migration. One strategy that comes to mind for achieving this result is as follows:
