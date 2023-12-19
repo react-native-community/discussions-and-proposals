@@ -120,6 +120,4 @@ It should be presented as React Native keeping up with changes and lowering the 
 
 - What other parts of the infra need to be changed for this transition to work?
 - How will this affect other targets such as React Native macOS, React Native visionOS, etc.?
-- Is our current separation of internals from the OSS template enough that we can simply change the template directly without any of the first four steps needed? (I managed to get a [test repo](https://github.com/TheRogue76/React-Native-Template-With-Swift) to work as a proof of concept with these changes, but I am not sure if that means that the app will work for all situations (new arch, bridge-less, etc.). I also submitted [a PR](https://github.com/facebook/react-native/pull/41896) to test out the current tests we had and those passed, but that might not be enough). And what about Expo? Will it continue to function if this change is done to the base template, or would it interfere with any of the work done on their side
-- Can we create a separation between the base template of the app and rest of the internals in a way that would allow us to switch over the template without breaking everything in the process?
 
