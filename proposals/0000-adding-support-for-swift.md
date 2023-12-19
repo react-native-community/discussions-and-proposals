@@ -120,4 +120,5 @@ It should be presented as React Native keeping up with changes and lowering the 
 
 - What other parts of the infra need to be changed for this transition to work?
 - How will this affect other targets such as React Native macOS, React Native visionOS, etc.?
+- Are bits like Native/TurboModule APIs or Native/Fabric Components APIs or Codegen (for the New Arch) compatible with Swift? If not, what work needs to be done to make these APIs compatible? (And in the case of Codegen, would it be possible to generate Swift types directly as well, even if its partial)? If they can not be made compatible, what can be done?
 
