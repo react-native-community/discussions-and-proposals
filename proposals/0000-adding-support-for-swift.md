@@ -16,7 +16,7 @@ React Native's codebase on Apple's platforms has been written in a mix of Obj-C,
 The motivation for this change is threefold:
 - As of Swift 5.9, Swift is now capable of direct interop with C++, Which was one of the primary reasons Obj-C and Obj-C++ were still required within the repository. While the development [is still ongoing](https://www.swift.org/documentation/cxx-interop/status/) and there are [constraints that still exist](https://github.com/apple/swift/issues/66159), Apple's end goal is to reach the needed API parity to work seamlessly between Swift and C++
 - Obj-C is relatively hard to write and maintain for, and it is reflected by the [community](https://github.com/react-native-community/discussions-and-proposals/issues/104). Having a modern language that is more readable, more performant(in some cases) and [safer from certain class of errors](https://developer.apple.com/swift/#safety) means that users and library maintainers alike can produce better quality code and take advantage of the underlying platforms easier if they need it
-- As Swift evolves and becomes more feature rich, there is a possibility that Apple will begin to remove support for Obj-C in it's toolchain. The documentation for the various APIs that Apple provides may also be moved to simply having Swift as the supported language.
+- As Swift evolves and becomes more feature rich, there is a possibility that Apple will begin to remove support for Obj-C in it's toolchain, or release new frameworks that are Swift only (We have already begun seeing this trend with frameworks like Swift Data). The documentation for the various APIs that Apple provides may also be moved to simply having Swift as the supported language.
 
 
 ## Detailed design
