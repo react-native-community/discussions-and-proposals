@@ -42,12 +42,27 @@ const MyComp = () => (
 
 Opt-in to using DisplayP3 as the default color space by using a feature flag.
 
-```sh
-# in ios/Podfile
-ENV['RCT_WIDE_GAMUT_ENABLED'] = '1'
+```kt
+// MyMainApplication.kt
 
-# in android/gradle.properties
-wideGamutEnabled=true
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
+
+override fun onCreate() {
+  ...
+  if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+    load(wideGamutEnabled = true)
+  }
+  ...
+}
+```
+
+```objc
+// AppDelegate.mm
+
+- (BOOL)wideGamutEnabled
+{
+    return YES;
+}
 ```
 
 Then specify colors as before but now they will be in the DisplayP3 color space.
@@ -108,14 +123,10 @@ enum ColorSpace: NSInteger {
 
 + (UIColor *) createColorFrom:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha andColorSpace:(ColorSpace)colorSpace
 {
-  if (colorSpace == displayP3) {
+  if (colorSpace == displayP3 || RCTWideGamutEnabled()) {
     return [UIColor colorWithDisplayP3Red:red green:green blue:blue alpha:alpha];
   }
-#if RCT_WIDE_GAMUT_ENABLED
-  return [UIColor colorWithDisplayP3Red:red green:green blue:blue alpha:alpha];
-#else
   return [UIColor red:red green:green blue:blue alpha:alpha];
-#endif
 }
 
 + (UIColor *)UIColor:(id)json
@@ -128,15 +139,14 @@ enum ColorSpace: NSInteger {
   } else if ([json isKindOfClass:[NSDictionary class]]) {
     NSDictionary *dictionary = json;
     id value = nil;
-
-    // handle json with srgb color space specified
-    if ((value = [dictionary objectForKey:@"srgb"])) {
-      return [self createColorFrom:value.red green:value.green blue:value.blue alpha:value.alpha andColorSpace:ColorSpace.sRGB];
-
-    // handle json with display-p3 color space specified
-    } else if ((value = [dictionary objectForKey:@"display-p3"])) {
-      return [UIColor colorWithDisplayP3Red:value.red green:value.green blue:value.blue alpha:value.alpha andColorSpace:ColorSpace.displayP3];
-
+    if ((value = [dictionary objectForKey:@"display-p3"]) ||
+        (value = [dictionary objectForKey:@"srgb"])) {
+      CGFloat r = [[dictionary objectForKey:@"r"] floatValue];
+      CGFloat g = [[dictionary objectForKey:@"g"] floatValue];
+      CGFloat b = [[dictionary objectForKey:@"b"] floatValue];
+      CGFloat a = [[dictionary objectForKey:@"a"] floatValue];
+      ColorSpace colorSpace = [dictionary objectForKey:@"display-p3"] ? displayP3 : sRGB;
+      return [self createColorFrom:r green:g blue:b alpha:a andColorSpace:colorSpace];
     // ...
 ```
 
@@ -153,11 +163,7 @@ struct ColorComponents {
   float green{0};
   float blue{0};
   float alpha{0};
-#if RCT_WIDE_GAMUT_ENABLED
-  ColorSpace colorSpace{ColorSpace::DisplayP3};  // Default to DisplayP3
-#else
-  ColorSpace colorSpace{ColorSpace::sRGB};  // Default to sRGB
-#endif
+  ColorSpace colorSpace{ColorSpace::sRGB};
 };
 ```
 
@@ -167,14 +173,10 @@ struct ColorComponents {
 
 ```cpp
 auto components = facebook::react::colorComponentsFromColor(sharedColor);
-if (components.colorSpace == ColorSpace::DisplayP3) {
+if (RCTWideGamutEnabled() || components.colorSpace == ColorSpace::DisplayP3) {
   return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
 } else {
-#if RCT_WIDE_GAMUT_ENABLED
-  return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
-#else
   return [UIColor colorWithRed:components.red green:components.green blue:components.blue alpha:components.alpha];
-#endif
 }
 ```
 
