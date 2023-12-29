@@ -92,10 +92,12 @@ This approach has several pros which should be taken into consideration:
 ## Adoption strategy
 
 The core idea is to still be able to deliver feature and changes that users and library maintainers have been asking for while doing the migration. One strategy that comes to mind for achieving this result is as follows:
-- (If needed) Isolating the OSS bits that are user facing from the internals as much as possible (Like AppDelegate and the tests)
-- (If needed) Updating CocoaPods infra
-- (If needed) Communicating with third party libraries to adjust
-- (If needed) Rolling out a new version
+- Isolating the OSS bits that are user facing from the internals as much as possible (Like AppDelegate and the tests)
+- Updating CocoaPods infra
+- Communicating with third party libraries to adjust
+- Rolling out a new version
+- Configuring the exposed modules as Clang modules so they can be consumed by Swift
+- (If configuring the modules ends up requiring some breaking change (like needing to put the public headers in an include folder)) Deal with breaking change for the libraries and setting up migration guides
 - Migrating the OSS parts from Obj-C -> Swift
 - Updating CLI to support the new files and structures
 - Updating React Native Helper to support people trying to migrate their templates from Obj-C to Swift
