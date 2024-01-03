@@ -45,23 +45,23 @@ Opt-in to using DisplayP3 as the default color space by using a feature flag.
 ```kt
 // MyMainApplication.kt
 
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
-
-override fun onCreate() {
-  ...
-  if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-    load(wideGamutEnabled = true)
-  }
-  ...
-}
+override val reactNativeHost: ReactNativeHost =
+    object : DefaultReactNativeHost(this) {
+      // ...
+      override val defaultColorSpace: RCTColorSpace = RCTColorSpaceDisplayP3
+    }
 ```
 
 ```objc
 // AppDelegate.mm
 
-- (BOOL)wideGamutEnabled
+#import <React/RCTConvert.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    return YES;
+  // ...
+  RCTSetDefaultColorSpace(RCTColorSpaceDisplayP3)
+  // ...
 }
 ```
 
@@ -91,7 +91,7 @@ Since most new devices support wider gamut color spaces, React Native should sup
 1. Parse the color() function in [normalizeColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/normalize-color/index.js#L235)
 
 ```js
-const COLOR_SPACE = /display-p3|srgb/
+const COLOR_SPACE = 'display-p3|srgb';
 
 function getMatchers() {
   if (cachedMatchers === undefined) {
@@ -101,14 +101,14 @@ function getMatchers() {
           call(COLOR_SPACE, NUMBER, NUMBER, NUMBER) +
           '|' +
           callWithSlashSeparator(COLOR_SPACE, NUMBER, NUMBER, NUMBER, NUMBER) +
-          ')'
+          ')',
       ),
 ```
 
 2. Include the color space in the return value of [StyleSheet processColor](https://github.com/facebook/react-native/blob/63213712125795ac082597dad2716258b90cdcd5/packages/react-native/Libraries/StyleSheet/processColor.js) and [Animated processColor](https://github.com/facebook/react-native/blob/main/packages/react-native/Libraries/Animated/nodes/AnimatedColor.js)
 
 ```js
-return { ["display-p3"]: true, red, green, blue, alpha };
+return { space: "display-p3", red, green, blue, alpha };
 ```
 
 ### iOS Changes
@@ -116,17 +116,41 @@ return { ["display-p3"]: true, red, green, blue, alpha };
 1. Update [RCTConvert](https://github.com/facebook/react-native/blob/781b637db4268ad7f5f3910d99ebb5203467840b/packages/react-native/React/Base/RCTConvert.m#L881) to handle setting new color values for color space. If color space is not included preserve existing behavior.
 
 ```objc
-enum ColorSpace: NSInteger {
-  case sRGB = 0
-  case displayP3 = 1
+typedef NS_ENUM(NSInteger, RCTColorSpace) {
+  RCTColorSpaceSRGB,
+  RCTColorSpaceDisplayP3,
 };
 
-+ (UIColor *) createColorFrom:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha andColorSpace:(ColorSpace)colorSpace
+static RCTColorSpace defaultColorSpace = (RCTColorSpace)facebook::react::defaultColorSpace;
+RCTColorSpace RCTGetDefaultColorSpace(void)
 {
-  if (colorSpace == displayP3 || RCTWideGamutEnabled()) {
+  return (RCTColorSpace)facebook::react::defaultColorSpace;
+}
+void RCTSetDefaultColorSpace(RCTColorSpace colorSpace)
+{
+  facebook::react::setDefaultColorSpace((facebook::react::ColorSpace)colorSpace);
+}
+
++ (UIColor *)createColorFrom:(CGFloat)r green:(CGFloat)g blue:(CGFloat)b alpha:(CGFloat)a
+{
+  RCTColorSpace space = RCTGetDefaultColorSpace();
+  return [self createColorFrom:r green:g blue:b alpha:a andColorSpace:space];
+}
++ (UIColor *)createColorFrom:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha andColorSpace:(RCTColorSpace)colorSpace
+{
+  if (colorSpace == RCTColorSpaceDisplayP3) {
     return [UIColor colorWithDisplayP3Red:red green:green blue:blue alpha:alpha];
   }
-  return [UIColor red:red green:green blue:blue alpha:alpha];
+  return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+}
+
++ (RCTColorSpace)colorSpaceFromString:(NSString *)colorSpace {
+  if ([colorSpace isEqualToString:@"display-p3"]) {
+    return RCTColorSpaceDisplayP3;
+  } else if ([colorSpace isEqualToString:@"srgb"]) {
+    return RCTColorSpaceSRGB;
+  }
+  return RCTGetDefaultColorSpace();
 }
 
 + (UIColor *)UIColor:(id)json
@@ -139,13 +163,13 @@ enum ColorSpace: NSInteger {
   } else if ([json isKindOfClass:[NSDictionary class]]) {
     NSDictionary *dictionary = json;
     id value = nil;
-    if ((value = [dictionary objectForKey:@"display-p3"]) ||
-        (value = [dictionary objectForKey:@"srgb"])) {
+    NSString *rawColorSpace = [dictionary objectForKey: @"space"];
+    if ([@[@"display-p3", @"srgb"] containsObject:rawColorSpace]) {
       CGFloat r = [[dictionary objectForKey:@"r"] floatValue];
       CGFloat g = [[dictionary objectForKey:@"g"] floatValue];
       CGFloat b = [[dictionary objectForKey:@"b"] floatValue];
       CGFloat a = [[dictionary objectForKey:@"a"] floatValue];
-      ColorSpace colorSpace = [dictionary objectForKey:@"display-p3"] ? displayP3 : sRGB;
+      RCTColorSpace colorSpace = [self colorSpaceFromString: rawColorSpace];
       return [self createColorFrom:r green:g blue:b alpha:a andColorSpace:colorSpace];
     // ...
 ```
@@ -153,17 +177,22 @@ enum ColorSpace: NSInteger {
 2. Update [ColorComponents.h](https://github.com/facebook/react-native/blob/528f97152b7e0a7465c5b5c02e96c2c4306c78fe/packages/react-native/ReactCommon/react/renderer/graphics/ColorComponents.h) to include color space.
 
 ```cpp
-enum class ColorSpace {
-  sRGB,
-  DisplayP3
-};
+enum class ColorSpace { sRGB, DisplayP3 };
+
+static ColorSpace defaultColorSpace = ColorSpace::sRGB;
+ColorSpace getDefaultColorSpace() {
+  return defaultColorSpace;
+}
+void setDefaultColorSpace(ColorSpace newColorSpace) {
+  defaultColorSpace = newColorSpace;
+}
 
 struct ColorComponents {
   float red{0};
   float green{0};
   float blue{0};
   float alpha{0};
-  ColorSpace colorSpace{ColorSpace::sRGB};
+  ColorSpace colorSpace{getDefaultColorSpace()};
 };
 ```
 
@@ -173,11 +202,11 @@ struct ColorComponents {
 
 ```cpp
 auto components = facebook::react::colorComponentsFromColor(sharedColor);
-if (RCTWideGamutEnabled() || components.colorSpace == ColorSpace::DisplayP3) {
-  return [UIColor colorWithDisplayP3Red:components.red green:components.green blue:components.blue alpha:components.alpha];
-} else {
-  return [UIColor colorWithRed:components.red green:components.green blue:components.blue alpha:components.alpha];
-}
+return [RCTConvert createColorFrom:components.red
+                             green:components.green
+                              blue:components.blue
+                             alpha:components.alpha
+                     andColorSpace:(RCTColorSpace)components.colorSpace];
 ```
 
 ### Android Changes
