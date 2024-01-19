@@ -6,7 +6,7 @@ author:
 date: 08.01.2023
 ---
 
-# RFC0000: Hover style API for iPad / Apple Vision Pro
+# RFC0000: Hover style API for iPad / Apple Vision Pro (Cursor: pointer)
 
 ## Summary
 
@@ -16,10 +16,10 @@ The native API this feature is basing on: https://developer.apple.com/documentat
 
 ## Basic example
 
-This API would introduce an additional prop to UIView (which is used to render touchable/pressable elements).
+This effect would be applied by adding `cursor: pointer` style to a view (which is used to render touchable/pressable elements).
 
 ```jsx
-<Pressable hoverEffect=”lift” onPress={onPressFunction}>
+<Pressable style={{ cursor: "pointer" }} onPress={onPressFunction}>
   <Text>I'm pressable!</Text>
 </Pressable>
 ```
@@ -38,23 +38,23 @@ Additionally, We have lots of React Native experiences in brownfield contexts at
 
 This API can work side by side with the Pointer Events API. Users can choose to either spin up their own custom interactions with the pointer events API, or use Apple OS default. Adding a hover effect shouldn’t affect pointer events being fired or not. https://reactnative.dev/blog/2022/12/13/pointer-events-in-react-native
 
+Also in react-native-macos the `cursor: pointer` API is already present so this will introduce a familiar API to core.
+
 ## Detailed design
 
 _Disclaimer: I will discuss the design for New Architecture, but the API can be easily backported._
 
 Also this API is already working in react-native-visionos [fork](https://github.com/callstack/react-native-visionos/blob/58f6e180d49cbd638ff9b637c0308808eeee2321/packages/react-native/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm#L522).
 
+The first version of this api should support adding only `UIHoverAutomaticEffect`, which later on can be expanded and other hover effects can be exposed as `-rn-apple-lift` and `-rn-apple-highlight`.
+
 The API should be opt-in to avoid breaking current iPad apps. The implementation bases on extending `RCTView` with a new prop of type `std::string`.
 
-Next inside of `RCTViewComponentView` `- (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &)oldProps`` method:
+1. Add `cursor` property to RCTView And list it in `Libraries/StyleSheet/StyleSheetTypes.js`
+
+2. Handle setting UIView `hoverStyle` property with a simillar function to the one below.
 
 ```objc
-if (oldViewProps.hoverEffect != newViewProps.hoverEffect) {
-    [self updateHoverEffect:[NSString stringWithUTF8String:newViewProps.hoverEffect.c_str()]];
-  }
-
-In the code above we are detecting props update, and calling updateHoverEffect method:
-
 - (void) updateHoverEffect:(NSString*)hoverEffect {
     if (hoverEffect == nil || [hoverEffect isEqualToString:@""]) {
         self.hoverStyle = nil;
@@ -88,7 +88,6 @@ The current API implementation might need some polish to correctly retrieve corn
 
 ## Alternatives
 
-- This API might be also implemented using Pointer Events API by detecting hover and applying some custom styling to the view but this would be less performant than using native solution.
 - This feature could be also implemented in user space by creating their own subclass of UIView and wrapping every element with it.
 
 ## Adoption strategy
@@ -100,5 +99,3 @@ Users can opt-in without any breaking changes.
 Describe this prop in the documentation. Add section to docs about iPad development.
 
 ## Unresolved questions
-
-- How does it fit with Pointer Events API?
