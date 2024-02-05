@@ -16,9 +16,9 @@ This RFC defines the concept of **React Native Frameworks**: frameworks built on
 
 By defining what React Native is and is not responsible for, we can improve the focus and stability of React Native and ensure that reliable extension points are available where needed.
 
-We’re formalizing this concept now as, ultimately, we want our users to build **production-grade applications** while experiencing a **top-notch developer experience**.
+We’re formalizing this concept now as, ultimately, we want developers to build **production-grade applications** while experiencing a **top-notch developer experience**.
 
-We believe most of our users **should be using a React Native Framework**, and this document explains what exactly this means and how we can achieve this goal.
+We believe most of our developers **should be using a React Native Framework**, and this document explains what exactly this means and how we can achieve this goal.
 
 ## Table of Content
 
@@ -43,8 +43,8 @@ We believe most of our users **should be using a React Native Framework**, and t
     - [Template](#template)
       - [Internal Use Cases](#internal-use-cases)
       - [External Use cases](#external-use-cases)
-        - [Users that intend to migrate to an existing React Native Framework](#users-that-intend-to-migrate-to-an-existing-react-native-framework)
-        - [Users that can’t migrate to an existing React Native Framework because it doesn’t satisfy their requirements](#users-that-cant-migrate-to-an-existing-react-native-framework-because-it-doesnt-satisfy-their-requirements)
+        - [Developers that intend to migrate to an existing React Native Framework](#developers-that-intend-to-migrate-to-an-existing-react-native-framework)
+        - [Developers that can’t migrate to an existing React Native Framework because it doesn’t satisfy their requirements](#developers-that-cant-migrate-to-an-existing-react-native-framework-because-it-doesnt-satisfy-their-requirements)
       - [Community CLI](#community-cli)
         - [Commands to be moved inside react-native core](#commands-to-be-moved-inside-react-native-core)
         - [Commands to be removed](#commands-to-be-removed)
@@ -71,11 +71,11 @@ A practical example of bespoke React Native Framework is how Meta uses React Nat
 For the rest of this document we will clearly state what are the responsibilities of React Native Frameworks, so that if you don’t want to use an available solution, you know what are the boundaries of React Native.
 
 > [!NOTE]
-> We do acknowledge that “Framework” is an overloaded term here, as React Native itself is a UI framework built on top of React. For the sake of simplicity in the rest of this document, the “Framework” term will always refer to a React Native Framework — a set of tools & libraries built on top of React Native.
+> We do acknowledge that “Framework” is an overloaded term here, as React Native itself is a UI framework which uses React. For the sake of simplicity in the rest of this document, the “Framework” term will always refer to a React Native Framework — a set of tools & libraries built on top of React Native.
 
 ## Why are we defining this now?
 
-You might be wondering why we are defining those concepts now. React Native has been **growing in popularity and scope** over the recent years. This is mostly thanks to one of the strongest components of React Native: our **ecosystem**.
+You might be wondering why we are defining those concepts now. React Native has been **growing in popularity, scope & maturity** over the recent years. This is mostly thanks to one of the strongest components of React Native: our **ecosystem**.
 
 The Authors & Maintainers of React Native libraries and tools have played such a crucial role in the development of React Native.
 
@@ -83,11 +83,11 @@ The intention of this document is **not** to drop responsibilities on their shou
 
 This is one of the **goals** we set ourselves when defining what a React Native Framework is, among others:
 
-- **Allow users to “think in React”** - Each library, Framework or tool should sit on top of the core fundamental APIs, so that it can be easily reused and ported between different targets.
+- **Allow developers to “think in React”** - Each library, Framework or tool should sit on top of the core fundamental APIs, so that it can be easily reused and ported between different targets.
 - **Providing great APIs & extension points** - It’s crucial for Framework developers to have a way to voice their concern and share how they’re integrating with React Native and what does/doesn’t work for them. Frameworks should be able to “plug” into React Native without having to fork or use private APIs. Relying on public and stable APIs will provide a more sustainable future and an easier update experience for framework authors.
 - **Set “the standard” for the ecosystem** - React Native should set standards that are general enough to work across Frameworks so that Frameworks can use our standards as a foundation to build tools and extensions on top of them.
 - **Enable portability** - React Native should provide all of the standards and language features needed to write libraries that are portable to use across all frameworks (either bespoke or Open Source Frameworks).
-- **Fostering a healthy community** - As mentioned, by defining our boundaries, it will be clearer where we draw the line between React Native Core APIs and third-party framework APIs, we’ll save a lot of confusion to our users, and we’ll avoid re-implementing solutions.
+- **Fostering a healthy community** - As mentioned, by defining our boundaries, it will be clearer where we draw the line between React Native Core APIs and third-party framework APIs, we’ll save a lot of confusion for developers, and we’ll avoid re-implementing solutions.
 
 ## Frameworks & Platforms
 
@@ -145,18 +145,18 @@ React Native Frameworks provide features that **most native apps** that are inte
 
 Here is a (non-exhaustive) list of areas of what the React Native package is **not directly focusing** on, and is delegating this responsibility to frameworks:
 
-- **Project Scaffolding** - Frameworks can offer tools and templates to create new projects so that users can get started developing in a matter of seconds.
+- **Project Scaffolding** - Frameworks can offer tools and templates to create new projects so that developers can get started developing in a matter of seconds.
 - **Tooling for React Native upgrade DevX** - Similarly to project scaffolding, framework can offer tools to make sure the project can easily keep up with the latest React Native version. Tools such as the upgrade helper, Expo Config Plugins and others fit in this category.
 - **Navigation and Routing solutions** - React Native doesn’t offer a navigation or a routing solution out of the box. Frameworks can either offer their own solution or recommend a preferred navigation solution to use.
 - **Managing the build experience** - Framework can offer tools to simplify the native builds and move to fully managed native builds that are happening in the cloud.
 - **Manage the publishing experience** - Frameworks can offer solutions to publish applications to public stores (App Store/Play Store and others) either locally or managed in the cloud.
-- **Providing OTA updates** - Frameworks can offer mechanisms to deploy Over-the-air updates to users. Tools such as EAS Update & Codepush fall into this category.
+- **Providing OTA updates** - Frameworks can offer mechanisms to deploy Over-the-air updates to app users. Tools such as EAS Update & Codepush fall into this category.
 - **Auto-Linking libraries** - Frameworks can offer mechanisms to simplify linking of external 3rd party libraries.
 - **Support new targets via Out-of-tree Platforms** - Frameworks can offer support for additional targets by using OOT Platforms, in order to offer a more cohesive Development experience.
 
 ## What do we recommend to React Native app developers?
 
-As mentioned before, we believe React Native Framework offers all the tools you’ll eventually need to get to production quickly while offering a superior developer experience. As we mentioned before:
+As mentioned before, we believe a React Native Framework offers all the tools you’ll eventually need to get to production quickly while offering a superior developer experience. As we mentioned before:
 
 > You’re either using a React Native Framework or you’re building your own React Native Framework
 
@@ -165,11 +165,11 @@ We believe that an existing React Native Framework should be the default solutio
 You should be building your own React Native Framework **only** if you’re:
 
 - An expert native engineer with requirements not satisfied by existing frameworks
-- A power user which needs to integrate React Native inside their organization with custom workflows.
+- A React Native power-user which needs to integrate React Native inside their organization with custom workflows.
 - A developer looking into porting React Native to newer Native platforms (e.g. visionOS).
 - A company that for specific requirements (e.g. legal, licensing) can't use one of the existing Frameworks.
 
-For this reason we intend to **recommend** our users to use an existing React Native Framework.  At the time of writing, Expo is the only Framework in the ecosystem that fits the definition we shared above, and so we will recommend using Expo for most users.
+For this reason we intend to **recommend** developers to use an existing React Native Framework. At the time of writing, Expo is the only Framework in the ecosystem that fits the definition we shared above, and so we will recommend using Expo for most developers.
 
 We’re going to update our official channels (websites, GitHub, social media channels) with the recommendations explained in the following paragraphs.
 
@@ -187,12 +187,12 @@ The **current recommendation** to library developers is as follows:
   - Refer to the documentation of the specific Out-of-tree platform on how to create libraries for that platform
 - If you intend to integrate with C++ (i.e. you have a native library to integrate with or you want to share implementation among platforms):
   - Use the React Native Core API, as they provide easier access to lower-level mechanisms.
-- If you’re looking for a better developer experience & are willing to require that your users depend on a Framework specific dependency:
+- If you’re looking for a better developer experience & are willing to require that your consumer depend on a Framework specific dependency:
   - Use the Framework specific API.
   - The tradeoff here is on simplicity/ergonomics vs wider compatibility.
     - Frameworks are able to quickly ship and iterate on Developer Experience improvements to the Core APIs (e.g. build an idiomatic API for modern languages such as Swift/Kotlin). The best ideas can later be pulled into the React Native Core APIs once they are proven, if they are a good fit.
     - On the other hand, using Framework specific APIs requires library consumers to add an extra dependency in their application on the specific Framework. This could result in libraries that are less compatible with apps that are using other Frameworks.
-- Otherwise if you don’t want to impose a Framework dependency on their user, to ensure that your library is compatible with all Frameworks:
+- Otherwise if you don’t want to impose a Framework dependency on their consumer, to ensure that your library is compatible with all Frameworks:
   - The recommendation is to use the React Native Core API.
 
 We do acknowledge that the current recommendation for library authors is complicated, and the React Native team will be working with Frameworks developers in the future to simplify the current offerings.
@@ -205,7 +205,7 @@ In this section, we clarify what are the **requirements** to become an official 
 
 Frameworks that are adhering to requirements described below:
 
-- Will be spotlighted in the Getting Started page of the React Native website (our highest traffic page). Specifically, we’ll recommend to users to use one of the Frameworks which satisfies the requirements.
+- Will be spotlighted in the Getting Started page of the React Native website (our highest traffic page). Specifically, we’ll recommend to developers to use one of the Frameworks which satisfies the requirements.
 - Will be mentioned during public comms as one of the recommended frameworks by the React Native core team.
 - The company/entity behind the Framework will automatically be granted a [partner status](https://github.com/facebook/react-native/blob/main/ECOSYSTEM.md#partners).
 - PRs and Issues coming from the Framework developers will receive higher priorities.
@@ -216,8 +216,8 @@ Here is a short summary of what are the requirements for React Native Frameworks
 
 #### DOs of Frameworks
 
-- **Focus on developer & user experience** - We believe Frameworks should aim to provide a top-notch developer experience. Frameworks that fail to provide good documentation or developer workflows are not likely high quality frameworks, and our users will most likely not want to use them. Similarly, we want to promote frameworks that provide a top-notch user experience and do not ignore basic user needs, such as accessibility, performance, and delightful UIs.
-- **Focus on building cohesive experiences** - Users are looking into deploying universal apps across multiple targets. We’re delegating this responsibility to frameworks that can provide better experiences to users and craft cohesive developer experiences between mobile, web, desktop and beyond.
+- **Focus on developer & user experience** - We believe Frameworks should aim to provide a top-notch developer experience. Frameworks that fail to provide good documentation or developer workflows are not likely high quality frameworks, and developers will most likely not want to use them. Similarly, we want to promote frameworks that provide a top-notch app user experience and do not ignore basic user needs, such as accessibility, performance, and delightful UIs.
+- **Focus on building cohesive experiences** - Developers are looking into deploying universal apps across multiple targets. We’re delegating this responsibility to frameworks that can provide better experiences to app users and craft cohesive developer experiences between mobile, web, desktop and beyond.
 - **Focus on abstracting complexity away** - Any initiative that simplifies the developer workflow is welcomed in the framework domain.
 - **Be popular** - We’ll only be recommending solutions that are widely known and adopted by the community.
 - **Open source** - Recommended frameworks must be free, open source, projects. We allow for companies to provide paid services on top of the Open Source framework, but these services should not be a requirement to use the framework and should not have vendor lock-in.
@@ -225,9 +225,9 @@ Here is a short summary of what are the requirements for React Native Frameworks
 #### DON’Ts of Frameworks
 
 - **Do not hard fork react-native** - As a rule of thumb, you should not GitHub-fork react-native and re-publish it. If you’re doing so, it’s probably due to a lack of APIs that React Native should provide. Please reach out to us and attempt to de-fork your framework.
-- **Do not soft fork the core APIs** - We want to make sure developers need to learn only once how to write a native component. Building abstraction and wrappers is accepted, forking is not, as it makes it harder for users to share components/modules between targets.
-- **Do not fork the ecosystem** - It’s crucial that `react-native-*` libraries can be easily shared and ported to other targets or frameworks (with little to no work). Frameworks should aim at building libraries that work across the whole ecosystem and not solutions that silo the users away.
-- **Do not redistribute prebuilts** - React Native ships native prebuilts for several targets. Do not attempt to republish them as this reduces security for users and is essentially yet another fork.
+- **Do not soft fork the core APIs** - We want to make sure developers need to learn only once how to write a native component. Building abstraction and wrappers is accepted, forking is not, as it makes it harder for developers to share components/modules between targets.
+- **Do not fork the ecosystem** - It’s crucial that `react-native-*` libraries can be easily shared and ported to other targets or frameworks (with little to no work). Frameworks should aim at building libraries that work across the whole ecosystem and not solutions that silo the developers away.
+- **Do not redistribute prebuilts** - React Native ships native prebuilts for several targets. Do not attempt to republish them as this reduces security for app users and is essentially yet another fork.
 - **Do not depend on the internals** - Do not depend on internal APIs. As a rule of thumb, depending on private/internal API (i.e. those from the `internal` package or with `unstable_` prefix) is not recommended and will cause breakages in the future. Specifically, we might consider rotating private APIs (changing the name) in the future to discourage its usages. When there is a need for Frameworks to access those internal APIs, we’ll be annotating them to make them easy to recognize it (i.e. with the `@FrameworkAPI` annotation).
 
 #### Note for Platforms developers
@@ -240,17 +240,17 @@ The React Native team is committed to fostering innovation and supporting new pl
 
 ## Evolving the React Native Community Template & CLI
 
-Users who have been using the React Native **Community CLI & Template**, might be wondering how React Native Frameworks affect them.
+Developers who have been using the React Native **Community CLI & Template**, might be wondering how React Native Frameworks affect them.
 
-We want to reassure our users that are using those tools and clarify that those tools will **still be supported** **and updated**, and you can keep on using them if you wish. However, we’ll be recommending new users and **newly created mobile apps** to use a React Native Framework from now on. Similarly, you’re free to migrate to a React Native Framework if you intend to.
+We want to reassure React Native developers that are using those tools and clarify that those tools will **still be supported** **and updated**, and you can keep on using them if you wish. However, we’ll be recommending new developers and **newly created mobile apps** to use a React Native Framework from now on. Similarly, you’re free to migrate to a React Native Framework if you intend to.
 
 We do recognize that both the Community CLI & Template are crucial pieces of infrastructure of the current React Native experience. At the same time, they’re highly controversial as their role is not clearly defined between the React Native package and Frameworks.
 
-Specifically, we feel that those tools are attempting to address **two different user groups** (internal users and external users) with different requirements, unable to solve either as well as a focused tool could. Those two groups would be much better suited by fundamentally different approaches, while the current setup ends up delivering a suboptimal experience for both.
+Specifically, we feel that those tools are attempting to address **two different user groups** (internal developers and external developers) with different requirements, unable to solve either as well as a focused tool could. Those two groups would be much better suited by fundamentally different approaches, while the current setup ends up delivering a suboptimal experience for both.
 
 We believe that a significant number are approaching React Native via the Community CLI as they believe this is the official recommendation (as it is commonly referred to as the React Native CLI for short), and they would be better suited by using a React Native Framework.
 
-Ultimately, users experiencing the template/CLI as they exist today is one of the causes of the **largest negative impact** on React Native's perception, adoption, and future growth. This is reflected by the adoption drop of the React Native Community CLI in the latest [The State of React Native 2023 Survey](https://results.stateofreactnative.com/tools/tools_section_streams). Moreover in the State of React Native 2022, the majority of users [reported Upgrades as #1](https://results.2022.stateofreactnative.com/opinions/) pain point in the ecosystem, as the Template/CLI in the current state are not resolving this crucial gap in the developer experience.
+Ultimately, developers experiencing the template/CLI as they exist today is one of the causes of the **largest negative impact** on React Native's perception, adoption, and future growth. This is reflected by the adoption drop of the React Native Community CLI in the latest [The State of React Native 2023 Survey](https://results.stateofreactnative.com/tools/tools_section_streams). Moreover in the State of React Native 2022, the majority of developers [reported Upgrades as #1](https://results.2022.stateofreactnative.com/opinions/) pain point in the ecosystem, as the Template/CLI in the current state are not resolving this crucial gap in the developer experience.
 
 ### Template
 
@@ -276,10 +276,10 @@ The React Native template is used for:
     2. The Release Crew is using it to test that a new app can be created, built and executed correctly **before releasing** a new version of React Native ([docs on this process are here](https://reactnative.dev/contributing/release-testing))
     3. Issues and bug reports require a **reproducer**, being either an Expo Snack or an instance of a template project ([see here for the reproducer](https://github.com/react-native-community/reproducer-react-native)).
 2. **External** use cases
-    4. React Native users that are **not using a Framework** because they haven’t migrated to it yet
-    5. React Native users that are **not using a Framework** such as Expo because it doesn’t satisfy their requirements
-    6. New React Native users that are creating a new app. They might either not know how to use a Framework, or they might seek the official/bare/**Meta-recommended** way to use React Native.
-    7. Users looking into integrating React Native into frameworks or existing apps. They can use the template as a **reference** for their own integration, or to understand how the internals work.
+    4. React Native developers that are **not using a Framework** because they haven’t migrated to it yet
+    5. React Native developers that are **not using a Framework** such as Expo because it doesn’t satisfy their requirements
+    6. New React Native developers that are creating a new app. They might either not know how to use a Framework, or they might seek the official/bare/**Meta-recommended** way to use React Native.
+    7. Developers looking into integrating React Native into frameworks or existing apps. They can use the template as a **reference** for their own integration, or to understand how the internals work.
 
 As we do have a mixture of internal and external use cases for the template, the proposed solution is to **split the template** between internal and external use cases.
 
@@ -293,51 +293,51 @@ This HelloWorld App will be similar to RN-Tester but with a couple of crucial di
 
 - It will **not build from source**, it will be configured to use a packaged version of React Native (via local repositories such as Verdaccio, Maven Local, etc.)
 - It will **not contain examples**, but just a landing page, making it easier to start and work with.
-- Can be used as a **reproducer to verify bugs against main**. i.e. users can easily git clone the `react-native` repo and use the HelloWorld App to reproduce bugs.
+- Can be used as a **reproducer to verify bugs against main**. i.e. developers can easily git clone the `react-native` repo and use the HelloWorld App to reproduce bugs.
   - This is similar to the internal **Playground app** that Meta has to offer reproducers.
 - It can be used by the release crew to **test blank apps** with newer React Native releases.
 
 For reproducers using numbered versions of React Native, we can either:
 
-- Ask users to git clone react-native, checkout the release branch, and update the HelloWorld app (potentially impractical and hard for everyday users).
+- Ask developers to git clone react-native, checkout the release branch, and update the HelloWorld app (potentially impractical and hard for everyday users).
 - Adapt the [reproducer-react-native](https://github.com/react-native-community/reproducer-react-native) GitHub repo to use the HelloWorld App from a given branch/version.
 
-Moreover, the HelloWorld app can be used by framework authors and advanced users as a reference for React Native integrations (point _2.d_ of External Use Cases)
+Moreover, the HelloWorld app can be used by framework authors and advanced developers as a reference for React Native integrations (point _2.d_ of External Use Cases)
 
-- It intentionally **won’t** be possible to scaffold new apps from it. Users will have to manually copy the files, making it impractical for everyday use.
+- It intentionally **won’t** be possible to scaffold new apps from it. Developers will have to manually copy the files, making it impractical for everyday use.
 
 #### External Use cases
 
-As mentioned above, we want to keep on supporting existing users that are currently using the React Native template.
+As mentioned above, we want to keep on supporting existing developers that are currently using the React Native template.
 
-We won’t be removing the template, as users are relying on it via tools such as the [upgrade helper](https://react-native-community.github.io/upgrade-helper/), which are part of their normal workflow. Removing/deprecating those tools without a proper replacement is **unacceptable**.
+We won’t be removing the template, as developers are relying on it via tools such as the [upgrade helper](https://react-native-community.github.io/upgrade-helper/), which are part of their normal workflow. Removing/deprecating those tools without a proper replacement is **unacceptable**.
 
-Those users can either migrate to an existing React Native Framework or keep on using the template, as described below:
+Those developers can either migrate to an existing React Native Framework or keep on using the template, as described below:
 
-##### Users that intend to migrate to an existing React Native Framework
+##### Developers that intend to migrate to an existing React Native Framework
 
-Those users have no practical blockers to use a React Native Framework, they simply haven’t had the time or don’t feel that those Frameworks are ready for their use case yet.
+Those developers have no practical blockers to use a React Native Framework, they simply haven’t had the time or don’t feel that those Frameworks are ready for their use case yet.
 
-For those users we will:
+For those developers we will:
 
 - Update the guidance on the website mentioning to use a React Native Framework
-- Update the community CLI and other user tools to mention the new recommendation around React Native Frameworks.
+- Update the community CLI and other developers tools to mention the new recommendation around React Native Frameworks.
 - Work with existing React Native Framework to identify use cases that are not properly covered by their Framework yet
 - Work with existing React Native Framework to provide a viable migration path from the template.
 
-##### Users that can’t migrate to an existing React Native Framework because it doesn’t satisfy their requirements
+##### Developers that can’t migrate to an existing React Native Framework because it doesn’t satisfy their requirements
 
-We do have several users who can’t use a Framework yet, due to specific constraints.
+We do have several developers who can’t use a Framework yet, due to specific constraints.
 
 One of the partners that we had conversation with, is developing React Native apps inside a monorepo with multiple native apps (a mixture of RN-only and mixed native apps), as well as multiple React web applications. They built their own bespoke Framework, but still rely on the template & upgrade helper as a reference.
 
-For those users we will:
+For those developers we will:
 
 - Move the current template **outside** of the `react-native` package:
   - Specifically move it to `@react-native-community/template` and kept on being **maintained by the community and the React Native team**.
-    - This is the least disruptive change for users, as it will keep on being easily accessible but it will be clearer that is a community owned component, and not part of the core of react-native
+    - This is the least disruptive change for developers, as it will keep on being easily accessible but it will be clearer that is a community owned component, and not part of the core of react-native
     - Moreover, the template will be closer to where the community CLI lives today (`@react-native-community/cli`)
-  - We (Meta & the community) want to keep on **maintaining** the template and make sure that users that can’t migrate to a framework, still have a viable alternative.
+  - We (Meta & the community) want to keep on **maintaining** the template and make sure that developers that can’t migrate to a framework, still have a viable alternative.
   - We don’t foresee the template to change drastically in the future. Only **minimal changes** will be allowed to the template, to reduce the upgrade pain between versions.
   - Similarly, we’ll aim at **reducing the breaking changes** as much as possible.
 - Update all the various community tools to refer to the new template location (e.g. the Upgrade Helper)
@@ -380,12 +380,12 @@ Commands that live inside `react-native` should be extensible enough to be **use
 
 - `info` and `doctor`
   - Those commands should be moved out and become standalone utilities and should be **working well across frameworks**
-  - Those are key parts of the React Native **bug and issue reporting** experience so should be easily accessible for users.
-  - As an alternative they could be moved inside `react-native` and shipped as separate packages that users can selectively use if they wish.
+  - Those are key parts of the React Native **bug and issue reporting** experience so should be easily accessible for developers.
+  - As an alternative they could be moved inside `react-native` and shipped as separate packages that developers can selectively use if they wish.
 
 ### The init command
 
-The `init` command needs a dedicated section as it’s the entry-point of most of our users to React Native.
+The `init` command needs a dedicated section as it’s the entry-point of most of our developers to React Native.
 
 We suggest to evolve the init command as follows:
 
@@ -415,7 +415,7 @@ Running: npx @react-native-community/cli init
 ... logs as usual
 ```
 
-- **react-native@>=0.76**: Inform the user that the command has been deprecated and just fire a warning for alternatives
+- **react-native@>=0.76**: Inform the developer that the command has been deprecated and just fire a warning for alternatives
 
 ```bash
 $ npx react-native@latest init 
@@ -427,7 +427,7 @@ The behavior will be changed on January 1, 2025 (344 days).
 - Refer to the documentation for information about alternative tools: https://reactnative.dev/docs/getting-started
 ```
 
-Similarly, the `create-react-native-app` command (currently owned by Expo) will be updated to just print a warning to users by React Native **0.75**:
+Similarly, the `create-react-native-app` command (currently owned by Expo) will be updated to just print a warning to developers by React Native **0.75**:
 
 ```bash
 $ npx create-react-native-app@latest
