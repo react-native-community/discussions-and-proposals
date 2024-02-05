@@ -160,7 +160,7 @@ As mentioned before, we believe React Native Framework offers all the tools you�
 
 > You’re either using a React Native Framework or you’re building your own React Native Framework
 
-We believe that an existing React Native Framework should be the default solution for the **majority of app developers**, specifically for beginners and developers which lack a native background.
+We believe that an existing React Native Framework should be the default solution for the **majority of app developers**, including developers who have more of a web background than a native background.
 
 You should be building your own React Native Framework **only** if you’re:
 
