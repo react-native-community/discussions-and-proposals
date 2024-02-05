@@ -108,7 +108,7 @@ We consider the Framework and Platform concepts as **orthogonal**, i.e. you can 
 This section describes where we draw the line between the React Native package and Frameworks.
 
 > [!NOTE]
-> For the sake of simplicity, we will be focusing on the React Native package (i.e. the NPM package called `react-native` which offers first-party support for Android & iOS).
+> For the sake of simplicity, we will be focusing on the React Native package (i.e. the npm package called `react-native` which offers first-party support for Android & iOS).
 
 ### What does the React Native package do
 
