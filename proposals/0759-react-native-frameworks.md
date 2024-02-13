@@ -114,6 +114,8 @@ This section describes where we draw the line between the React Native package a
 
 The React Native package is responsible for **core APIs and capabilities** to build native apps. React Native is also responsible for offering **APIs** that allow Frameworks to deliver their experience. When such APIs are missing, it’s our interest to create them and have a conversation with Framework developers to inform their development, and help framework developers merge changes back into React Native.
 
+When a new significant change to the API is needed, especially if it impacts Frameworks & libraries, we'll be publishing a dedicated RFC to discuss the change.
+
 React Native offers first-party support for Android & iOS. Other platform support is offered by other libraries or Frameworks.
 
 Here is a (non-exhaustive) list of areas of responsibilities of the React Native package:
