@@ -278,10 +278,10 @@ The React Native template is used for:
     2. The Release Crew is using it to test that a new app can be created, built and executed correctly **before releasing** a new version of React Native ([docs on this process are here](https://reactnative.dev/contributing/release-testing))
     3. Issues and bug reports require a **reproducer**, being either an Expo Snack or an instance of a template project ([see here for the reproducer](https://github.com/react-native-community/reproducer-react-native)).
 2. **External** use cases
-    4. React Native developers that are **not using a Framework** because they haven’t migrated to it yet
-    5. React Native developers that are **not using a Framework** such as Expo because it doesn’t satisfy their requirements
-    6. New React Native developers that are creating a new app. They might either not know how to use a Framework, or they might seek the official/bare/**Meta-recommended** way to use React Native.
-    7. Developers looking into integrating React Native into frameworks or existing apps. They can use the template as a **reference** for their own integration, or to understand how the internals work.
+    1. React Native developers that are **not using a Framework** because they haven’t migrated to it yet
+    2. React Native developers that are **not using a Framework** such as Expo because it doesn’t satisfy their requirements
+    3. New React Native developers that are creating a new app. They might either not know how to use a Framework, or they might seek the official/bare/**Meta-recommended** way to use React Native.
+    4. Developers looking into integrating React Native into frameworks or existing apps. They can use the template as a **reference** for their own integration, or to understand how the internals work.
 
 As we do have a mixture of internal and external use cases for the template, the proposed solution is to **split the template** between internal and external use cases.
 
