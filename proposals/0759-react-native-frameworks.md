@@ -62,7 +62,7 @@ When those tools & libraries are collected to form a cohesive framework built on
 
 An example of Open Source React Native Framework is [Expo](https://expo.dev/).
 
-If you’re not using a React Native Framework, but you’re building production-ready applications, you probably have a collection of scripts and automations that helps you develop and ship applications to production. This collection of infrastructure is a bespoke React Native Framework that you built around your own needs and processes. For this reason, is easier to think about React Native Framework as:
+If you’re building production-ready applications without using React Native Framework, you probably have a collection of scripts and automations that helps you develop and ship applications to production. This collection of infrastructure is a bespoke React Native Framework that you built around your own needs and processes. For this reason, is easier to think about React Native Framework as:
 
 > **You’re either using a React Native Framework or you’re building your own React Native Framework**
 
