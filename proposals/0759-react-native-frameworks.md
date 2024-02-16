@@ -154,7 +154,7 @@ Here is a (non-exhaustive) list of areas of what the React Native package is **n
 - **Manage the publishing experience** - Frameworks can offer solutions to publish applications to public stores (App Store/Play Store and others) either locally or managed in the cloud.
 - **Providing OTA updates** - Frameworks can offer mechanisms to deploy Over-the-air updates to app users. Tools such as EAS Update & Codepush fall into this category.
 - **Auto-Linking libraries** - Frameworks can offer mechanisms to simplify linking of external 3rd party libraries.
-- **Support new targets via Out-of-tree Platforms** - Frameworks can offer support for additional targets by using OOT Platforms, in order to offer a more cohesive Development experience.
+- **Support new targets via Out-of-tree Platforms** - Frameworks can offer support for additional targets by using OOT Platforms, in order to offer a more cohesive development experience.
 
 ## What do we recommend to React Native app developers?
 
