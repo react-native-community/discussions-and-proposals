@@ -79,7 +79,7 @@ You might be wondering why we are defining those concepts now. React Native has 
 
 The Authors & Maintainers of React Native libraries and tools have played such a crucial role in the development of React Native.
 
-The intention of this document is **not** to drop responsibilities on their shoulders. The React Native team is fully committed to supporting React Native in the same capacity as we’ve been doing to this day. But we believe that by clearly defining our **boundaries**, we could build a **better ecosystem** for everyone and foster further growth to increase adoption and stability of React Native.
+The intention of this document is **not** to drop responsibilities on their shoulders. The React Native team is fully committed to supporting React Native in the same capacity as we’ve been doing to this day. We believe that by clearly defining our **boundaries**, we could build a **better ecosystem** for everyone and foster further growth to increase adoption and stability of React Native.
 
 This is one of the **goals** we set ourselves when defining what a React Native Framework is, among others:
 
