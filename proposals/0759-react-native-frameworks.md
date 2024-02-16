@@ -446,7 +446,7 @@ Expo
      npx create-expo-app@latest
 
 React Native Community template
-     npx @react-native-community/cli init
+     npx @react-native-community/cli@latest init
 
 Learn more: https://reactnative.dev/docs/getting-started
 ```
