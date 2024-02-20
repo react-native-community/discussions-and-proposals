@@ -333,6 +333,8 @@ We do have several developers who can’t use a Framework yet, due to specific c
 
 One of the partners that we had conversation with, is developing React Native apps inside a monorepo with multiple native apps (a mixture of RN-only and mixed native apps), as well as multiple React web applications. They built their own bespoke Framework, but still rely on the template & upgrade helper as a reference.
 
+Another scenario is developers that are building apps targeting a number of different paltforms. At the time of writing, not all the platforms are supported by existing Frameworks (e.g. Expo doesn't support shipping applications to Windows). Those developers could resort to either building their own bespoke Framework, or using a mixture of existing Frameworks and custom infrastructure to support the necessary platforms.
+
 For those developers we will:
 
 - Move the current template **outside** of the `react-native` package:
