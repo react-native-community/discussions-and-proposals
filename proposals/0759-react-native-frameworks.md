@@ -5,7 +5,7 @@ author:
 date: 2024-02-02
 ---
 
-# RCF0759: React Native Frameworks
+# RFC0759: React Native Frameworks
 
 > [!IMPORTANT]
 > This RFC is open for comments till Monday 19th February 2024.
