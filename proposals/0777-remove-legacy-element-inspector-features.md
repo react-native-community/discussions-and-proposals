@@ -11,6 +11,18 @@ date: 2024-04-04
 
 This RFC identifies two sub-features of the in-app Element Inspector which we believe are **not worth reimplementing** under the New Architecture.
 
+**Proposed features to remove**
+
+These will not be available under the New Architecture.
+
+- Element Inspector > Perf
+- Element Inspector > Network
+
+**Proposed features to keep (no change)**
+
+- Element Inspector > Inspect
+- Element Inspector > Touchables
+
 ## Motivation
 
 As the React team focuses on the New Architecture and Debugging, we are reviewing the current development tooling we offer.
@@ -44,6 +56,15 @@ The functionality and value of both of these tabs is limited, providing basic vi
 
 - Replacement tooling (today): native network inspectors (e.g. Charles Proxy), Network panel (web), console logs.
 - Replacement tooling (future): Fully functional Network panel in Chrome DevTools (**available in Expo today**).
+
+### Legacy features to keep (input wanted)
+
+We believe that the below tabs within the Element Inspector are a combination of more useful, relevant, and popular than the "Perf" or "Network" panels.
+
+- Element Inspector > Inspect
+- Element Inspector > Touchables
+
+There is some replacement tooling for these features, e.g. element highlighting from React DevTools, and native view inspection in Xcode/Android Studio.
 
 ## Adoption strategy
 
