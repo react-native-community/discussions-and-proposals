@@ -21,8 +21,6 @@ The motivation for this change is threefold:
 
 ## Detailed design
 
-### HELP WANTED: I am unaware of a lot of the internals of RN, so if anyone more aware than me can contribute, it is appreciated.
-
 The general idea is that the code we have for Apple platforms should be consistent of three primary parts by the end of this migration:
 - The Swift API layer that is in charge of the platform specific operations that can not be shared across other platforms (the View Delegate, the Scene Delegate, anything that has to do with Apple specific frameworks like UIKit)
 - The Shared C++ code that is platform-agnostic and used by all React Native target platforms (Yoga, Hermes, the event handlers, the bridge (if applicable), etc.)
