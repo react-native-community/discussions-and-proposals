@@ -32,6 +32,7 @@ To support activities that do not have AppCompat support, we will need to perfor
 The check would look something like this:
 
 ```kotlin
+// ThemeUtils.kt
 fun isAppCompatTheme(activityContext: Context): Boolean {
   val typedArray = activityContext.obtainStyledAttributes(R.styleable.AppCompatTheme)
   return typedArray.hasValue(R.styleable.AppCompatTheme_windowActionBar)
@@ -46,7 +47,7 @@ fun createDialog(
   arguments: Bundle,
   fragment: DialogInterface.OnClickListener ,
 ): Dialog {
-  return if (isAppCompatTheme()) {
+  return if (ThemeUtils.isAppCompatTheme(activityContext)) {
     // return androidx.appcompat.app.AlertDialog result
   } else {
     // Warning logs here
@@ -72,6 +73,8 @@ The only other alternative is to leave this component as-is.
 ## Adoption strategy
 
 This introduces a subtle breaking change in the form of theme support changes. Theming is now applied via `alertDialogTheme`, not `android:alertDialogTheme`. We would have to include a blurb in the release about the theme changes and dropping support for `android.app.AlertDialog`.
+
+As the change is significant enough, it should go out in the next minor release (for example, we're on 0.74.2 so this would ship with 0.75.0). 
 
 Upon communicating this change, the release docs as well as the logging we introduce should point to this RFC. The vast majority of developers should already be using AppCompat activities so the cohort of impacted users will be minimal.
 
