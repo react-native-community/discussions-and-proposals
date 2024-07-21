@@ -39,7 +39,7 @@ There is a PR for that change already https://github.com/facebook/react-native/p
 
 ## Drawbacks
 
--   onPaste callback timing is not the same in iOS vs Android. In iOS `onPaste` is called first then `onChange`. While in Android it's the other way around.
+None
 
 ## Alternatives
 
@@ -55,4 +55,4 @@ Update the docs https://github.com/facebook/react-native-website/pull/4161
 
 ## Unresolved questions
 
--   How to resolve the timing inconsistency? (Not a blocker)
+-   onPaste event does not expose any clipboard data. How can we add such data?
