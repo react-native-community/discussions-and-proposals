@@ -14,7 +14,23 @@ Add `onPaste` prop to `TextInput` component
 ## Basic example
 
 ```js
-<TextInput onPaste={() => console.log("User pressed Paste")} />
+<TextInput
+	onPaste={(e) => {
+		const clipboardContent = e.nativeEvent.items[0];
+
+		if (clipboardContent.type === "text/plain") {
+			console.log(`Pasting text: ${clipboardContent.data}`);
+			return;
+		}
+
+		const file = {
+			uri: clipboardContent.data,
+			type: clipboardContent.type,
+		};
+		console.log("Uploading file");
+		uploadFile(file);
+	}}
+/>
 ```
 
 ## Motivation
