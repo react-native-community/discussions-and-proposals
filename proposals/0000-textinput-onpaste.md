@@ -23,8 +23,11 @@ Add `onPaste` prop to `TextInput` component
 			return;
 		}
 
+		const fileURI = clipboardContent.data;
+		const fileName = fileURI.split("/").pop();
 		const file = {
-			uri: clipboardContent.data,
+			uri: fileURI,
+			name: fileName,
 			type: clipboardContent.type,
 		};
 		console.log("Uploading file");
@@ -65,11 +68,13 @@ Android:
 
 ### onPaste event
 
-Invoked when the user performs the paste action. The `items` array contains one object where `type` and `data` are the MIME type and the content of the clipboard respectively. `data` is in plaintext if the type is `text/plain`, data URI (base64-encoded) otherwise.
+Invoked when the user performs the paste action. The `items` array contains one object where `type` and `data` are the MIME type and the content of the clipboard respectively. `data` is in plaintext if the type is `text/plain`, URI otherwise.
 
 | Type                                                      |
 | --------------------------------------------------------- |
 | (`{nativeEvent: {target, items: [{type, data}]}`) => void |
+
+Note: On iOS the clipboard items do not expose any URI. When a file is pasted, we copy its data into a temporarily file and provide that file's URI instead.
 
 ## Drawbacks
 
