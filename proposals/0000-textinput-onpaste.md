@@ -78,7 +78,7 @@ Note: On iOS the clipboard items do not expose any URI. When a file is pasted, w
 
 ## Drawbacks
 
--   Implementation cost: If the clipboard contains an image, the whole image is read in memory and encoded to base64
+-   iOS: Pasted image is copied into a temporarily file
 
 ## Alternatives
 
