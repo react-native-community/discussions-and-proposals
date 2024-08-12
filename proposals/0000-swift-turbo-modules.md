@@ -17,12 +17,12 @@ This RFC aims to allow developers to write Turbo Modules using Swift. This will 
 The primary motivations for introducing Swift Turbo Modules are:
 - Enhance developer experience for iOS developers working with React Native
 - Allow the use of more modern language
-- Make barrier to entry lower
+- Lower the entry barrier to write a native turbo module
 
 
 ## Detailed design
 
-One of the problem why we can't adopt Swift in TurboModules  is the contamination of C++ ending up in user-space.
+One of the reasons why we can't adopt Swift in TurboModules is the contamination of C++ types ending up in user-space.
 
 ### Current Situation
 The interfaces we generate for an Objective-C turbomodules have this shape:
@@ -31,20 +31,20 @@ The interfaces we generate for an Objective-C turbomodules have this shape:
 @end
 ```
 
-Where the `RCTTurboModule` protocol requires the conforming object to implement a method with this signature:
+The `RCTTurboModule` protocol requires the conforming object to implement a method with this signature:
 ```objc
  - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
        (const facebook::react::ObjCTurboModule::InitParams &)params;
 ```
 
-As you can see, the signature of this method contains two types from C++:
+The signature of this method contains two types from C++:
 
 * `std::shared_ptr<facebook::react::TurboModule>`
 * `facebook::react::ObjCTurboModule::InitParams`
 
 ### Solution
 
-The idea is to wrap the `getTurboModule` invocation in a `TurboModuleWrapper` object.
+The idea is to wrap the `getTurboModule` invocation in a `ModuleFactory` object.
 
 The `TurboModuleWrapper` object is a base class that is supposed to be extended by a companion object for TurboModules. The base class has this interface:
 ```objc
@@ -65,7 +65,7 @@ When it comes to the implementation, the user-defined TurboModule  won't have to
 
 ```objc
 @implementation MyTurboModule
-- (TurboModuleWrapper *)getWrapper
+- (TurboModuleWrapper *)moduleFactory
 {
 return [[MyTurboModuleWrapper alloc] init];
 }
@@ -118,12 +118,12 @@ Finally, we will have to update the `RCTTurboModuleManager` to take this new obj
 ```
 
 
-Additionally we need to make sure that `React_Codegen` module is compatible with importing to Swift. I did a small test and adding few ifdefs to React_Codegen headers allows us to use Swift.
+Additionally we need to make sure that `ReactCodegen` module is compatible with importing to Swift. I did a small test and adding few ifdefs to React_Codegen headers allows us to use Swift.
 
 ```swift
-import protocol React_Codegen.NativeSwiftTestLibrarySpec
-import protocol React_Codegen.TurboModuleWrapper
-import class React_Codegen.NativeSwiftTestLibraryWrapper
+import protocol ReactCodegen.NativeSwiftTestLibrarySpec
+import protocol ReactCodegen.TurboModuleWrapper
+import class ReactCodegen.NativeSwiftTestLibraryWrapper
 
 @objc public class SwiftTestLibrary: NSObject, NativeSwiftTestLibrarySpec {
   @objc public func multiply(_ a: Double, b: Double) -> NSNumber! {
