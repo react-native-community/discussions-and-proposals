@@ -55,4 +55,4 @@ Update the docs.
 ## Unresolved questions
 
 -   Should regex flags be supported? The current implementation plan is equivalent to `/[PATTERN]/`
--   Still working on PoC for Android
+-   ~Still working on PoC for Android~
