@@ -99,7 +99,7 @@ Create a `LifecycleManager` to manage registered modules:
 
 ```kotlin
 object LifecycleManager {
-    private val modules = mutableListOf<RNLifecycleAwareModule>()
+    private val modules = mutableSetOf<RNLifecycleAwareModule>()
 
     fun registerModule(module: RNLifecycleAwareModule) {
         modules.add(module)
