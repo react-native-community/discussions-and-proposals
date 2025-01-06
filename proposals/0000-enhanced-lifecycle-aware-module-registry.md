@@ -9,7 +9,7 @@ date: 2025-01-06
 
 ## Summary
 
-This RFC proposes a framework to enhance the module registry in React Native by introducing a lifecycle-aware system for native modules. The goal is to address the current gap in handling application lifecycle events, similar to Flutter's `FlutterApplicationLifeCycleDelegate` on iOS and `Application.ActivityLifecycleCallbacks` on Android. The design enables seamless integration of native modules with application lifecycle events across iOS and Android platforms. There is also Expo Modules Core that handles this, but React Native does not have this by default and it requires Expo to be used in such cases.
+This RFC proposes a framework to enhance the module registry in React Native by introducing a lifecycle-aware system for native modules. The goal is to address the current gap in handling application lifecycle events, similar to Flutter's `FlutterApplicationLifeCycleDelegate` on iOS and `Application.ActivityLifecycleCallbacks` on Android. The design enables seamless integration of native modules with application lifecycle events across iOS and Android platforms. There is also Expo Modules Core that handles this via `ExpoAppDelegateSubscriber` and `ReactActivityLifecycleListener`, but React Native does not have this by default and it requires Expo to be used in such cases.
 
 ## Motivation
 
@@ -20,6 +20,21 @@ React Native lacks a comprehensive and standardized approach for native module l
 - **Limited Module Registry:** React Native's module registry doesn't natively support lifecycle awareness. On Android, React Native provides a `LifecycleEventListener` that partially addresses this by allowing modules to listen to events like `onHostResume`, `onHostPause`, and `onHostDestroy`. However, there is no support for early lifecycle events such as `onCreate` or `onTerminate`. On iOS, there is no equivalent lifecycle support, leading to significant gaps in managing the full application lifecycle effectively across platforms.
 - **Manual Lifecycle Handling:** Developers must manually wire up lifecycle events for each native module.
 - **Inconsistency Across Platforms:** There is no unified approach for managing lifecycle events across iOS and Android except `Expo Modules API`.
+
+### Potential use cases:
+
+- One of the most popular libraries that can benefit from this approach is [React Native Firebase](https://github.com/invertase/react-native-firebase). For example, integrating Firebase on iOS requires adding `[FIRApp configure]` to the `didFinishLaunchingWithOptions` method in the `AppDelegate`. This process could be automated by allowing the Firebase module to implement a lifecycle-aware interface:
+  ```objc
+  - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [FIRApp configure];
+    // Other initialization code...
+    return YES;
+  }
+  ```
+
+- Another libraries like [`react-native-health-connect`](https://github.com/matinzd/react-native-health-connect), [`@braze/react-native-sdk`](https://github.com/braze-inc/braze-react-native-sdk) can benefit from this approach without the need for manual setup and the headache of managing issues related to lifecycle events.
+
+By supporting lifecycle-aware modules, React Native Firebase and similar libraries can eliminate the need for manual native code changes, making integration smoother and more developer-friendly.
 
 ## Detailed Design
 
