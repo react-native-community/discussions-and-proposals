@@ -9,7 +9,7 @@ date: 2025-01-06
 
 ## Summary
 
-This RFC proposes a framework to enhance the module registry in React Native by introducing a lifecycle-aware system for native modules. The goal is to address the current gap in handling application lifecycle events, akin to Flutter's `FlutterPlugin` and `FlutterApplicationLifeCycleDelegate`. The design enables seamless integration of native modules with application lifecycle events across iOS and Android platforms. There is also Expo Modules Core that handles this, but React Native does not have this by default and it requires Expo to be used in such cases.
+This RFC proposes a framework to enhance the module registry in React Native by introducing a lifecycle-aware system for native modules. The goal is to address the current gap in handling application lifecycle events, similar to Flutter's `FlutterApplicationLifeCycleDelegate` on iOS and `Application.ActivityLifecycleCallbacks` on Android. The design enables seamless integration of native modules with application lifecycle events across iOS and Android platforms. There is also Expo Modules Core that handles this, but React Native does not have this by default and it requires Expo to be used in such cases.
 
 ## Motivation
 
