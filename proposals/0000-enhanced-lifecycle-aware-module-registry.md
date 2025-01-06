@@ -164,9 +164,9 @@ class MyModule : RNLifecycleAwareModule {
 }
 ```
 
-By implementing the `RNLifecycleAwareModule` interface, library developers can ensure that their modules respond appropriately to lifecycle events without requiring additional setup from the application developers.
+By implementing the `RNLifecycleAwareModule` interface, library developers can ensure that their modules respond appropriately to lifecycle events without requiring additional setup from application developers. This approach streamlines integration, reducing manual coding and improving consistency across projects.
 
-However the design details here are just a demonstration and the actual implementation may vary. This implementation ca be baked into the current interface or a new interface can be introduced.
+While the design details here serve as a conceptual demonstration, the actual implementation may differ based on React Native's evolving architecture. For instance, this could either extend the current module registry or involve introducing a new interface entirely, which may cause breaking changes in some scenarios. These considerations would require careful evaluation during the development phase.
 
 ## Drawbacks
 
