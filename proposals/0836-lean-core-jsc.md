@@ -13,13 +13,14 @@ This RFC proposes a Lean Core effort to extract JSC (JavaScriptCore) from React 
 
 ## Proposed Changes and Timeline
 
-- Version 0.77: Remove the [`jsc-android` npm dependency](https://github.com/facebook/react-native/blob/2d337efc23c662143b3f39a6c994d80fec047054/packages/react-native/package.json#L132) from React Native and instead download the artifact from Maven Central. When using Hermes, downloading the unused npm dependency is unnecessary and removing it saves about 32 MB of uncompressed build time size.
-- Version 0.80: Introduce a new `react-native-javascriptcore` npm package with a newer version of JavaScriptCore for Android. In this version, we will only provide the [Intl variant](https://github.com/react-native-community/jsc-android-buildscripts/blob/9c61fece4753902a2cd6d29dfa46b7b521f0c821/README.md#international-variant), as newer JavaScriptCore versions do not support disabling Intl. The existing JSCRuntime from the core should still function with this version but will display a deprecation warning during build time. A challenge will be managing the core JSCRuntime alongside the third-party JSCRuntime from `react-native-javascriptcore`; details will be mentioned in the [Mixing `JSCRuntime` from core and third-party](#mixing-jscruntime-from-core-and-third-party) section.
-  - Could we support `react-native-javascriptcore` only on New Architecture mode?
-- Version 0.82: Completely remove JavaScriptCore from the core:
-  - Eliminate `JSCRuntime` code and drop `useThirdPartyJSC` support.
-  - Update documentation at https://reactnative.dev/docs/hermes.
-  - At this point, React Native will stop JSCRuntime testing from core. All the integration testing effort should move into the `react-native-javascriptcore` repository.
+- **Version 0.78**: Remove the [`jsc-android` npm dependency](https://github.com/facebook/react-native/blob/2d337efc23c662143b3f39a6c994d80fec047054/packages/react-native/package.json#L132) from React Native and instead download the artifact from Maven Central. When using Hermes, downloading the unused npm dependency is unnecessary and removing it saves about 32 MB of uncompressed build time size.
+- **Version 0.79**: Introduce the community [`@react-native-community/javascriptcore`](https://github.com/react-native-community/javascriptcore) package, allowing developers to begin migrating from core JSC to the community-maintained version. Using the core JSC will trigger a build-time warning about its upcoming removal:
+  - React Native core will reduce its [testing support](https://github.com/reactwg/react-native-releases/blob/main/docs/guide-release-testing.md#dimensions-to-test) for JSC.
+  - The community JSC package will include basic end-to-end tests.
+- **Version 0.80**: The `@react-native-community/javascriptcore` package will offer a newer JSC version on Android that may support modern JavaScript language features, such as [`BigInt`](https://github.com/react-native-community/jsc-android-buildscripts/pull/169). In this updated `jsc-android`, only the [`Intl` variant](https://github.com/react-native-community/jsc-android-buildscripts/blob/9c61fece4753902a2cd6d29dfa46b7b521f0c821/README.md#international-variant) will be provided because newer JavaScriptCore versions do not support disabling `Intl` The core JSC remains available in this version with a build-time warning:
+  - Update documentation at https://reactnative.dev/docs/hermes to recommend the community JSC.
+- **Version 0.81 or 0.82**: Completely remove JSC from the core:
+  - Eliminate `JSCRuntime` code and drop support for `useThirdPartyJSC`.
 
 ## Motivation
 
@@ -27,22 +28,20 @@ Since Hermes has become the dominant JavaScript engine in the React Native ecosy
 
 ## Adoption strategy
 
-We will offer a drop-in replacement with the `react-native-javascriptcore` npm package while maintaining JSC support in the core for two additional React Native releases to ensure a smooth transition.
+We will offer a drop-in replacement with the [`@react-native-community/javascriptcore`](https://github.com/react-native-community/javascriptcore) package while maintaining JSC support in the core for two additional React Native releases to ensure a smooth transition.
+
+> [!NOTE]
+> The community JSC will only support New Architecture mode.
 
 ### Mixing `JSCRuntime` from core and third-party
 
-Originally, the `hermesEnabled` in Android's **gradle.properties** and `hermes_enabled` in iOS's **Podfile** take two responsibilities. One is to create the Hermes bytecode bundle. The other is to choose JSCRuntime over HermesRuntime. During the transition period, we will introduce a `useThirdPartyJSC` flag for **gradle.properties** and `ENV['useThirdPartyJSC']` for CocoaPods. When `useThirdPartyJSC` is enabled, React Native will not link the `JSCRuntime` from core.
+Originally, the `hermesEnabled` flag in Android's **gradle.properties** and `hermes_enabled` flag in iOS's **Podfile** served two purposes: creating the Hermes bytecode bundle and selecting JSCRuntime over HermesRuntime. During the transition period, we will introduce a `useThirdPartyJSC` flag in **gradle.properties** and `ENV['USE_THIRD_PARTY_JSC']` in CocoaPods. When `useThirdPartyJSC` is enabled, React Native will not link the core `JSCRuntime`.
 
-### Setup guide for `react-native-javascriptcore`
+### Setup guide for `@react-native-community/javascriptcore`
 
-A rough idea to set up `react-native-javascriptcore`:
-
-1. `yarn add react-native-javascriptcore`
-2. Set `hermesEnabled=false`
-3. Add `useThirdPartyJSC=true` on React Native 0.80~0.82
-4. On Android, update MainApplication to support custom JSRuntimeFactory for JSC
-5. TODO: On iOS, there are some challenges since `createJSRuntimeFactory()` requires C++ integration and we now have AppDelegate.swift. We could try to abstract the `createJSRuntimeFactory()` to an Objective-C interface first, so that people can pass their own JSRuntimeFactory through Swift. I will study some approaches and update this part later.
+Refer to the [README from `@react-native-community/javascriptcore for setup instructions](https://github.com/react-native-community/javascriptcore/blob/main/README.md).
 
 ## How we teach this
 
-We will announce the upcoming changes in the version 0.80 release notes and provide guidance for developers on migrating to the new `react-native-javascriptcore` package. After version 0.82, the core will no longer support JSCRuntime and no more integration testing will be done in the core. All the integration testing effort should move into the `react-native-javascriptcore` repository.
+- We will announce the upcoming changes in the version 0.79 release notes and provide guidance for developers on migrating to the new `@react-native-community/javascriptcore` package.
+- A build-time warning in React Native will notify users about the upcoming lean core changes regarding JSC.
