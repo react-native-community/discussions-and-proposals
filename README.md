@@ -1,3 +1,9 @@
+This repository is being **archived** as there are other better options for filing proposals for React Native for Windows.
+
+- You can [file proposals](https://github.com/microsoft/react-native-windows/issues/new/choose) on the react-native-windows repo
+- You can [start a discussion](https://github.com/microsoft/react-native-windows/discussions) on the react-native-windows repo
+- For general React Native discussion use the [discussions-and-proposals repo](https://github.com/react-native-community/discussions-and-proposals)
+
 # React Native: Discussions and Proposals
 
 Do you have an idea on how to make React Native better?
