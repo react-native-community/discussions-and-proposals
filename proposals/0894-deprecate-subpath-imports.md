@@ -84,7 +84,7 @@ import {Alert, AlertType} from 'react-native';
 
 By removing subpath imports, we will scope the `react-native` package down to a narrower, enumerable public API, using the existing `index.js` and `index.d.ts` exports as a starting point.
 
-All existing APIs exported from the main `'react-native'` import path will be **unchanged**. As of March 2025, we now define a strict list of type exports, see [`index.js.flow`](/TODO) — symbols that are not in this file will not be part of the public API.
+All existing APIs exported from the main `'react-native'` import path will be **unchanged**. As of March 2025, we now define a strict list of type exports, see [`index.js.flow`](https://github.com/facebook/react-native/blob/main/packages/react-native/index.js.flow) — symbols that are not in this file will not be part of the public API.
 
 #### Framework considerations
 
@@ -141,6 +141,10 @@ import {Alert} from 'react-native/Libraries/Alert/Alert';
 
 **Under the hood**: As we are unsure about the % usage of [@react-native/eslint-config](https://www.npmjs.com/package/@react-native/eslint-config), we believe integrating via Metro is important for consistent visibility.
 
+#### Removing subpaths from our TypeScript API (opt-in)
+
+See [Parallel effort: Strict TypeScript API](#parallel-effort-strict-typescript-api).
+
 ### Eventual strong enforcement
 
 Again, it's important that we give the community sufficient time to adapt to this change before we action a hard removal — we anticipate this will be during **H2 2025**.
@@ -156,6 +160,71 @@ This will functionally disallow unlisted subpath imports under TypeScript, Metro
   "exports": {  
     ".": "./index.js", // 🚫 Subpath imports disallowed
     // ... (non-runtime exports)
+  }
+}
+```
+
+---
+
+## Parallel effort: Strict TypeScript API
+
+> 🟢 In active development as of January 2025.
+
+#### Discouraging use by removing subpaths under TypeScript
+
+A parallel part of our adoption strategy is a new version of React Native's TypeScript API, auto-translated from the source codebase in Flow. While a separate effort, this forms an incentivising mechanism for removing subpath imports, on top of console and ESLint warnings.
+
+This new API will no longer expose internal `react-native` modules under TypeScript — resulting in type errors against existing uses, and preventing new deep imports which may have occurred from auto-importing in the past.
+
+#### User opt-in
+
+By default, TypeScript will continue to use the existing manually defined types included in the `react-native` package, which allow subpaths.
+
+When we ship the new Strict TypeScript API, it will be available as a user opt-in — by specifying the `"react-native-strict-api"` condition in a project's `tsconfig.json`.
+
+```json
+{
+  "compilerOptions": {
+    "customConditions": ["react-native-strict-api"]
+  }
+}
+```
+
+<small>See [TSConfig Reference - `customConditions`](https://www.typescriptlang.org/tsconfig/#customConditions).</small>
+
+Under the hood, this opt-in will be implemented in React Native via a lenient `package.json` `"exports"` mapping, exposing only `"." → "types_generated/index.d.ts"` under this condition.
+
+```json5
+{
+  "exports": {  
+    ".": {
+      "react-native-strict-api": "./types_generated/index.d.ts",
+      "default": "./index.js"
+    },
+    "./*": {
+      "react-native-strict-api": null, // ← 🚫 Subpath imports disallowed
+      "default": "./*.js"
+    }
+  }
+}
+```
+
+
+- The scope of this opt-in will be for the immediately analysed TypeScript project root, and will have no impact at runtime or on dependent projects.
+- Having an user opt-in will be necessary both for subpath import removal, as well as breaking changes to some type shapes now generated from source (increasing correctness, consistency, and ergonomics).
+- As with subpath import deprecation, we may consider an escape hatch for Frameworks, based on feedback.
+
+#### Final state (coordinated removal of subpath imports)
+
+The final state (potentially with a preceding opt-out state) will be a hard rollout of the new types in a future version of React Native, aligned with when we remove subpath imports in our `"exports"` mapping.
+
+```json5
+{
+  "exports": {  
+    ".": {
+      "types": "./types_generated/index.d.ts",
+      "default": "./index.js"
+    }
   }
 }
 ```
