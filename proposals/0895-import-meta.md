@@ -9,17 +9,21 @@ date: 2025-04-28
 
 ## Summary
 
-Implementation of [`import.meta`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta) in JS bundles through Metro and React Native, with per-module, host-defined properties.
+Implementation of [`import.meta`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta) in transformed source modules within JavaScript bundles through Metro and React Native, with per-module, host-defined properties.
 
 ## Motivation
 
-`import.meta` is [specified](https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#sec-meta-properties) 
+`import.meta` is [part of the ECMAScript specification](https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#sec-meta-properties) and is used in ES Modules across the ecosystem.
+
+When ES Modules are bundled into a plain script, an untransformed `import.meta` expression inherently appears outside of the context of an ES Module, and engines will throw (typically `SyntaxError`) on evaluation. This represents a failure of the bundle to faithfully mirror the behaviour of valid source files. Metro will successfully build a bundle which fails at runtime
+
+Practically, the motivation to support this has increased since React Native 0.79, which enabled `package.json#exports` field resolution by default, which led to bundling ESM versions of `node_modules` packages where previously Metro would resolve and bundle CJS versions. Such failures are difficult for the user to action, requiring custom resolvers, upstream changes, or workarounds like `patch-package`.
 
 ## Detailed design
 
 ### Changes to the core bundling algorithm in Metro
 
-As an implementation detail, Metro will transform `import.meta` (Babel `MetaProperty` nodes) to a `MemberExpression` on the `module` pseudo-global. Access 
+As an implementation detail, Metro will transform `import.meta` (Babel `MetaProperty` nodes) to a `MemberExpression` on the `module` pseudo-global: `module.importMeta`. References to `module.importMeta` in untransformed source will be prohibited.
 
 Without lazy bundling, Metro's core bundling algorithm consists of:
 
@@ -53,13 +57,13 @@ For backwards compatibility, lazy bundling will be **off by default in Metro**, 
 
 Within the lifetime of a given Metro server instance, modules will receive stable IDs based on their paths. This will allow the client to skip evaluating copies of the same module that may occur across multiple bundles.
 
-### `__loadBundleAsync` in Metro
+### `__getImportMetaProperties` in Metro
 
-The first time an `import()` call is evaluated with a given target, the default `asyncRequire()` implementation in Metro will call a new *framework-defined* global function named `__loadBundleAsync` with that target's bundle path (as produced by the serializer).
+The first time `import.meta` is evaluated within a module implementation, Metro's module system will call a new *framework-defined* global function named `__getImportMetaProperties` with information about the module.
 
-> **NOTE:** The `__loadBundleAsync` identifier will be prefixed with the currently configured [global prefix](https://github.com/facebook/metro/blob/69c8fc707bda418b4eb7aa646ad2887d83e1d3f1/packages/metro-config/src/defaults/index.js#L105), so the correct way to reference it at runtime is ``global[`${__METRO_GLOBAL_PREFIX__}__loadBundleAsync`]``. For simplicity we will continue to call it simply `__loadBundleAsync` in this RFC.
+> **NOTE:** The `__getImportMetaProperties` identifier will be prefixed with the currently configured [global prefix](https://github.com/facebook/metro/blob/69c8fc707bda418b4eb7aa646ad2887d83e1d3f1/packages/metro-config/src/defaults/index.js#L105), so the correct way to reference it at runtime is ``global[`${__METRO_GLOBAL_PREFIX__}__getImportMetaProperties`]``. For simplicity we will continue to call it simply `__getImportMetaProperties` in this RFC.
 
-`__loadBundleAsync` must return a promise that resolves once the bundle has been fetched and evaluated (e.g. with `fetch` and `eval`).
+`__getImportMetaProperties` must return an object whose enumerable properties will be added to `import.meta`.
 
 ```flow
 // For lazy bundling: type SerializedBundlePath = string;
@@ -72,7 +76,7 @@ If there is no `__loadBundleAsync` implementation available, the bundled code ma
 
 > **NOTE:** With the introduction of `__loadBundleAsync`, **we will deprecate the [`asyncRequireModulePath`](https://facebook.github.io/metro/docs/configuration/#asyncrequiremodulepath) option in Metro**. Providing a custom `__loadBundleAsync` implementation is expected to fulfil all current use cases for replacing `asyncRequire` at build time.
 
-### `__loadBundleAsync` in React Native
+### `__getImportMetaProperties` in React Native
 
 In development builds, React Native will provide an implementation of `__loadBundleAsync` that fetches a bundle URL from the currently connected Metro server, integrates with Fast Refresh and LogBox, and provides feedback to the developer on the progress of loading a bundle.
 
