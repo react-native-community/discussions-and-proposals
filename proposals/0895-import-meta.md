@@ -40,7 +40,7 @@ type Module = $ReadOnly<{id: number}>; // Properties TBD
 declare function __getImportMetaProperties(module: Module): {...};
 ```
 
-`__getImportMetaProperties` will be called at most once in the lifetime of a module, and, as the specification allows, properties of `import.meta` may subsequently be added to, unset or overwritten by the module itself.
+`__getImportMetaProperties` will be called at most once in the lifetime of a module, and, as the specification allows, properties of `import.meta` may subsequently be added, unset or overwritten by the module itself.
 
 > **NOTE:** The `__getImportMetaProperties` identifier will be prefixed with the currently configured [global prefix](https://github.com/facebook/metro/blob/v0.82.2/packages/metro-config/src/defaults/index.js#L107), so the correct way to reference it at runtime is ``global[`${__METRO_GLOBAL_PREFIX__}__getImportMetaProperties`]``. For simplicity we will continue to call it simply `__getImportMetaProperties` in this RFC.
 
