@@ -86,8 +86,11 @@ This proposal was chosen partially because options for E2E testing already exist
 ## Adoption strategy
 
 1. Publish `@react-native/jest-preset` in parallel to an ongoing stable release.
-2. Pick a warning into `react-native/jest-preset` that informs users of the package change.
-3. Drop `react-native/jest-preset` in a subsequent release.
+2. For current release: Pick change into `react-native/jest-preset` that informs users of the package change and re-exports `@react-native/jest-preset` temporarily.
+3. For next release: Drop `react-native/jest-preset` entirely and replace it with an error that tells people to replace it with `@react-native/jest-preset`.
+
+**Alternatively** to (3): Keep `react-native/jest-preset` and its warning+reexport but define an optional peer dependency on `@react-native/jest-preset` that throws an error if it's not installed.
+This would make the adoption entirely backwards-compatible, and allow us to ship this within one release, since migration is then trivial.
 
 The change to projects is an added dependency and a single line of changing the Jest preset. No codemod will be needed.
 
