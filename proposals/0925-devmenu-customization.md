@@ -29,7 +29,7 @@ We propose adding a new configuration object:
 ```kotlin
 data class DevMenuConfiguration(
   val isDevMenuEnabled: Boolean = BuildConfig.DEBUG,
-  val minNumberOfShakes: Int = 2,
+  val isShakeGestureEnabled: Boolean = true,
   val areKeyboardShortcutsEnabled: Boolean = true,
 )
 ```
@@ -39,7 +39,7 @@ fun setDevMenuConfiguration(config: DevToolsConfiguration)
 ```
 Handling of `isDevMenuEnabled` will need to be implemented - a matching field would be required in [`DevSupportManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/interfaces/DevSupportManager.kt#L25), which would then be checked [before showing the dev menu](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/DevSupportManagerBase.kt#L304). `ReleaseDevSupportManager` would always set this field to false.
 
-Handling of `minNumberOfShakes` can rely on existing infrastructure. [`ShakeDetector`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.kt#L20) would need to be updated by adding a setter for the `minNumsShakes`.
+Handling of `isShakeGestureEnabled` can rely on existing infrastructure. [`ShakeDetector`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.kt#L36-L50) could be started or stopped, depending on the value in the configuration.
 
 Handling of `areKeyboardShortcutsEnabled` would need to be implemented - a matching field would be required in [`DevSupportManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/interfaces/DevSupportManager.kt#L25). This field would be checked in the [`ReactDelegate`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/ReactDelegate.kt#L371), before dispatching the relevant action. `ReleaseDevSupportManager` would always set this field to false, which could replace the existing check in the `ReactDelegate`.
 
