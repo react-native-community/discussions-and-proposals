@@ -21,7 +21,7 @@ This API is targeted to be utilized by frameworks.
 
 ## Motivation
 This API will enable frameworks to further improve the developer experience when building apps using React Native. It will also allow for more granular control over the environment where release JS bundles are used within the debug native app builds.
-In such environments, where the multiple bundles can be used by the same native code, the ability to modify the configuration dynamically would be useful for disabling the dev menu when a release bundle is used, and keeping it enabled for debug bundles.
+In such environments, where multiple bundles can be used by the same native code, the ability to modify the configuration dynamically would be useful for disabling the dev menu when a release bundle is used, and keeping it enabled for debug bundles.
 
 ## Detailed design
 ### Android
