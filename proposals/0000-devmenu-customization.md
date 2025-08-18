@@ -2,7 +2,7 @@
 title: New APIs to customise the DevMenu
 author:
 - Jakub Piasecki
-date: 12.08.2025
+date: 2025-08-12
 ---
 
 # RFC0925: New APIs to customise the DevMenu
