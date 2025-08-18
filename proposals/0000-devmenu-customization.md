@@ -5,7 +5,7 @@ author:
 date: 12.08.2025
 ---
 
-# RFC0XXX: New APIs to customise the DevMenu
+# RFC0925: New APIs to customise the DevMenu
 
 ## Summary
 In this RFC, we propose a mechanism for configuring the dev menu in the following ways:
