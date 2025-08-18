@@ -10,7 +10,7 @@ date: 12.08.2025
 ## Summary
 In this RFC, we propose a mechanism for configuring the dev menu in the following ways:
 - Option to disable (and if possible, configure) the shake gesture
-- Option to disable the 	keyboard shortcuts
+- Option to disable the keyboard shortcuts
 - Option to disable the dev options dialog
 
 ![Screenshot showing the legacy Perf and Network panels in the Element Inspector overlay](../assets/devmenu-dialog.png)
