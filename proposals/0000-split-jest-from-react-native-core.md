@@ -45,7 +45,7 @@ The proposed change is to split this out into a separate, `@react-native/jest-pr
 
 There are several key motivations for this change:
 
-- **Maintenance Status:** While Jest 30 has now been released after a long break of major maintenance updates, the [Jest 30 includes a regression for `transformIgnorePatterns`](https://github.com/jestjs/jest/issues/15781), demonstrating that React Native isn't Jest's main focus, and that continuously maintaining a Jest preset in React Native that is part of the core package poses challenges.
+- **Maintenance Status:** While Jest 30 has now been released after a long break of major maintenance updates, [it includes a regression for `transformIgnorePatterns`](https://github.com/jestjs/jest/issues/15781), demonstrating that React Native isn't Jest's main focus, and that continuously maintaining a Jest preset in React Native that is part of the core package poses challenges.
 - **Ecosystem Evolution:** Outside of Meta, many teams and projects have migrated to alternative testing solutions, especially for unit testing, such as Vitest. These days alternative test runners exist that are better set up to support React Native in the future, that the ecosystem signals they're starting to prefer. By bundling the Jest preset by default, we create an artificial constraint and recommendation that doesn't reflect current practices.
 - **Dependency Management and size:** Including Jest by default adds significant weight to `node_modules` and projects' dependency graphs, even for projects that may be using alternative testing frameworks or no testing framework at all.
 - **Testing Strategy Flexibility:** Different projects have different testing needs and requirements. Apart from unit testing, many projects implement integration or E2E tests, such as with Cypress and Maestro. This ultimately means that Jest is only fulfilling one requirement with alternatives being available.
@@ -77,7 +77,7 @@ In short, this change affirms Jest being a choice and comes with maintenance and
 
 ## Alternatives
 
-- **Continue including Jest:** We could continue including the preset, and take on the maintenance burden associated with this, as long as development and support is revilatised.
+- **Continue including Jest:** We could continue including the preset, and take on the maintenance burden associated with this, as long as development and support is revitalised.
 - **Switch default testing framework:** We could replace Jest with another test framework and runner like Vitest. However, this increases maintenance burden.
 - **Minimal testing interface:** We could create a framework-agnostic unit testing interface. However, `@testing-library/react-native` already exists.
 
