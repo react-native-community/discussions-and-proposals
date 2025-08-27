@@ -73,7 +73,7 @@ Note that because changing the configuration on iOS is done through the `RCTReac
 Given that this is a new API that is being added only for frameworks, we don't see drawbacks in implementing it, aside from the need to maintain it. If not used, the behavior would fall back to the default one.
 
 ## Alternatives
-Expo, for example, currently does it only on Android using reflection to [replace the relevant classes](https://github.com/expo/expo/blob/b90fea77e87bb03f3c65ceeaf8913c96a7c26aff/packages/expo-dev-launcher/android/src/debug/java/expo/modules/devlauncher/react/DevLauncherDevSupportManagerSwapper.kt#L100-L114). It’s currently not done at all on iOS.
+Expo, for example, currently does it on Android using reflection to [replace the relevant classes](https://github.com/expo/expo/blob/b90fea77e87bb03f3c65ceeaf8913c96a7c26aff/packages/expo-dev-launcher/android/src/debug/java/expo/modules/devlauncher/react/DevLauncherDevSupportManagerSwapper.kt#L100-L114), and using [method swizzling on iOS](https://github.com/expo/expo/blob/f17e0292bbdfa52908cf9145650c542cfaf7c769/packages/expo-dev-menu/ios/Interceptors/DevMenuMotionInterceptor.swift#L6).
 
 ## Adoption strategy / How we teach this
 As a part of the implementation, documentation for the new API will be provided with example usages to showcase how it works and explain the use cases.
