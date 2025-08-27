@@ -35,7 +35,7 @@ data class DevMenuConfiguration(
 ```
 which will be accepted as an argument by a new method on `ReactHost`:
 ```kotlin
-fun setDevMenuConfiguration(config: DevToolsConfiguration)
+fun setDevMenuConfiguration(config: DevMenuConfiguration)
 ```
 Handling of `isDevMenuEnabled` will need to be implemented - a matching field would be required in [`DevSupportManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/interfaces/DevSupportManager.kt#L25), which would then be checked [before showing the dev menu](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/DevSupportManagerBase.kt#L304). `ReleaseDevSupportManager` would always set this field to false.
 
@@ -57,7 +57,7 @@ We propose adding a new configuration object:
 ```
 which will be accepted as an argument by a new method on `RCTReactNativeFactory`:
 ```objc
-- (void)setDevToolsConfiguration:(RCTDevToolsConfiguration*)configuration;
+- (void)setDevMenuConfiguration:(RCTDevMenuConfiguration*)configuration;
 ```
 This optional configuration would then be passed to the `RCTHost`. From there, the setup could be the same as for [`bundleManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm#L245), which is passed from `RCTHost` to `RCTInstance` and is synthesizable in individual turbomodules.
 
