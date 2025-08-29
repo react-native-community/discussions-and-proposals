@@ -5,7 +5,7 @@ author:
 date: 2025-08-29
 ---
 
-# RFC0928: Removal of the Legacy Architecture of React Native
+# RFC0929: Removal of the Legacy Architecture of React Native
 
 ## Summary
 
@@ -36,7 +36,7 @@ While we [already implemented](https://github.com/reactwg/react-native-new-archi
 
 The following is a rough timeline of the changes related to this RFC:
 
-![Diagram showing the timeline for Legacy Arch removal](assets/0928-legacyarch-removal-timeline.png)
+![Diagram showing the timeline for Legacy Arch removal](assets/0929-legacyarch-removal-timeline.png)
 
 ### Already implemented steps
 
