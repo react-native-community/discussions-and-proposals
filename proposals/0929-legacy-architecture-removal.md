@@ -328,7 +328,7 @@ The list of C++ symbols we intend to remove is the following:
 
 The following JavaScript definitions are related to the Legacy Architecture. They are all **private** and should not be accessed as of today.
 
-We don’t consider those part of the public API, and you should not be accessing them (see also [Deprecating deep imports from react-native](https://reactnative.dev/blog/2025/06/12/moving-towards-a-stable-javascript-api#deprecating-deep-imports-from-react-native)).
+We don’t consider those part of the public API, and you should not use them (see also [Deprecating deep imports from react-native](https://reactnative.dev/blog/2025/06/12/moving-towards-a-stable-javascript-api#deprecating-deep-imports-from-react-native)).
 
 We’re looking into removing them from the React Native bundle in the near future:
 
