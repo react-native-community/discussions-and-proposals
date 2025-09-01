@@ -46,7 +46,7 @@ The following is a rough timeline of the changes related to this RFC:
     * We stopped working on Legacy Architecture.
     * We stopped accepting PRs that modify the Legacy Architecture.
     * We stopped testing the Legacy Architecture when releasing React Native.
-* **2025-06-12: [React Native 0.80]** New Architecture [warnings are added](https://reactnative.dev/blog/2025/06/12/react-native-0.80#legacy-architecture-freezing--warnings)
+* **2025-06-12: [React Native 0.80]** Legacy Architecture [warnings are added](https://reactnative.dev/blog/2025/06/12/react-native-0.80#legacy-architecture-freezing--warnings)
     * Users will see a warning on DevTools when using Legacy Architecture.
     * Moreover, specific warnings have been added to notify the user if they’re using a pattern that won’t be supported by interop layers
 * **2025-08-12: [React Native 0.81]** Further New Architecture classes are marked as `@Deprecated`
