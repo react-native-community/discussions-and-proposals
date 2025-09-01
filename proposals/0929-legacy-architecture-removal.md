@@ -26,7 +26,7 @@ By removing the Legacy Architecture, we aim to achieve the following goals:
 
 * **Improve Performance and Consistency:** The New Architecture offers superior capabilities (such as synchronous rendering, lazy loading of modules, type safety, etc.). Consolidating to a single architecture ensures all React Native applications can benefit from these advancements consistently.
 
-* **Reduced User Overhead**: Currently React Native developers have to think whether a specific library supports the New Architecture before adopting it. This adds cognitive overhead and makes it difficult to tell if a library will work in a given project. In the longer run, moving to a single architecture simplifies this model as users don’t have to think about which architecture is supported for each library anymore, or if it’s supported via Interop layer or not.0
+* **Reduced User Overhead**: Currently React Native developers have to think whether a specific library supports the New Architecture before adopting it. This adds cognitive overhead and makes it difficult to tell if a library will work in a given project. In the longer run, moving to a single architecture simplifies this model as users don’t have to think about which architecture is supported for each library anymore, or if it’s supported via Interop layer or not.
 
 * **Reduced Maintenance Overhead**: Up until this point, many features and components require separate implementations and testing for both the legacy and new architectures. This doubles the effort for development, debugging, and maintenance. Moreover, during React Native releases we had to duplicate the amount of testing due to the dual architecture which increased the release workload for the React Native release crew.
 
