@@ -49,7 +49,7 @@ The following is a rough timeline of the changes related to this RFC:
 * **2025-06-12: [React Native 0.80]** Legacy Architecture [warnings are added](https://reactnative.dev/blog/2025/06/12/react-native-0.80#legacy-architecture-freezing--warnings)
     * Users will see a warning on DevTools when using Legacy Architecture.
     * Moreover, specific warnings have been added to notify the user if they’re using a pattern that won’t be supported by interop layers
-* **2025-08-12: [React Native 0.81]** Further New Architecture classes are marked as `@Deprecated`
+* **2025-08-12: [React Native 0.81]** Further Legacy Architecture classes are marked as `@Deprecated`
     * Users will be notified at build time if using a `@Deprecated` class through a build warning.
 
 ### Upcoming steps
