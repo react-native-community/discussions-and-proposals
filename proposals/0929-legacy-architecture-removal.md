@@ -60,7 +60,7 @@ The following is a rough timeline of the changes related to this RFC:
         * On Android, setting `newArchEnabled=false` will result in a warning message and the property will be hardcoded to `true`
         * To keep compatibility with libraries, we will set `newArchEnabled=true` if a user removes the `newArchEnabled` line from their `gradle.properties`.
         * On iOS
-            * Installing pods with ``RCT_NEW_ARCH_ENABLED=0`` will result in a warning message and the property will be hardcoded to `1`
+            * Installing pods with `RCT_NEW_ARCH_ENABLED=0` will result in a warning message and the property will be hardcoded to `1`
             * Changing the `RCTNewArchEnabled` flag in the `Info.plist` will be ignored
             * Overriding methods such as `newArchEnabled` in the AppDelegate will be ignored
         * To keep compatibility with libraries, we will set `RCT_NEW_ARCH_ENABLED=1`in all the podspecs, including the one autolinked. This will give library authors the time to remove the legacy arch code from their library.
