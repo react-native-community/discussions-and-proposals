@@ -62,7 +62,7 @@ The following is a rough timeline of the changes related to this RFC:
         * On iOS
             * Installing pods with `RCT_NEW_ARCH_ENABLED=0` will result in a warning message and the property will be hardcoded to `1`
             * Changing the `RCTNewArchEnabled` flag in the `Info.plist` will be ignored
-            * Overriding methods such as `newArchEnabled` in the AppDelegate will be ignored
+            * Overriding methods such as `newArchEnabled` in the `AppDelegate` will be ignored
         * To keep compatibility with libraries, we will set `RCT_NEW_ARCH_ENABLED=1`in all the podspecs, including the one autolinked. This will give library authors the time to remove the legacy arch code from their library.
     * We don’t forecast removal of Legacy Architecture APIs in this version (i.e. Legacy Architecture will still be inside React Native core, but not accessible).
 * **2025-12-x: [React Native 0.83]** Legacy Architecture internal and non-public classes are removed
