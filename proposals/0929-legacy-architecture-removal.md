@@ -105,7 +105,7 @@ We also `@Deprecated` several of those classes, so you will get build warnings i
 
 #### Android Internal APIs
 
-The following classes are marked as Kotlin `internal` and planned for removal.
+The following classes are marked as `internal` in Kotlin and are planned for removal.
 
 As those classes are `internal` you should not be accessing them directly and it should be safe to either remove them or stub them.
 
