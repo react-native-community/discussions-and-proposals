@@ -4,7 +4,7 @@ author: Jakub Piasecki
 date: 01.08.2025
 ---
 
-# RFC0000: Implement setBundleSource to customise the Bundle source.
+# RFC0933: Implement setBundleSource to customise the Bundle source.
 
 ## Summary
 In this RFC, we propose adding a `setBundleSource` method that would allow us to change the bundle dynamically and without the need to modify `MainApplication` or `AppDelegate`.
