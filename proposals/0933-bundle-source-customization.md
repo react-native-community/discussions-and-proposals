@@ -1,7 +1,7 @@
 ---
 title: implement setBundleSource to customise the Bundle URL
 author: Jakub Piasecki
-date: 01.08.2025
+date: 2025-09-01
 ---
 
 # RFC0933: Implement setBundleSource to customise the Bundle source.
