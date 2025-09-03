@@ -72,7 +72,7 @@ The following is a rough timeline of the changes related to this RFC:
 * **2025-12-x: Expo SDK 55**
     * We expect Expo SDK 55 to ship React Native 0.83. This is going to be the first version of Expo where users can’t opt out from the New Architecture.
 * **2026-02-x: [React Native 0.84]** Legacy Architecture public classes will start to be removed
-    * From 0.84, we will start removing classes and APIs from the Legacy Architecture (classes used by Interop Layer won't be removed). See below for the list of APIs we intend to remove.
+    * From 0.84, we will start removing classes and APIs from the Legacy Architecture (this does not include classes used by the Interop layer). See below for the list of APIs we intend to remove.
 
 
 ## The future of the Interop Layer
