@@ -286,12 +286,12 @@ The following symbols are due for removal:
 
 ### C++
 
-In C++ we use the `RCT_FIT_RM_OLD_RUNTIME` macro to annotate classes that are due for removal.
+In C++ we use the `RCT_REMOVE_LEGACY_ARCH` macro to annotate classes that are due for removal.
 
 If a class or a symbol is wrapped inside a:
 
 ```c++
-#ifndef RCT_FIT_RM_OLD_RUNTIME
+#ifndef RCT_REMOVE_LEGACY_ARCH
 ...
 #endif
 ```
