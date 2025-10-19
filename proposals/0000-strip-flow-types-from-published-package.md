@@ -15,8 +15,6 @@ This proposal seeks to remove Flow type annotations from the JavaScript code pub
 
 **Current state** (what gets published to npm):
 
-React Native currently publishes JavaScript files containing Flow annotations plus separate TypeScript definition files. Here's a real example from React Native's [ActivityIndicator component](https://github.com/facebook/react-native/blob/main/packages/react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.js):
-
 ```javascript
 // Current: Published with Flow annotations
 import type {HostComponent} from '../../../src/private/types/HostComponent';
