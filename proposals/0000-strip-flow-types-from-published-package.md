@@ -90,7 +90,6 @@ export type ActivityIndicatorProps = $ReadOnly<{
   size?: ?IndicatorSize,
 }>;
 
-/* Use canonical Flow syntax for the component */
 declare export function ActivityIndicator(
   props: ActivityIndicatorProps,
   ref?: React.Ref<HostComponent<empty>>
