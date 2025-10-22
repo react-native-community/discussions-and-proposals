@@ -21,34 +21,74 @@ Developers should be able to define a TypeScript spec as follows:
 export interface Spec extends TurboModule {
   getBuffer(): ArrayBuffer;
   processBuffer(buffer: ArrayBuffer): void;
+
+  getAsyncBuffer(): Promise<ArrayBuffer>;
+  processAsyncBuffer(buffer: ArrayBuffer): Promise<void>;
 }
 ```
 
 ## Motivation
 
-TurboModules currently lack a first-class way to represent `ArrayBuffer` end-to-end in Codegen, which forces developers to rely on copies, ad-hoc platform bridges, global helpers, or external libraries. This hurts performance for binary-heavy use cases such as media data or ML tensors, and it increases implementation complexity. The expected outcome is a cross-platform contract that lets JS and native pass binary data with minimal copying. Codegen should be able to generate working code for the `ArrayBuffer` type on every platform.
+TurboModules currently lack a first-class way to represent `ArrayBuffer` end-to-end in Codegen, which forces developers to rely on copies, direct JSI access, or external libraries. This hurts performance for binary-heavy use cases such as media data or ML tensors, and it increases implementation complexity. The expected outcome is a cross-platform contract that lets JS and native pass binary data with minimal copying. Codegen should be able to generate working code for the `ArrayBuffer` type on every platform.
 
 For example, several important use cases are currently difficult to implement efficiently while working with TurboModules:
 
+- **Binary Data Handling (Blob Manager)**: React Native's Blob implementation could benefit from first-class `ArrayBuffer` support, serving as an ideal migration candidate. This would enable efficient handling of binary data for file uploads, image processing, and network requests.
 - **Real-time media streaming**: A native video decoder could stream frames directly to a JavaScript-based player component. Without zero-copy `ArrayBuffer`s, each frame would need to be copied, leading to significant performance overhead and potential frame drops.
 - **Machine Learning**: On-device ML models often require passing large tensors between native inference engines and JS. Copying this data can be a major bottleneck, especially for real-time applications like video analysis.
 - **High-performance networking**: Applications that handle large binary payloads over WebSockets or other protocols (e.g., financial data streams, real-time gaming) may be forced into inefficient data conversion, which adds CPU and memory pressure.
+- **Web Standards and Interoperability**: First-class `ArrayBuffer` support will also enable implementation of web-spec-compatible primitives such as `Blob` and `File`. This is particularly important for interoperability across different module frameworks.
 
-By providing a first-class `ArrayBuffer` type support to TurboModules, this RFC will unblock these and other performance-sensitive areas, making it possible to develop faster more efficient applications for React Native.
+By providing first-class `ArrayBuffer` type support to TurboModules, this RFC will unblock these and other performance-sensitive areas, making it possible to develop faster, more efficient applications for React Native.
 
 ## Detailed design
 
 This section contains a description of the design and related topics. It's split by topics and affected packages/areas. In the expandable sections, extensive code snippets can be found. In the final implementation, each area should come with appropriate unit tests.
 
-### Memory ownership
+### Memory ownership model
 
-When passing an `ArrayBuffer` to native code, it should always be treated as "borrowed" or "non-owning": JS owns the ArrayBuffer's memory and the JS GC is responsible for freeing it. Native code should access the passed memory only for the duration of the synchronous call.
+Memory ownership semantics differ based on where the `ArrayBuffer` was created:
 
-The same rules apply when passing buffers from native to JS: native code remains the owner of the allocated memory and may expose zero-copy buffers to JS.
+#### JS-to-Native (Borrowing Semantics)
+
+When passing an `ArrayBuffer` that was created in JavaScript to native code, it should be treated as "borrowed": JavaScript owns the ArrayBuffer's memory and the JS GC is responsible for freeing it. Native code should access the passed memory only for the duration of the synchronous call.
+
+**Rationale**: The current implementation of Hermes and JSI does not expose a dedicated API for detaching an `ArrayBuffer` that was created on the JS side. Without a proper detachment mechanism, we cannot safely transfer ownership to native code. Attempting to do so would result in:
+
+- The `ArrayBuffer` remaining valid on the JS side with accessible properties (e.g., `byteLength`)
+- No runtime enforcement preventing JS from reading/writing to the buffer while native code uses it
+- Potential race conditions and memory corruption if both sides access the buffer concurrently
+
+**Concerns**: Community members have raised valid concerns that this deviates from standard `ArrayBuffer` transfer semantics (similar to `postMessage` with transferable objects). In standard web APIs, transferred buffers become "detached" and unusable in the sending context, eliminating thread-safety concerns. However, implementing true transfer semantics requires dedicated JSI API additions and runtime changes in Hermes.
+
+Until these underlying platform capabilities are available, borrowing semantics provide a pragmatic path forward while acknowledging the thread-safety implications documented in the Threading section below.
+
+**Alternatives**: Alternatively, transfer of the ownership to the native can be mimicked by aligning the JS object lifetime with native memory reference. It would still allow access to the buffer on the JS side, potentially resulting in race conditions. However, it can be clearly stated in the documentation that once a buffer is passed to Native, it cannot be used anymore.
+
+#### Native-to-JS (Transfer Ownership)
+
+When passing a buffer from native to JS, ownership can be transferred, and it can be treated as "owned". Native code creates the buffer, wraps it in a shared pointer, and passes it to JS. The JS GC will properly manage the buffer's lifetime, and the buffer will be freed when no longer referenced.
 
 ### Threading
 
-`ArrayBuffer` implementations are not thread-safe; if multiple threads simultaneously read from or write to an `ArrayBuffer`, race conditions can occur. To prevent this, developers must ensure that an `ArrayBuffer` is not accessed concurrently from different threads, for example by making sure that JavaScript thread does not modify the `ArrayBuffer` while native code is working on it.
+`ArrayBuffer` implementations are not thread-safe; if multiple threads simultaneously read from or write to an `ArrayBuffer`, race conditions can occur. This limitation extends from JSI and the JS engine itself, which are also not thread-safe.
+
+#### Current Approach: Developer Responsibility
+
+With borrowing semantics (JS-to-Native), developers must ensure that an `ArrayBuffer` is not accessed concurrently from different threads. For example, developers must avoid modifying an `ArrayBuffer` in JavaScript while native code is processing it on a background thread.
+
+**Critical Concern**: This places a significant burden on developers, especially those who may not be familiar with thread-safety concepts. JavaScript traditionally does not expose thread-safety concerns to developers - when working with Workers or WebWorkers, data is either copied or transferred (becoming inaccessible in the source thread). Requiring React Native developers to manually ensure thread-safety is inconsistent with JavaScript's typical safety guarantees and could lead to subtle, hard-to-debug race conditions.
+
+#### Alternative Approach: Transfer Semantics
+
+As discussed in the Memory Ownership section, transfer semantics (moving ownership rather than borrowing) would eliminate these thread-safety concerns:
+
+- The source thread would lose access to the buffer (it becomes "detached")
+- Only one thread can access the buffer at any time
+- No manual synchronization needed
+- Aligns with standard JavaScript behavior for transferable objects
+
+However, this requires underlying platform support not currently available in JSI/Hermes.
 
 ### Types
 
@@ -79,7 +119,7 @@ However, to maintain consistency with other types, we should add a helper `Array
 
 #### Java
 
-Java provides a class that matches our needs: `java.nio.ByteBuffer`. It offers the required functionality and can be created via `ByteBuffer.allocateDirect()` or `NewDirectByteBuffer()` to wrap existing memory without extra allocations — unlike a `byte[]` alternative. It also provides access to the raw data pointer, individual bytes, and its length.
+Java provides a class that matches our needs: `java.nio.ByteBuffer`. It offers the required functionality and can be created in Java via `ByteBuffer.allocateDirect()` or `NewDirectByteBuffer()` to wrap existing memory without extra allocations — unlike a `byte[]` alternative. There is also a JNI helper, `facebook::jni::JByteBuffer`, that can be used to simplify conversion. It also provides access to the raw data pointer, individual bytes, and its length.
 
 #### Objective-C
 
@@ -91,7 +131,7 @@ Below you can find required changes and example zero-copy conversion implementat
 
 #### C++
 
-No changes are needed in JSI. Its in-place support for `ArrayBuffer` already provides the necessary in-place conversion functionality.
+No changes are needed in JSI. Its built-in support for `ArrayBuffer` already provides the necessary in-place conversion functionality.
 
 #### Java
 
@@ -112,9 +152,8 @@ Java class `java.nio.ByteBuffer` can be constructed using JNI function `jobject 
     auto arrayBuffer = arg->asObject(rt).asArrayBuffer(rt);
     auto len = arrayBuffer.size(rt);
     auto data = arrayBuffer.data(rt);
-    auto directBuffer = env->NewDirectByteBuffer(
-        static_cast<void*>(data), static_cast<jlong>(len));
-    jarg->l = makeGlobalIfNecessary(directBuffer);
+    auto directBuffer = jni::JByteBuffer::wrapBytes(data, len);
+    jarg->l = makeGlobalIfNecessary(directBuffer.release());
     continue;
   }
   ...
@@ -238,6 +277,9 @@ The end goal of this RFC is to enable developers to use the `ArrayBuffer` type i
 export interface Spec extends TurboModule {
   getBuffer(): ArrayBuffer;
   processBuffer(buffer: ArrayBuffer): void;
+
+  getAsyncBuffer(): Promise<ArrayBuffer>;
+  processAsyncBuffer(buffer: ArrayBuffer): Promise<void>;
 }
 ```
 
@@ -250,8 +292,10 @@ protected:
 
 public:
   virtual jsi::ArrayBuffer getBuffer(jsi::Runtime &rt) = 0;
-  virtual jsi::Value generateAsyncBuffer(jsi::Runtime &rt) = 0;
-  virtual jsi::String processBuffer(jsi::Runtime &rt, jsi::ArrayBuffer buffer) = 0;
+  virtual void processBuffer(jsi::Runtime &rt, jsi::ArrayBuffer buffer) = 0;
+
+  virtual jsi::Value getAsyncBuffer(jsi::Runtime &rt) = 0;
+  virtual jsi::Value processAsyncBuffer(jsi::Runtime &rt, jsi::ArrayBuffer buffer) = 0;
 };
 ```
 
@@ -266,7 +310,15 @@ public abstract class NativeBufferSpec extends ReactContextBaseJavaModule implem
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   @DoNotStrip
-  public abstract String processBuffer(java.nio.ByteBuffer buffer);
+  public abstract void processBuffer(java.nio.ByteBuffer buffer);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void getAsyncBuffer(Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void processAsyncBuffer(java.nio.ByteBuffer buffer, Promise promise);
 }
 
 ```
@@ -277,7 +329,13 @@ public abstract class NativeBufferSpec extends ReactContextBaseJavaModule implem
 @protocol NativeBufferSpec <RCTBridgeModule, RCTTurboModule>
 
 - (NSMutableData *)getBuffer;
-- (NSString *)processBuffer:(NSMutableData *)buffer;
+- (void)processBuffer:(NSMutableData *)buffer;
+
+- (void)getAsyncBuffer:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject;
+- (void)processAsyncBuffer:(NSMutableData *)buffer
+                   resolve:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject;
 
 @end
 ```
@@ -286,19 +344,10 @@ public abstract class NativeBufferSpec extends ReactContextBaseJavaModule implem
 
 So far this RFC mentioned support for `ArrayBuffer` only for a specific range of use cases. As can be noticed in the section above, these are:
 
-- Function output argument (`getBuffer`)
-- Function input argument (`processBuffer`)
+- Synchronous function input/output argument (`getBuffer`/`processBuffer`)
+- Asynchronous function input/output argument (`getAsyncBuffer`/`processAsyncBuffer`)
 
 However, Codegen provides more functionality and broader support for types that can be shared across platforms. Below you can find the list (probably not full) of them:
-
-- Promises
-
-```ts
-export interface Spec extends TurboModule {
-  getBuffer(): ArrayBuffer;
-  getAsyncBuffer(): Promise<ArrayBuffer>;
-}
-```
 
 - Structs
 
@@ -339,7 +388,7 @@ It looks like the current implementation of `AsyncEventEmitter` requires an argu
 
 #### Java
 
-While in C++ and Objective-C data can be easily shared between JS and Native, Java stores the data as a `folly::dynamic` map on the Native side. The `folly` library has support for data buffers (class `IOBuf`). This means that JS buffers can be stored on the Native side, but its implementation will be more challenging. Moreover, classes responsible for storing variables, such as `NativeMap` or `NatviveArray`, have a rich inheritance tree and are widely used across the JNI files. Adding storage for buffers to them will require changes to a large number of `ReactAndroid` JNI and Java/Kotlin files. These changes are required to add support for e.g. Promises or Structs.
+While in C++ and Objective-C data can be easily shared between JS and Native, Java stores the data as a `folly::dynamic` map on the Native side. The `folly` library has support for data buffers (class `IOBuf`). This means that JS buffers can be stored on the Native side, but its implementation will be more challenging. Moreover, classes responsible for storing variables, such as `NativeMap` or `NativeArray`, have a rich inheritance tree and are widely used across the JNI files. Adding storage for buffers to them will require changes to a large number of `ReactAndroid` JNI and Java/Kotlin files. These changes are required to add support for e.g. Promises or Structs.
 
 #### Objective-C
 
@@ -347,10 +396,16 @@ No obstacles were found for this platform.
 
 #### Conclusion
 
-To conclude, supporting only simple function input/output parameters is straightforward, but extending that support to cover all Codegen functionalities across every platform is significantly more complex. However, integrating Promises and asynchronous operations may be crucial for supporting binary-heavy use cases. This leads to the question:
+Supporting only simple function input/output parameters is straightforward, but extending that support to cover all Codegen functionalities across every platform is significantly more complex. However, integrating Promises and asynchronous operations is crucial for supporting binary-heavy use cases.
 
-> [!IMPORTANT]
-> Should this RFC focus on introducing only the basic and most valuable synchronous support for ArrayBuffer, or should it aim for full coverage of all possible Codegen use cases, including asynchronous operations, despite the higher complexity and the impact on more files (especially on Android)?
+**RFC Scope**: This RFC aims to document the complete feature set and implementation approach for `ArrayBuffer` support across all Codegen use cases, including:
+
+- Synchronous function parameters (input/output)
+- Asynchronous operations (Promises)
+- Structs and nested objects
+- Events
+
+The implementation will follow an incremental rollout strategy (see Adoption Strategy section), starting with the highest-value synchronous cases and progressively adding more complex scenarios. Each phase will be delivered through focused PRs that can be reviewed and tested independently.
 
 ## Drawbacks
 
@@ -362,7 +417,61 @@ I considered other native types. For Java, `byte[]` was considered but it doesn'
 
 ## Adoption strategy
 
-Adoption will be non-breaking. The Codegen changes introduce a new type and generate platform glue that is backwards-compatible with existing TurboModules. Developers who are currently passing large buffers inefficiently (e.g., using `UnsafeObject` or `base64`) will need to manually update their code after this feature is implemented.
+Adoption will be non-breaking. The Codegen changes introduce a new type and generate platform glue that is backwards-compatible with existing TurboModules.
+
+### Incremental Rollout Plan
+
+The implementation will be delivered in phases, with each phase building on the previous one:
+
+#### Phase 1: Core Synchronous Support
+
+- **Scope**: Basic function parameters (input/output) for synchronous TurboModule methods
+- **Deliverables**:
+  - Codegen updates to recognize `ArrayBuffer` type
+  - Platform-specific type mappings and conversions
+  - Zero-copy bridge implementations
+  - Basic documentation
+
+#### Phase 2: Structs and Objects
+
+- **Scope**: `ArrayBuffer` as fields within structs and nested objects
+- **Deliverables**:
+  - Extend Codegen to support `ArrayBuffer` in type definitions
+  - Update `NativeMap`/`NativeArray` and equivalent structures to support buffers
+
+#### Phase 3: Asynchronous Operations
+
+- **Scope**: Promise support for async methods
+- **Deliverables**:
+  - Lifetime management for async `ArrayBuffer` parameters
+  - Promise resolution with `ArrayBuffer` values
+  - Clear documentation on thread-safety and lifetime guarantees
+
+#### Phase 4: Advanced Features
+
+- **Scope**: Events, Unions, Constants (as needed)
+- **Deliverables**:
+  - Event emitter support for `ArrayBuffer` payloads
+  - Add support for remaining Codegen functionalities (if exist)
+
+### Migration Path for Existing Code
+
+Developers who are currently using workarounds can migrate gradually:
+
+- **From Base64**: Replace string encoding/decoding with direct `ArrayBuffer` passing
+- **From UnsafeObject**: Update type definitions to use `ArrayBuffer`, remove manual JSI code
+- **From raw JSI access**: Adopt Codegen-generated bindings for type safety and reduced boilerplate
+
+### Core Modules Migration
+
+After Phase 1-3 are complete, React Native core modules should migrate to use the new `ArrayBuffer` support:
+
+- **BlobManager**: Primary candidate, would benefit immediately from zero-copy buffers
+- **FileReader/FileWriter**: Async binary file operations
+- **WebSocket**: Binary message frames
+- **Image Processing**: Loading/decoding raw image data
+
+These migrations will serve as real-world validation and provide reference examples for the community.
 
 ## How we teach this
 
@@ -374,8 +483,17 @@ This feature can be taught in a few different ways:
 
 ## Unresolved questions
 
-Open questions/topics for discussion:
+### 1. Transfer vs. Borrowing Semantics (Critical)
 
-1.  Thread-safety of the `ArrayBuffer` - do we need to implement any additional synchronization mechanism to make this change thread-safe?
-2.  Should we introduce two kinds of buffers, mutable and read-only, in order to improve DX and solve potential concerns about thread-safety?
-3.  Should this RFC focus on introducing only the basic and most valuable synchronous support for ArrayBuffer, or should it aim for full coverage of all possible Codegen use cases, including asynchronous operations, despite the higher complexity and the impact on more files (especially on Android)?
+Which memory ownership model should be chosen for JS-to-Native passing?
+
+- **Current**: Borrowing (pragmatic, requires manual thread-safety)
+- **Alternative**: Transfer (thread-safe, aligns with web standards, requires JSI/Hermes new APIs or workarounds), Shared (by keeping JS object alive).
+
+### 2. Async Lifetime Management
+
+How to handle `ArrayBuffer` lifetime in async operations? Possible options:
+
+1.  Sync-only initially
+2.  Automatic lifetime extension
+3.  Explicit transfer/copy
