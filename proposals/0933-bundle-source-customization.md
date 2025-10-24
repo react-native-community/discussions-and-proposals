@@ -59,19 +59,26 @@ Second, make it rely on [`RCTBundleManager`](https://github.com/facebook/react-n
 @property (nonatomic, readonly, nullable) RCTCustomBundleConfiguration *customBundleConfig;
 ```
 ```objective-c
+typedef NSMutableArray<NSURLQueryItem *> *_Nullable (^RCTPackagerOptionsUpdater)(
+    NSMutableArray<NSURLQueryItem *> *_Nullable options);
+
 @interface RCTCustomBundleConfiguration
 
 @property (nonatomic, readonly, nullable) NSURL *bundleFilePath;
 
+@property (nonatomic, readonly, nullable) NSString *bundlePath;
+
 @property (nonatomic, readonly, nullable) NSString *packagerServerScheme;
+
+@property (nonatomic, copy, nullable) RCTPackagerOptionsUpdater packagerOptionsUpdater;
 
 @property (nonatomic, readonly, nullable) NSString *packagerServerHost;
 
-- (NSURL *)getBundleURL:(NSMutableArray<NSURLQueryItem *> *)query;
+- (nullable NSURL *)getBundleURL:(NSURL *_Nullable (^_Nullable)(void))fallbackURLProvider;
 
 @end
 ```
-Only one of `bundleFilePath` and `(packagerServerScheme, packagerServerHost)` would be allowed to be set. This configuration object would be set on the `RCTReactNativeFactory`, which would pass it down to `RCTRootViewFactory`, which would pass it down to `RCTHost`. `RCTHost` would need to be modified to accept the new configuration object and set it to the instance of [`RCTBundleManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm#L166).
+Only one of `bundleFilePath` and `(bundlePath, packagerServerScheme, packagerServerHost)` would be allowed to be set. This configuration object would be set on the `RCTReactNativeFactory`, which would pass it down to `RCTRootViewFactory`, which would pass it down to `RCTHost`. `RCTHost` would need to be modified to accept the new configuration object and set it to the instance of [`RCTBundleManager`](https://github.com/facebook/react-native/blob/504cf3e9330285ba8995dd938756d2ea13ffa28d/packages/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm#L166).
 
 The logic responsible for building the URL query from [`RCTBundleURLProvider::jsBundleURLForBundleRoot`](https://github.com/facebook/react-native/blob/f21a89078c69a71a9ff5fd6ba77b38ec9ed272f4/packages/react-native/React/Base/RCTBundleURLProvider.mm#L305-L352) would be extracted to a separate method - `createJsBundleURLQuery`. It would return the default query, which would then be passed to the `getBundleURL` method in the configuration object, where it could be modified by the frameworks before returning the final URL.
 
