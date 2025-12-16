@@ -1,5 +1,5 @@
 ---
-title: [iOS] Migration to SceneDelegate
+title: \[iOS\] Migration to SceneDelegate
 author:
 - artus9033
 date: 16.12.2025
