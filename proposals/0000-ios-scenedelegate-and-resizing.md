@@ -30,7 +30,7 @@ N/A
 
 ## Motivation
 
-Support for iOS scene lifecycle APIs that are the current preferred approach for apps. The secondary reason is to remediate the problem when the UIScene lifecycle will become mandatory in a future release of iOS.
+Support for iOS scene lifecycle APIs that are the current preferred approach for apps. The secondary reason is to remediate the problem when the `UIScene` lifecycle will become mandatory in a future release of iOS.
 
 As an example, the following key APIs are already deprecated:
 
@@ -42,7 +42,7 @@ As an example, the following key APIs are already deprecated:
 
 ### `SceneDelegate` `RCTReactNativeFactory` entrypoint
 
-To support `SceneDelegate` lifecycle, a new entrypoint for RN application initialization should be provided in `RCTReactNativeFactory`, which would be invoked from `SceneDelegate` lifecycle methods. The existing entrypoint from `AppDelegate` would be kept for backwards compatibility, making this an additive change. An example code snippet of a ``SceneDelegate`` using React Native proposed in this RFC would be:
+To support `SceneDelegate` lifecycle, a new entrypoint for RN application initialization should be provided in `RCTReactNativeFactory`, which would be invoked from `SceneDelegate` lifecycle methods. The existing entrypoint from `AppDelegate` would be kept for backwards compatibility, making this an additive change. An example code snippet of a `SceneDelegate` using React Native proposed in this RFC would be:
 
 ```objc
 @interface SceneDelegate ()
@@ -87,16 +87,16 @@ To support `SceneDelegate` lifecycle, a new entrypoint for RN application initia
 
 ### Migration from `AppDelegate` to `SceneDelegate`
 
-Adoption of UIScene lifecycle requires the following actions:
+Adoption of `UIScene` lifecycle requires the following actions:
 
 * In application base code  
   * migration from `AppDelegate` as the primary point of lifecycle-related logic to `SceneDelegate`; for backwards compatibility, RN public API integration points will still be compatible with `AppDelegate` approach for users that may not want to migrate immediately  
   * invoke RN `RCTLinkingManager` methods from `SceneDelegate`:  
     * `scene:continueUserActivity:`
     * `scene:openURLContexts:`
-  * update of the app's Info.plist to include a UIApplicationSceneManifest specifying the support and disabling multiple scenes capability  
+  * update of the app's Info.plist to include a `UIApplicationSceneManifest` specifying the support and disabling multiple scenes capability  
 * In React Native code:  
-  * migration of code that relies on `launchOptions` and deprecated `UIApplicationLaunchOptions`\* keys to UIScene lifecycle and UIScene.ConnectionOptions.userActivities  
+  * migration of code that relies on `launchOptions` and deprecated `UIApplicationLaunchOptions`\* keys to `UIScene` lifecycle and `UIScene.ConnectionOptions.userActivities`
 * In React Native code, RN native libraries’ code:  
   * migration of app lifecycle methods from application\* to scene\* as per [https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle)  
   * migration of code that relies on *any* *deprecated* `AppDelegate`-related APIs, which detailed description of is presented below
@@ -110,16 +110,16 @@ To enforce the user not to enable the `UIApplicationSceneManifest`.`UIApplicatio
 In case of the RN app template, the iOS boilerplate code is limited only to basic bootstrapping of the application. This implies adjustments to:
 
 * `Info.plist` \- add support for `SceneDelegate`  
-* ``SceneDelegate`.mm` \- implement the `SceneDelegate`  
-* ``AppDelegate`.mm` \- move app bootstrap code from here to ``SceneDelegate`.mm`
+* `SceneDelegate.mm` \- implement the `SceneDelegate`  
+* `AppDelegate.mm` \- move app bootstrap code from here to `SceneDelegate.mm`
 
 #### Migration: inspect usages of `RCTReactNativeFactory`
 
-Support methods for initializing React Native from ``SceneDelegate``’s lifecycle methods.
+Support methods for initializing React Native from `SceneDelegate`’s lifecycle methods.
 
 #### Migration: `RCTLinkingManager`
 
-The linking manager is using ``AppDelegate`` methods for handling URLs being opened at runtime. This needs to be migrated to `SceneDelegate`. To maintain backwards compatibility, we can implement both approaches and \- to ensure that only one is invoked at a given time \- conditionally check if the app is based on ``AppDelegate`` or has scenes to ensure only one listener handles the event. The Scene lifecycle options (`NSDictionary`) are adapted to the format of ``AppDelegate`` launchOptions (`NSDictionary` as well).
+The linking manager is using `AppDelegate` methods for handling URLs being opened at runtime. This needs to be migrated to `SceneDelegate`. To maintain backwards compatibility, we can implement both approaches and \- to ensure that only one is invoked at a given time \- conditionally check if the app is based on `AppDelegate` or has scenes to ensure only one listener handles the event. The Scene lifecycle options (`NSDictionary`) are adapted to the format of `AppDelegate` launchOptions (`NSDictionary` as well).
 
 #### Migration: RCTDevLoadingView
 
