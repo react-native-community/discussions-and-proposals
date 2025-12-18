@@ -18,9 +18,8 @@ This RFC will bring in an additive change that should allow for adoption of a ne
 
 This RFC will bring in an additive change that should allow for adoption of a new `SceneDelegate` entrypoint while also allowing for (deprecated) usage of `AppDelegate`. Also, the `@react-native-community/template` and `packages/rn-tester` should be migrated to implement the `SceneDelegate` API.
 
-:::note
-It is possible to perform dynamic window resizing both via stage manager (split view) and freely via the bottom-right corner handle. `SceneDelegate` with proper configuration in `Info.plist` can enable the multi-window capability for iPadOS, which would require adjustments in React Native code and React Native libraries code to accommodate such design. Such a change would be large and shall be addressed in a separate RFC. The scope of this RFC is to cover a single resizable window (single instance of a given React Native app), yielding the assumption that `UIApplicationSupportsMultipleScenes` **must not** be set to true at the moment. 
-:::
+> [!NOTE]
+> It is possible to perform dynamic window resizing both via stage manager (split view) and freely via the bottom-right corner handle. `SceneDelegate` with proper configuration in `Info.plist` can enable the multi-window capability for iPadOS, which would require adjustments in React Native code and React Native libraries code to accommodate such design. Such a change would be large and shall be addressed in a separate RFC. The scope of this RFC is to cover a single resizable window (single instance of a given React Native app), yielding the assumption that `UIApplicationSupportsMultipleScenes` **must not** be set to true at the moment. 
 
 ## Basic example
 
