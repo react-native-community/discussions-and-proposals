@@ -9,7 +9,7 @@ date: 16.12.2025
 
 ## Summary
 
-iOS26 introduced deprecation of many UIApplication APIs and made `SceneDelegate` API the preferred one, notifying programmers with a warning that "UIScene lifecycle will soon be required". In future versions of iOS, `SceneDelegate` [is going to be the only supported API](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle#:~:text=Failure%20to%20adopt%20will%20result%20in%20an%20assert%20in%20the%20future.) and therefore we need to start migrating to it.
+iOS26 introduced deprecation of many UIApplication APIs and made UIScene lifecycle - achieveable with the `SceneDelegate` API - the preferred one, notifying programmers with a warning that "UIScene lifecycle will soon be required". In future versions of iOS, `SceneDelegate` [is going to be the only supported API](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle#:~:text=Failure%20to%20adopt%20will%20result%20in%20an%20assert%20in%20the%20future.) and therefore we need to start migrating to it.
 
 ![](assets/0000-ios-deprecation-warning.png)
 
@@ -19,7 +19,7 @@ One related aspect not covered by this RFC is the performance of `useWindowDimen
 
 The idea proposed in this RFC is to:
 
-1) migrate from `AppDelegate` to `SceneDelegate`  
+1) migrate from `AppDelegate` to UIScene lifecycle by adopting `SceneDelegate`
 2) educate on the need to migrate existing apps to adopt `SceneDelegate`
 
 ## Basic example
