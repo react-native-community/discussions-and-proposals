@@ -106,7 +106,7 @@ type ExtensionsConfig = {
 
 At runtime, `dev-middleware` resolves each package on the filesystem, validates the manifest, and serves the extension assets from the development server.
 
-- `/debugger-frontend/embedder-static/extensionsConfig.js` — dynamically served script (loaded by the RNDT frontend) that populates `globalThis.__DEVTOOLS_EXTENSIONS__` with the resolved extension entries.
+- `/debugger-frontend/embedder-runtime/extensionsConfig.js` — dynamically served script (loaded by the RNDT frontend) that populates `globalThis.__DEVTOOLS_EXTENSIONS__` with the resolved extension entries.
 - `/devtools-extensions/<packageNameSanitized>/<asset>` — serves extension static assets.
 
 ---
