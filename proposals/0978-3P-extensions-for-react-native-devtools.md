@@ -212,10 +212,45 @@ The page registered via `chrome.devtools.panels.create()` is loaded inside an if
 
 The extension API injected at runtime exposes a strict subset of Chrome's `chrome.devtools` namespace. Initially:
 
-- `chrome.devtools.panels.create(title, iconPath, pagePath)` — registers a new panel tab in RNDT.
-- `chrome.devtools.inspectedWindow.eval(expression, callback)` — evaluates a JavaScript expression in the context of the inspected React Native runtime.
+| API | Supported | Notes |
+|---|---|---|
+| `chrome.devtools.panels.create()` | Yes | Registers a new panel tab in RNDT |
+| `chrome.devtools.inspectedWindow.eval()` | Yes | Evaluates JS in the inspected RN runtime |
 
 This is intentionally minimal. Further APIs can be added incrementally.
+
+#### Implementation detail: `inspectedWindow.eval()` and CDP
+
+Under the hood, `chrome.devtools.inspectedWindow.eval()` is implemented via the CDP `Runtime.evaluate` method on the inspected target's WebSocket connection. For extensions that need **bidirectional communication** with the inspected runtime (e.g. subscribing to state changes), we support the `Runtime.addBinding` / `Runtime.bindingCalled` pattern:
+
+```
+Extension (panel.html)              RNDT Host                  RN Runtime (Hermes)
+        │                               │                              │
+        │  inspectedWindow.eval(        │                              │
+        │    'setupBinding()')          │                              │
+        │  ─────────────────────────►   │  Runtime.evaluate            │
+        │                               │  ────────────────────────►   │
+        │                               │                              │  Registers binding via
+        │                               │                              │  global.__EXTENSION_SEND__
+        │                               │                              │
+        │                               │  Runtime.addBinding          │
+        │                               │  ('__EXTENSION_SEND__')      │
+        │                               │  ────────────────────────►   │
+        │                               │                              │
+        │                               │         Runtime.bindingCalled│
+        │                               │  ◄────────────────────────   │
+        │  postMessage(data)            │                              │
+        │  ◄────────────────────────    │                              │
+        │                               │                              │
+        │  inspectedWindow.eval(        │                              │
+        │    'handleResponse(…)')       │                              │
+        │  ─────────────────────────►   │  Runtime.evaluate            │
+        │                               │  ────────────────────────►   │
+```
+
+This enables a persistent communication channel between the extension panel and the React Native runtime — e.g. a Redux DevTools extension subscribing to store updates.
+
+**Extensions MUST only communicate with the React Native runtime via these APIs.** Panels run in sandboxed iframes — no direct access to the runtime's JS context, WebSocket connection, or CDP session. All reads and writes are proxied by the RNDT host over the existing CDP session.
 
 #### Optional: `@react-native/devtools-extensions-api` types package
 
