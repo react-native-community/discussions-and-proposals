@@ -5,11 +5,13 @@ author:
 date: 2025-10-20
 ---
 
-# RFC0000: Strip Flow Types from React Native Published Package
+# RFC0949: Strip Flow Types from Published `react-native` Package
 
 ## Summary
 
-This proposal seeks to remove Flow type annotations from the JavaScript code published to npm in the `react-native` package. Currently, React Native ships JavaScript files that contain Flow annotations plus separate TypeScript definition files (`.d.ts`). This proposal would strip the Flow annotations from the JavaScript source files while maintaining the existing TypeScript definitions and adding Flow definition files (`.js.flow`) for Flow users.
+This proposal seeks to modernize the `react-native` npm package by distributing plain JavaScript source code with Flow types stripped. This will help the ecosystem by significantly expanding compatibility with modern JS parsers and tooling, and reducing coupling with the user-land `@react-native/babel-preset`.
+
+For Flow users, we will introduce a `"flow"` `exports` condition which points to the Flow source files.
 
 ## Basic example
 
@@ -67,9 +69,9 @@ const ActivityIndicator = ({
 };
 ```
 
-**Flow definitions:**
+**Flow source (resolved via the `"flow"` `exports` condition):**
 ```javascript
-// react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.js.flow
+// react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.js
 // @flow
 
 import type {HostComponent} from '../../../src/private/types/HostComponent';
@@ -109,6 +111,7 @@ The JavaScript tooling ecosystem is moving fast. There are very good alternative
 Modern build tools and test runners increasingly do not support Flow syntax out of the box:
 - **SWC and @swc/jest**: Fast Rust-based transpiler that is becoming the standard for performance-conscious projects. Flow syntax is not officially supported. They don't plan to support Flow https://github.com/swc-project/swc/issues/256.
 - **esbuild**: Fast go-based bundler, doesn't plan to support Flow either. See https://github.com/evanw/esbuild/issues/79
+- **oxc**: Fast Rust-based JavaScript toolchain.
 - **Vitest**: Modern test runner that's gaining popularity as a Jest alternative.
 
 Projects using these tools must add extra transformation layers specifically to handle Flow syntax from `react-native`, adding complexity and slowing build times.
@@ -130,17 +133,17 @@ After this change:
 
 ## Detailed design
 
-React Native's publishing pipeline would gain a Flow stripping step:
+React Native's publishing pipeline would gain a Flow stripping step, and introduce a `"flow"` `exports` condition:
 
 1. **Build Process**:  
    - Use `@babel/plugin-transform-flow-strip-types` or `flow-remove-types` to remove Flow annotations at publish time.  
-   - Preserve the original Flow-typed sources as `.js.flow` files.
+   - Preserve the original Flow-typed sources, which will be available via the `"flow"` `exports` condition.
 
 2. **Package Structure:**  
    The npm package would include:
    - Plain `.js` files → Flow annotations stripped  
    - Existing `.d.ts` files for TypeScript  
-   - Matching `.js.flow` files for Flow users  
+   - Flow-typed source files for Flow users (via the `"flow"` `exports` condition)
 
 3. **Source Repository:**  
    The React Native source would remain Flow-typed internally. Only the published output changes.
@@ -148,15 +151,15 @@ React Native's publishing pipeline would gain a Flow stripping step:
 ## Drawbacks
 
 - **Build Pipeline**: Adds a Flow stripping step to the release process
-- **Flow Users**: May perceive this as reduced Flow support (though `.js.flow` files maintain compatibility)
+- **Flow Users**: May perceive this as reduced Flow support (though the Flow-typed sources remain available via the `"flow"` `exports` condition)
 
 ## Alternatives
 
-The alternative is to keep Flow annotations in JavaScript files and require each tool (SWC, esbuild, etc.) to strip Flow types using `flow-remove-types` or equivalent (Rust-based for SWC, Go-based for esbuild etc). However, this would be a repetitive task executed each time these tools run, causing performance loss compared to shipping plain JavaScript.
+The alternative is to keep Flow annotations in JavaScript files and require each tool (SWC, esbuild, oxc etc.) to strip Flow types using `flow-remove-types` or equivalent (Rust-based for SWC and oxc, Go-based for esbuild etc). However, this would be a repetitive task executed each time these tools run, causing performance loss compared to shipping plain JavaScript.
 
 ## Adoption strategy
 
-Since this is a non-breaking change (`.js.flow` files maintain Flow compatibility), this can be shipped in any release with no migration needed.
+This is intended to be a non-breaking change for default consumers, and can be shipped in any release with no migration needed. Flow users can opt into the `"flow"` `exports` condition, which may require resolver/tooling configuration to select the `"flow"` condition.
 
 ## How we teach this
 
@@ -164,5 +167,4 @@ This change can be documented in the release notes.
 
 ## Unresolved questions
 
-- Should we publish `.js.flow` files for Flow users, or drop Flow support entirely?
-- If `.js.flow` files are included, should we strip implementation bodies and only keep the type declarations to reduce npm package size?
+- Will the built files overwrite the source codebase locations on publish? Ideally not. This could involve copying more files into a dist/ directory, or using suffix-based filenames mapped via `exports`.
