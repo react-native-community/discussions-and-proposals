@@ -1,15 +1,15 @@
 ---
-title: Strip Flow Types from React Native Published Package
+title: Ship Standard JavaScript from React Native Published Package
 author:
 - Bruno Bodian
 date: 2025-10-20
 ---
 
-# RFC0949: Strip Flow Types from Published `react-native` Package
+# RFC0949: Ship Standard JavaScript from Published `react-native` Package
 
 ## Summary
 
-This proposal seeks to modernize the `react-native` npm package by distributing plain JavaScript source code with Flow types stripped. This will help the ecosystem by significantly expanding compatibility with modern JS parsers and tooling, and reducing coupling with the user-land `@react-native/babel-preset`.
+This proposal seeks to modernize the `react-native` npm package by distributing standard JavaScript output (published `.js` files that contain no Flow syntax). This will help the ecosystem by significantly expanding compatibility with modern JS parsers and tooling, and reducing coupling with the user-land `@react-native/babel-preset`.
 
 For Flow users, we will introduce a `"flow"` `exports` condition which points to the Flow source files.
 
@@ -54,7 +54,7 @@ const ActivityIndicator: component(
 
 ```javascript
 // react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.js
-// Plain JavaScript (Flow annotations stripped)
+// Standard JavaScript (no Flow syntax)
 import StyleSheet from '../../StyleSheet/StyleSheet';
 import Platform from '../../Utilities/Platform';
 import View from '../View/View';
@@ -102,7 +102,7 @@ declare export function ActivityIndicator(
 
 ### Why are we doing this?
 
-The JavaScript tooling ecosystem is moving fast. There are very good alternatives, that are mainly rust and go-based, which are created to improve the build speed and performance. As of today, React Native still ships Flow code on npm, relying on userland babel to strip these tags even though most React Native developers don't use Flow.
+The JavaScript tooling ecosystem is moving fast. There are very good alternatives, that are mainly rust and go-based, which are created to improve the build speed and performance. As of today, React Native still ships Flow code on npm, relying on userland babel to remove/transform Flow syntax even though most React Native developers don't use Flow.
 
 ### What problems does this solve?
 
@@ -118,7 +118,7 @@ Projects using these tools must add extra transformation layers specifically to 
 
 #### 2. **Build Efficiency**
 
-Currently, `react-native-babel-preset` strips Flow types on every build using `@babel/plugin-transform-flow-strip-types`. This means every developer's build process repeatedly performs the same Flow stripping operation. Stripping Flow types once at publish time would be more efficient and eliminate this redundant work from every build. Additionally, shipping plain JavaScript would open the door for React Native to potentially use bundlers other than Babel in the future.
+Currently, `react-native-babel-preset` removes/transforms Flow syntax on every build using a set of plugins (e.g. `@babel/plugin-transform-flow-strip-types` plus additional transforms such as `babel-plugin-transform-flow-enums`). This means every developer's build process repeatedly performs the same Flow-to-standard-JavaScript transformation. Doing this once at publish time would be more efficient and eliminate this redundant work from every build. Additionally, shipping standard JavaScript would open the door for React Native to potentially use bundlers other than Babel in the future.
 
 #### 3. **Alignment with Ecosystem Standards**
 
@@ -133,29 +133,29 @@ After this change:
 
 ## Detailed design
 
-React Native's publishing pipeline would gain a Flow stripping step, and introduce a `"flow"` `exports` condition:
+React Native's publishing pipeline would gain a Flow-to-standard-JavaScript transform step, and introduce a `"flow"` `exports` condition:
 
-1. **Build Process**:  
-   - Use `@babel/plugin-transform-flow-strip-types` or `flow-remove-types` to remove Flow annotations at publish time.  
-   - Preserve the original Flow-typed sources, which will be available via the `"flow"` `exports` condition.
+1. **Build Process**:
+    - Use a publish-time transform pipeline by reusing the Flow-related transforms from `@react-native/babel-preset` to emit standard JavaScript output. This is not limited to stripping type annotations. It also includes transforms for Flow syntax features (e.g. enums).
+    - Preserve the original Flow-typed sources, which will be available via the `"flow"` `exports` condition.
 
-2. **Package Structure:**  
-   The npm package would include:
-   - Plain `.js` files → Flow annotations stripped  
-   - Existing `.d.ts` files for TypeScript  
-   - Flow-typed source files for Flow users (via the `"flow"` `exports` condition)
+2. **Package Structure:**
+    The npm package would include:
+    - Plain `.js` files → standard JavaScript output (no Flow syntax)
+    - Existing `.d.ts` files for TypeScript
+    - Flow-typed source files for Flow users (via the `"flow"` `exports` condition)
 
 3. **Source Repository:**  
    The React Native source would remain Flow-typed internally. Only the published output changes.
 
 ## Drawbacks
 
-- **Build Pipeline**: Adds a Flow stripping step to the release process
+- **Build Pipeline**: Adds a Flow-to-standard-JavaScript transform step to the release process
 - **Flow Users**: May perceive this as reduced Flow support (though the Flow-typed sources remain available via the `"flow"` `exports` condition)
 
 ## Alternatives
 
-The alternative is to keep Flow annotations in JavaScript files and require each tool (SWC, esbuild, oxc etc.) to strip Flow types using `flow-remove-types` or equivalent (Rust-based for SWC and oxc, Go-based for esbuild etc). However, this would be a repetitive task executed each time these tools run, causing performance loss compared to shipping plain JavaScript.
+The alternative is to keep Flow syntax in JavaScript files and require each tool (SWC, esbuild, oxc etc.) to transpile Flow into standard JavaScript (strip type annotations and apply transforms for Flow-only syntax) using `flow-remove-types` plus additional transforms, or an equivalent pipeline (Rust-based for SWC and oxc, Go-based for esbuild etc). However, this would be a repetitive task executed each time these tools run, causing performance loss compared to shipping standard JavaScript.
 
 ## Adoption strategy
 
