@@ -5,7 +5,7 @@ author:
 date: 2026-04-09
 ---
 
-# RFC0000: Swift Package Manager Support for React Native iOS Projects
+# RFC0994: Swift Package Manager Support for React Native iOS Projects
 
 ## Summary
 
