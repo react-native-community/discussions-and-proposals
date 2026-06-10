@@ -72,7 +72,7 @@ To measure AGP v9 impact, we ran a discovery phase by enabling AGP v9 on React N
 
 For React Native core, the following changes were required in `react-native-community/template` and `facebook/react-native`:
 
-**react-native-community/template**:
+### react-native-community/template
 
 - Upgrade to Gradle v9.4.1
   - This is already addressed in https://github.com/react-native-community/template/pull/227
@@ -83,7 +83,7 @@ For React Native core, the following changes were required in `react-native-comm
 - Enable opt outs in `gradle.properties`
   - This is already addressed in https://github.com/react-native-community/template/pull/224
 
-**facebook/react-native**:
+### facebook/react-native
 
 - Upgrade to Gradle v9.4.1
   - This is already addressed in https://github.com/facebook/react-native/pull/57078
@@ -98,12 +98,14 @@ For React Native core, the following changes were required in `react-native-comm
 
 This completes Phase 1 described above.
 
+<hr/>
+
 The second area is AGP v9 compatibility for community libraries. Below are the common migration patterns and library-specific notes.
 
-**Community libraries**:
+### Community libraries
 
 Below is the matrix used during discovery:
-
+  
 | Library | Version | Patch link |
 | --- | --- | --- |
 | react-native-reanimated | v4.3.1 | https://github.com/hurali97/RN-AGP9-support/blob/main/patches/react-native-reanimated%2B4.4.1.patch |
@@ -121,6 +123,8 @@ Below is the matrix used during discovery:
 | async-storage | v3.1.0 | https://github.com/hurali97/RN-AGP9-support/blob/main/patches/%40react-native-async-storage%2Basync-storage%2B3.1.0.patch |
 | nitro-image | v0.14.0 | https://github.com/hurali97/RN-AGP9-support/blob/main/patches/react-native-nitro-image%2B0.14.0.patch |
 
+<hr/>
+
 - Most libraries apply the `kotlin-android` plugin in `build.gradle`. With built-in Kotlin, this is no longer needed and can fail builds.
 - Previously, `java.srcDirs` plus `kotlin-android` covered Kotlin-only sources. With built-in Kotlin, Kotlin-only sources should be defined via `kotlin.srcDirs`.
 - `.srcDirs` is deprecated in favor of `.directories`.
@@ -131,8 +135,14 @@ The points above cover common migration work. One notable library-specific case:
 
 - The `nitrogen` template (used by Nitro modules) defines `java.srcDirs` for Kotlin-only sources. With built-in Kotlin this must move to `kotlin.directories.add`.
 
+</details>
+
+<hr/>
+
 **Expo**:
 [TBA]
+
+<hr/>
 
 ## Adoption strategy
 
