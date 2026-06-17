@@ -1,0 +1,26 @@
+<!--
+Thank you for starting a discussion about React Native!
+
+Please follow the structure shown below.
+
+Note: Issues should be limited to long-form discussions.
+If you have a proposal, please add it via a Pull Request.
+-->
+
+### Introduction
+
+<!--
+A brief intro about the topic you want to discuss.
+-->
+
+Hello everyone. I have a feature request that I believe is not able to be achieved with the current `TextInput` component implementation.
+
+### Details
+
+Specifically, I would like it to be possible to always show the placeholder in a `TextInput`. This would be useful when there is a prompt for with a multiline input and the user can still follow along the prompt, typing, while the placeholder would dissapear as they type. I would leave it up to react developers to then make the `placeholder` content stateful for this type of behaviour, but it would at least need to be the case to expose such an `alwaysShowPlaceholder` prop.
+
+### Discussion points
+
+This would require the `boolean` prop `alwaysShowPlaceholder` to be exposed on the `TextInput` component. Then the question becomes if this type of behaviour is even possible according to native modules.
+
+If this is possible already using the `TextInput` component, please let me know. But obviously I've read the docs and don't believe it is, thus this proposal :)
