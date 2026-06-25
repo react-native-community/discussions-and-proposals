@@ -28,33 +28,37 @@ If React Native intends to deprecate CocoaPods in December 2026, it needs a migr
 
 NOTE: The following examples use the demo branch but will be implemented in react-native-cli with the same parameters and interface.
 
-For a new project, the prototype SPM setup is initialized with:
+For a new project, SPM is set up with:
 
 ```bash
-yarn ios --init # it calls node node_modules/react-native/scripts/setup-ios-spm.js --init under the hoods
-
+npx react-native spm  # invokes node node_modules/react-native/scripts/setup-apple-spm.js
+                      # with no action — auto-resolves to the right verb (see below)
 ```
 
-That command:
+The command exposes four verbs; with no action it auto-resolves which one to run:
 
-- runs React Native Codegen,
-- generates `autolinked/Package.swift`,
-- downloads the required prebuilt XCFramework artifacts,
-- generates the local SPM packages consumed by the app, and
-- creates an Xcode project configured for the SPM flow.
+- `add` — runs React Native Codegen, generates
+  `build/generated/autolinking/Package.swift`, downloads the prebuilt XCFramework
+  artifacts, generates the local SPM packages, and **injects** the SPM package
+  references into the app's existing Xcode project, in place. The injection is
+  additive and idempotent, and is recorded in a `.spm-injected.json` marker.
+  Default on a first run.
+- `update` — re-runs the pipeline and refreshes the existing injection. Default
+  once a project has been set up.
+- `deinit` — the exact inverse of `add`: surgically removes only what `add`
+  injected (using the marker) and drops it. Git-recoverable; no prompt.
+- `scaffold` — generates a `Package.swift` for community libraries that ship only
+  a podspec.
 
-After initialization, manual refresh is done with:
-
-```bash
-yarn ios # it calls node node_modules/react-native/scripts/setup-ios-spm.js under the hoods
-```
-
-And a full reset of generated state is done with:
-
-```bash
-yarn ios --clean # it calls node node_modules/react-native/scripts/setup-ios-spm.js --clean under the hoods
-
-```
+For an app that still uses CocoaPods, `add --deintegrate` first runs
+`pod deintegrate` and strips React Native from the Podfile, then injects SPM —
+converting the project in one step. The zero-arg `npx react-native spm` detects a
+freshly-scaffolded CocoaPods project and does this automatically; on an
+established app it stops and points the developer at `--deintegrate`. To remove
+SPM again, `npx react-native spm deinit` (then `pod install` to return to
+CocoaPods). Because the integration is injected in place rather than generated
+from scratch, the app keeps its own `.xcodeproj` (signing, capabilities, build
+phases) — no project is renamed or replaced.
 
 ## Detailed design
 
@@ -73,14 +77,14 @@ At a high level, React Native core is exposed to app projects as a small set of 
 - `ReactNativeDependencies`, which packages the native third-party dependencies used by React Native
 - `hermes-engine`, which provides the Hermes runtime
 
-The prototype uses a single script, `setup-ios-spm.js`, to prepare an app for this layout. That script:
+The prototype uses a single script, `setup-apple-spm.js`, to prepare an app for this layout. That script:
 runs Codegen,
 generates SPM autolinking,
 downloads the required artifacts,
-generates the package manifests
-creates an Xcode project configured for the SPM flow.
+generates the package manifests, and
+injects the SPM package references into the app's existing Xcode project, in place.
 
-From the app’s point of view, the integration stays relatively simple: the app’s `Package.swift` depends on three locally generated packages for React Native core, generated code, and autolinked native modules. The generated Xcode project also includes an auto-sync build phase that refreshes autolinking when dependencies change.
+From the app’s point of view, the integration stays relatively simple: the app's Xcode project references three locally generated packages — React Native core, generated code, and autolinked native modules — through `XCLocalSwiftPackageReference` entries. The injection also adds an auto-sync build phase that refreshes autolinking when dependencies change. No app-level `Package.swift` is generated or required; the sub-package paths under `build/` are stable, so adding or removing community deps never requires re-injecting. The edit is purely additive and recorded in a `.spm-injected.json` marker, so it can be reversed exactly (`deinit`) without touching the rest of the project.
 
 This RFC does not propose a new packaging model from scratch. Instead, it proposes standardizing and evolving the implementation direction already demonstrated in the prototype branch.
 
@@ -88,63 +92,62 @@ This RFC does not propose a new packaging model from scratch. Instead, it propos
 
 The current prototype keeps the React Native autolinking model, but changes the output from CocoaPods configuration to Swift Package Manager configuration.
 
-Instead of generating Podfile integration, the SPM flow generates a local `autolinked/Package.swift` that collects the native React Native dependencies discovered in the app. This package is then added as a dependency of the app’s main `Package.swift`, alongside the generated Codegen package and the React Native core package.
+Instead of generating Podfile integration, the SPM flow generates a local `build/generated/autolinking/Package.swift` that collects the native React Native dependencies discovered in the app. The generated Xcode project references this package directly via `XCLocalSwiftPackageReference`, alongside the generated Codegen package and the React Native core package.
 
 At a high level, the flow is:
 
 1. React Native Codegen generates the native metadata and codegen artifacts for the app.
 2. The SPM autolinking step reads the generated autolinking metadata and the app’s `react-native.config.js`.
-3. It produces `autolinked/Package.swift`, which contains local package targets for the app’s native dependencies.
-4. The app’s generated Xcode project depends on that package, so native modules are available through normal SPM package resolution.
+3. It produces `build/generated/autolinking/Package.swift`, which contains local package targets for the app’s native dependencies.
+4. The Xcode project references that package, so native modules are available through normal SPM package resolution.
 
 This keeps the developer-facing model close to today’s React Native workflow: dependencies are still discovered from the JavaScript project, but the integration backend is SPM instead of CocoaPods.
-Local modules
-The prototype also supports additional local modules through `spmModules` in `react-native.config.js`. This makes it possible to include native code that is not otherwise discovered through standard autolinking.
+
+###Local modules
+The prototype also supports additional local modules through `spm.modules` in `react-native.config.js`. This makes it possible to include native code that is not otherwise discovered through standard autolinking.
 
 For example:
 
 ```js
 module.exports = {
-  spmModules: [
-    {
-      name: "MyNativeModule",
-      path: "ios/MyNativeModule",
-      exclude: ["*.podspec"],
-      publicHeadersPath: ".",
-    },
-  ],
+  spm: {
+    modules: [
+      {
+        name: "MyNativeModule",
+        path: "ios/MyNativeModule",
+        exclude: ["*.podspec"],
+        publicHeadersPath: ".",
+      },
+    ],
+  },
 };
 ```
 
 For a new project, the initial setup is performed with:
 
 ```bash
-yarn ios --init
+npx react-native spm
 ```
 
-This first-time setup generates the initial `Package.swift`, the generated SPM packages, and the Xcode project for the app.
+This first-time setup generates the SPM sub-packages and injects them into the app's existing Xcode project in place. On a CocoaPods project, `npx react-native spm add --deintegrate` removes CocoaPods first (and the zero-arg command does this automatically when it detects a freshly-scaffolded CocoaPods app), so no project is renamed and `npm run ios` resolves to the same `.xcodeproj`.
 
-After initialization, autolinking is normally kept up to date automatically by the generated Xcode project. The prototype adds an auto-sync build phase that detects dependency changes and regenerates the autolinked package before compilation when needed.
+After initialization, autolinking is normally kept up to date automatically. The prototype adds an auto-sync build phase to the project that detects dependency changes and regenerates the autolinked package before compilation when needed.
 
 When a manual refresh is needed, for example after changing native dependencies or local module configuration, developers can re-run:
 
 ```bash
-yarn ios
+npx react-native spm   # resolves to `update` once the project is set up
 ```
 
-If generated state needs to be rebuilt from scratch, the prototype also supports:
-
-```bash
-yarn ios --clean
-```
+To remove the SPM integration again, `npx react-native spm deinit` reverses exactly what `add` injected.
 
 ### Codegen
 
 The current prototype keeps React Native Codegen as part of the normal iOS setup flow, but packages its output for Swift Package Manager instead of CocoaPods.
 
-In the implementation branch, `setup-ios-spm.js` starts by running the existing React Native Codegen pipeline and writing the generated output to `build/generated/ios/`. After that, it installs an SPM-specific `Package.swift` into that generated directory so the output can be consumed as a local Swift package.
+In the implementation branch, `setup-apple-spm.js` starts by running the existing React Native Codegen pipeline and writing the generated output to `build/generated/ios/`. After that, it installs an SPM-specific `Package.swift` into that generated directory so the output can be consumed as a local Swift package.
 
-From the app’s point of view, the generated code is exposed through a separate package, `React-GeneratedCode`, with products such as `ReactCodegen` and `ReactAppDependencyProvider`. The app’s main `Package.swift` then depends on that generated package alongside the React Native core package and the autolinked package.
+From the app’s point of view, the generated code is exposed through a separate package, `React-GeneratedCode`, with products such as `ReactCodegen` and `ReactAppDependencyProvider`. The Xcode project references that generated package alongside the React Native core package and the autolinked package.
 
 This keeps Codegen in roughly the same place in the developer workflow as today: it still runs before native compilation, but its output is expressed as SPM package targets rather than Pod targets.
 
@@ -162,10 +165,12 @@ Instead of asking each app to compile this dependency graph from source, the SPM
 
 These artifacts are downloaded during setup and cached locally, and the generated SPM package for the app links against them as binary targets. This keeps the app-facing package graph small and avoids moving the full complexity of the React Native native dependency tree into every application project.
 
-At the implementation level, the branch also addresses one of the key technical challenges of using prebuilt artifacts with React Native: header compatibility. React Native still uses many CocoaPods-style include paths such as `#import <React/...>`, which SPM does not handle directly. The prototype solves this by combining:
+At the implementation level, the branch also addresses one of the key technical challenges of using prebuilt artifacts with React Native: header compatibility. React Native uses both framework-style includes such as `#import <React/...>` and many lowercase namespace includes such as `#import <react/...>`, `<yoga/...>`, and `<jsi/...>`, which SPM does not handle directly. The prototype solves this with two artifacts shipped together:
 
-- organized headers inside the XCFramework artifacts
-- a generated Clang Virtual File System (VFS) overlay for the remaining non-standard include cases
+- `React.xcframework`, whose framework module map serves the `#import <React/...>` headers
+- `ReactNativeHeaders.xcframework`, a headers-only artifact whose module map makes the lowercase namespaces (`react/`, `yoga/`, `jsi/`, `ReactCommon/`, …) modular, so those includes resolve through standard Clang module lookup
+
+(An earlier iteration used a generated Clang Virtual File System overlay for the non-standard includes; that approach was replaced by the `ReactNativeHeaders` module map, which needs no per-app overlay generation.)
 
 This means the RFC does not need to argue only in theory that Hermes and React Native dependencies can work under SPM. The prototype already demonstrates a concrete model based on prebuilt XCFrameworks and local package generation.
 
@@ -179,7 +184,7 @@ Third-party library support should follow the same general model as React Native
 
 The simplest way forward is to add support for building using SPM by adding a Package.swift file to the library.
 
-The current prototype already supports app-local native modules through `spmModules` in `react-native.config.js`. Each declared module is turned into a target in `autolinked/Package.swift`, with sources mirrored into the generated package layout so they can be compiled by SPM.
+The current prototype already supports app-local native modules through `spm.modules` in `react-native.config.js`. Each declared module is turned into a target in `build/generated/autolinking/Package.swift`, with sources mirrored into the generated package layout so they can be compiled by SPM.
 
 That mechanism is enough to prove that source-based native modules can be integrated into the SPM flow today.
 
