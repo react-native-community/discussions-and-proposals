@@ -13,6 +13,10 @@ iOS26 introduced deprecation of many UIApplication APIs and made UIScene lifecyc
 
 ![](assets/0000-ios-deprecation-warning.png)
 
+iOS27 introduced an assertion that crashes applications built with iOS27 SDK if they are not using the `SceneDelegate`:
+<img width="1162" height="242" alt="image" src="https://github.com/user-attachments/assets/126f06a0-c151-428b-929b-59561210f85b" />
+
+
 This RFC will bring in an additive change that should allow for adoption of a new `SceneDelegate` entrypoint while also allowing for (deprecated) usage of `AppDelegate`. Also, the `@react-native-community/template` and `packages/rn-tester` should be migrated to implement the `SceneDelegate` API.
 
 
