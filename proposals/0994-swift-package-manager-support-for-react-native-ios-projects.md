@@ -86,7 +86,7 @@ injects the SPM package references into the app's existing Xcode project, in pla
 
 From the app’s point of view, the integration stays relatively simple: the app's Xcode project references three locally generated packages — React Native core, generated code, and autolinked native modules — through `XCLocalSwiftPackageReference` entries. The injection also adds an auto-sync build phase that refreshes autolinking when dependencies change. No app-level `Package.swift` is generated or required; the sub-package paths under `build/` are stable, so adding or removing community deps never requires re-injecting. The edit is purely additive and recorded in a `.spm-injected.json` marker, so it can be reversed exactly (`deinit`) without touching the rest of the project.
 
-This RFC does not propose a new packaging model from scratch. Instead, it proposes standardizing and evolving the implementation direction already demonstrated in the prototype branch.
+This RFC does not propose a new packaging model from scratch. Instead, it proposes standardizing and evolving the implementation direction already demonstrated in the prototype branch. The tooling, commands, header model, and extension points described below are documented in the branch under `packages/react-native/scripts/spm/__doc__/` (start with `spm-scripts.md`).
 
 ### Autolinking
 
@@ -165,12 +165,16 @@ Instead of asking each app to compile this dependency graph from source, the SPM
 
 These artifacts are downloaded during setup and cached locally, and the generated SPM package for the app links against them as binary targets. This keeps the app-facing package graph small and avoids moving the full complexity of the React Native native dependency tree into every application project.
 
-At the implementation level, the branch also addresses one of the key technical challenges of using prebuilt artifacts with React Native: header compatibility. React Native uses both framework-style includes such as `#import <React/...>` and many lowercase namespace includes such as `#import <react/...>`, `<yoga/...>`, and `<jsi/...>`, which SPM does not handle directly. The prototype solves this with two artifacts shipped together:
+At the implementation level, the branch also addresses one of the key technical challenges of using prebuilt artifacts with React Native: header compatibility. React Native uses framework-style includes such as `#import <React/...>`, many lowercase namespace includes such as `#import <react/...>`, `<yoga/...>`, and `<jsi/...>`, and the third-party dependency namespaces (`folly/`, `glog/`, `boost/`, …) — none of which SPM serves directly from a plain framework binary. The prototype solves this with a set of artifacts shipped together:
 
 - `React.xcframework`, whose framework module map serves the `#import <React/...>` headers
-- `ReactNativeHeaders.xcframework`, a headers-only artifact whose module map makes the lowercase namespaces (`react/`, `yoga/`, `jsi/`, `ReactCommon/`, …) modular, so those includes resolve through standard Clang module lookup
+- `ReactNativeHeaders.xcframework`, a headers-only artifact whose module map makes React Native's own lowercase namespaces (`react/`, `yoga/`, `jsi/`, `ReactCommon/`, …) modular
+- `ReactNativeDependencies.xcframework`, the prebuilt third-party dependency binaries, paired with `ReactNativeDependenciesHeaders.xcframework`, a headers-only sidecar that serves the dependency namespaces (`folly/`, `glog/`, `boost/`, …). The binary is a framework and cannot expose those headers to SwiftPM, so the headers ship as their own library-type artifact — which also keeps `ReactNativeHeaders` purely React Native, giving every namespace exactly one home
+- `hermes-engine`, the Hermes runtime
 
-(An earlier iteration used a generated Clang Virtual File System overlay for the non-standard includes; that approach was replaced by the `ReactNativeHeaders` module map, which needs no per-app overlay generation.)
+so those includes resolve through standard header search paths and Clang module lookup with no per-app configuration.
+
+(An earlier iteration used a generated Clang Virtual File System overlay for the non-standard includes; that approach was replaced by the headers-only artifacts above, which need no per-app overlay generation.)
 
 This means the RFC does not need to argue only in theory that Hermes and React Native dependencies can work under SPM. The prototype already demonstrates a concrete model based on prebuilt XCFrameworks and local package generation.
 
@@ -234,6 +238,14 @@ During the transition period, libraries should be able to ship both:
 - a `podspec` for CocoaPods users
 - SPM metadata and, optionally, `Package.swift` or prebuilt XCFramework artifacts for SPM users
 
+### Framework plugins (autolinking hooks)
+
+Some ecosystems — Expo is the first — layer their own module system on top of React Native: they discover native modules dynamically, generate a module registry, and ship mixed Swift/Objective-C/C++ modules such as `ExpoModulesCore`. A static `spm.modules` list cannot express this, and a one-shot post-process of the generated `Package.swift` would be overwritten the next time the auto-sync build phase re-runs autolinking.
+
+The prototype therefore exposes a generic **autolinking plugin hook**. Any dependency can register a plugin from its own `react-native.config.js` (a `spm.autolinkingPlugin` entry), and React Native invokes it wherever autolinking runs — during `add`/`update` and during the build-time sync — so a framework's contribution is regenerated on every build and never goes stale. The plugin receives the app/JS-root context and the discovered autolinking metadata, and returns SwiftPM package references, product dependencies, and generated-source files that React Native merges into the autolinked package graph. Discovery is transitive — installing the framework is enough, mirroring how CocoaPods pulls in `use_expo_modules!` — with an app-level opt-out for excluding a plugin.
+
+This keeps React Native framework-agnostic (no framework-specific code in core) while giving frameworks the same extension seam CocoaPods provided through the Podfile, `use_expo_modules!`, and its post-install hooks. Expo is the first consumer and is validating the contract, which ships as an unstable preview until proven. The discovery mechanism and the plugin contract are documented in `packages/react-native/scripts/spm/__doc__/spm-autolinking-plugins.md`.
+
 ### Transition phases
 
 The migration should happen in stages:
@@ -246,7 +258,7 @@ The migration should happen in stages:
 
 ## Brownfield
 
-Brownfield projects will also be able to use Package.swift files and integrate easily with existing Swift or Objective-C based apps, either as precompiled XCFrameworks or as source - both defined in a Package.swift file. There will be an option in the cli for generating separate Package.swift files for distributing the app as a brownfield target.
+Because `add` injects into the app's existing Xcode project in place (rather than generating one), an app that embeds React Native can adopt SPM today by pointing `add` at the right project and target (`--xcodeproj` / `--product-name`); the current constraint and coexistence rules are described in the tool docs (`spm-scripts.md`, "Brownfield apps"). Building on that, brownfield projects will also be able to use Package.swift files and integrate easily with existing Swift or Objective-C based apps, either as precompiled XCFrameworks or as source — both defined in a Package.swift file. There will be an option in the cli for generating separate Package.swift files for distributing the app as a brownfield target.
 
 ## Drawbacks
 
