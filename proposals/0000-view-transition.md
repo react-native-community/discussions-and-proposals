@@ -307,13 +307,13 @@ The deeper distinction is **where detection happens**. React detects transitions
 
 ## Prototype
 
-A working prototype — an Expo app that puts Reanimated's layout animation side by side with React's `<ViewTransition>` — drives the examples in this proposal. It lives on a dedicated branch: [`viewtransition-demo`](https://github.com/zeyap/discussions-and-proposals/tree/viewtransition-demo/proposals/0000-view-transition-demo/layout-anim-vt-demo).
+Check out [`viewtransition-demo`](https://github.com/zeyap/discussions-and-proposals/tree/viewtransition-demo/proposals/0000-view-transition-demo/layout-anim-vt-demo).
 
 It demonstrates:
 
-- **Update / layout reflow** *(available)* — the `onUpdate` example under [Shared transition](#shared-transition): a parent shrinks and its flex-wrap children reflow to their new wrapped positions (rather than scaling), showing that the animating subtree re-runs layout during the transition. The demo places this **side by side with the equivalent Reanimated layout animation** so the reflow difference is directly visible.
-- **Enter / exit** *(TBD)* — a subtree that mounts/unmounts inside `startTransition` drives an enter or exit animation ([Basic example 2](#basic-example)). Not yet implemented in the demo.
-- **Shared transition** *(TBD)* — a `<ViewTransition>` paired by `name` across renders animates from the old element's layout to the new one ([Basic example 1](#basic-example)). Not yet implemented in the demo.
+- **Enter / exit** *(TBD)*
+- **Shared transition** *(TBD)*
+- **Update / layout reflow** — a container shrinks (driven by ViewTransition `onUpdate`) and its flex-wrap children reflow to their new wrapped positions (rather than scaling), showing that the animating subtree re-runs layout during the transition. The demo places this side by side with the equivalent Reanimated layout animation so the reflow difference is directly visible.
 
 Current status: Android, driven by the Fabric animation runtime. iOS and CSS-animation-driven styling are not yet implemented (see [Unresolved questions](#unresolved-questions)).
 
