@@ -313,7 +313,7 @@ It demonstrates:
 
 - **Enter / exit** *(TBD)*
 - **Shared transition** *(TBD)*
-- **Update / layout reflow** — a container shrinks (driven by ViewTransition `onUpdate`) and its flex-wrap children reflow to their new wrapped positions (rather than scaling), showing that the animating subtree re-runs layout during the transition. The demo places this side by side with the equivalent Reanimated layout animation so the reflow difference is directly visible.
+- **Update** — a container shrinks (driven by ViewTransition `onUpdate`) and its flex-wrap children reflow to their new wrapped positions. The demo places this side by side with the equivalent Reanimated layout animation.
 
 Current status: Android, driven by the Fabric animation runtime. iOS and CSS-animation-driven styling are not yet implemented (see [Unresolved questions](#unresolved-questions)).
 
