@@ -311,9 +311,9 @@ A working prototype — an Expo app that puts Reanimated's layout animation side
 
 It demonstrates:
 
-- **Update / layout reflow** — the `onUpdate` example under [Shared transition](#shared-transition): a parent shrinks and its flex-wrap children reflow to their new wrapped positions (rather than scaling), showing that the animating subtree re-runs layout during the transition.
-- **Enter / exit** — a subtree that mounts/unmounts inside `startTransition` drives an enter or exit animation ([Basic example 2](#basic-example)).
-- **Shared transition** — a `<ViewTransition>` paired by `name` across renders animates from the old element's layout to the new one ([Basic example 1](#basic-example)).
+- **Update / layout reflow** *(available)* — the `onUpdate` example under [Shared transition](#shared-transition): a parent shrinks and its flex-wrap children reflow to their new wrapped positions (rather than scaling), showing that the animating subtree re-runs layout during the transition. The demo places this **side by side with the equivalent Reanimated layout animation** so the reflow difference is directly visible.
+- **Enter / exit** *(TBD)* — a subtree that mounts/unmounts inside `startTransition` drives an enter or exit animation ([Basic example 2](#basic-example)). Not yet implemented in the demo.
+- **Shared transition** *(TBD)* — a `<ViewTransition>` paired by `name` across renders animates from the old element's layout to the new one ([Basic example 1](#basic-example)). Not yet implemented in the demo.
 
 Current status: Android, driven by the Fabric animation runtime. iOS and CSS-animation-driven styling are not yet implemented (see [Unresolved questions](#unresolved-questions)).
 
