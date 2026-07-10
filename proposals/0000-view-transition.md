@@ -11,8 +11,6 @@ date: 2026-07-10
 
 This RFC proposes adding support for React's [`<ViewTransition>`](https://react.dev/reference/react/ViewTransition) component to React Native. `<ViewTransition>` is a React API that lets you animate elements that update inside a transition. On the web it delegates to the browser's View Transition API; this proposal brings the same programming model to React Native by integrating the React reconciler with the Fabric renderer.
 
-The main benefit is that React Native gains a **web-compatible, first-class API for shared transitions** (including page/router-level transitions) and **enter/exit/update transitions** that is more ergonomic than existing third-party or user-space solutions, and that covers animation use cases not well served by any current React Native animation API.
-
 ## Basic example
 
 **Example 1 — Shared transition**
@@ -115,9 +113,9 @@ React Native already offers built-in animation via `Animated` and `LayoutAnimati
 | --- | --- | --- | --- | --- |
 | Declarative animation config (time/curve) on style props; imperative start/stop | ✅ | | ✅ | |
 | Subscribe to native event (e.g. scroll) value | ✅ | | ✅ | |
-| Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ single view only | |
-| **Shared transition** — animate view A (layout X) → view B (layout Y); runtime interpolates automatically | | | 🚧 experimental, single view only | ✅ |
-| Runtime automatically detects and drives enter/exit transitions | fade on unmount only | 🚧 unstable | | ✅ |
+| Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ | |
+| **Shared transition** — animate view A (layout X) → view B (layout Y); runtime interpolates automatically | | | 🚧 experimental | ✅ |
+| Runtime automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | | ✅ |
 
 `<ViewTransition>` uniquely provides the last two rows in a general, cross-tree way — where the others are single-view, unstable, or experimental.
 
