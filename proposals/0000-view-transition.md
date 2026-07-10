@@ -115,7 +115,7 @@ React Native already offers built-in animation via `Animated` and `LayoutAnimati
 | Subscribe to native event (e.g. scroll) value | ✅ | | ✅ | |
 | Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ | ✅ |
 | **Shared transition** — animate view A (layout X) → view B (layout Y); runtime interpolates automatically | | | 🚧 experimental | ✅ |
-| Runtime automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | | ✅ |
+| Runtime automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | ✅ | ✅ |
 
 `<ViewTransition>` uniquely provides the last two rows in a general, cross-tree way — where the others are single-view, unstable, or experimental.
 
