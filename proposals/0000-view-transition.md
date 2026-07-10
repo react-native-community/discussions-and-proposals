@@ -115,27 +115,21 @@ React Native already offers built-in animation via `Animated` and `LayoutAnimati
 | Subscribe to native event (e.g. scroll) value | ✅ | | ✅ | |
 | Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ | ✅ |
 | **Shared transition** — animate view A (layout X) → view B (layout Y); runtime interpolates automatically | | | 🚧 experimental | ✅ |
-| Runtime automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | ✅ | ✅ |
-
-`<ViewTransition>` uniquely provides the last two rows in a general, cross-tree way — where the others are single-view, unstable, or experimental.
+| Automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | ✅ | ✅ |
 
 **What does `<ViewTransition>` add to the current React Native ecosystem?**
-
-Beyond the capability gaps in the table above (built-in libraries and Reanimated), it adds:
 
 - **A first-class way to create transition animations in React** that takes advantage of React's modern feature and existing mechanism in Reconciler — including integration with **Suspense and Activity**. Because it lives in React, you can animate from a Suspense fallback to its content when ready, and an `Activity` switching between visible/hidden picks up the same transition heuristics as mount/unmount.
 - **Predictable enter/exit detection.** Before `<ViewTransition>`, reliably running an animation when a component shows or hides was hard, and neither of the two available approaches — JS effects or native mutation interception — detects it well.
   - *`useEffect`-based detection is fragile:*
     - `useEffect` with an empty dependency list runs only on first mount; if you navigate to a route stacked on top and come back, the component was never unmounted, so no enter animation fires.
-    - With real dependencies, the callback can fire unexpectedly when an unrelated dependency changes, or when a hidden `Activity` becomes alive.
+    - The callback can fire unexpectedly when an unrelated item in the depdendency list changes.
     - Passive effects don't wait for native mount, so you can see a flash of the new component before the animation starts.
   - *Native mutation interception (the New Architecture approach used by RN LayoutAnimation & Reanimated) can't reliably detect enter/exit either:*
-    - It sees only anonymous native-view Create/Remove mutations, so it can't tell that a Remove here and a Create there are "the same element" — which is why plain enter/exit can't do `layoutId`-style pairing without a separate tag registry.
     - It animates any registered view mutation regardless of cause, rather than being gated on Transitions — so it can't distinguish a deliberate enter/exit from an incidental insert/delete.
-    - Switching an `<Activity>` between visible/hidden does **not** generate Create/Remove mutations at all, so a mutation-interception approach simply can't observe it.
-  - Because React drives `<ViewTransition>` from the reconciler — where it sees both trees, gates on Transitions, and understands `Activity` — it detects enter/exit at the *component boundary* with **correct timing**: it knows the boundary between the old and new tree and invokes callbacks before native mount, avoiding the visual "blink" that both user-space approaches struggle with, including on `Activity` visibility changes.
+    - Switching an `<Activity>` between visible/hidden does **not** generate Create/Remove mutations, so a mutation-interception approach simply can't observe it.
 
-Because React sees both the old and new tree, controls commit timing, and understands Suspense/Activity, this capability is better expressed as a React-integrated component rather than reinvented in a library. See [Alternatives](#alternatives) for a detailed comparison with Reanimated.
+Because React sees both the old and new tree, controls commit timing, and understands Suspense/Activity, this capability is better expressed as a React-integrated component rather than reinvented in a library. See [Alternatives](#alternatives) for a comparison with Reanimated.
 
 ## Detailed design
 
@@ -259,12 +253,12 @@ startTransition(() => {
 A `viewTransitionClass` assigned to `<ViewTransition>` holds the animation spec its immediate children apply. During the mutation phase, the "apply view transition name" config function receives the child ShadowNode and the `viewTransitionClass`. Because `completeSurface` may have already kicked off, the child could otherwise mount without the class applied. Options:
 
 - **Option 1 (recommended) — Run a second Fabric commit that blocks mount** (`mountSynchronously=false`) to apply the `viewTransitionClass` props when the config function is called. Type-safe; the props apply before mount so the animation can pick them up; specs are synced with Fabric (needed for general CSS animation/keyframes support later).
-- **Option 2 — Register the `viewTransitionClass` as a dynamic object** and apply it when animating. Guarantees the class arrives before first mount, but is not type-safe and doesn't reuse Fabric's props infra.
-- **Option 3 — Use `UIManager.synchronouslyUpdateViewOnUIThread`.** No-op here, because the initial React update hasn't been mounted yet.
+- **Option 2 — Register the `viewTransitionClass` as a dynamic object** and apply it when animating. Guarantees the class arrives before first mount, but is not type-safe and doesn't reuse Fabric's css infra.
+- **Option 3 — Use `UIManager.synchronouslyUpdateViewOnUIThread`.** No-op here, because at start of transition React update hasn't been mounted yet.
 
 ### Transition with video
 
-For shared transitions involving video, users may want playback to continue throughout the transition (feasible on mobile). A common approach in nowadays mobile frameworks is to reuse the same underlying player between the old and new video views.
+For shared transitions involving video, users may want playback to continue throughout the transition (feasible on mobile). A common strategy in nowadays mobile frameworks is to reuse the same underlying player between the old and new video views.
 
 ### Reference: React DOM renderer behavior
 
@@ -280,16 +274,12 @@ For alignment, the DOM renderer's order of operations is roughly: lock new async
 
 ## Alternatives
 
-The closest existing solutions are two Reanimated features, both driven by intercepting native-view mutations:
+The closest and most commonly used existing solutions are two Reanimated features, both driven by intercepting Fabric mutations:
 
-- **Reanimated layout animations** (`entering`/`exiting`/`layout` props) animate a *tagged view* whenever its mount/unmount or frame change is observed in a commit. They are registered and evaluated per view, with no boundary and no cross-view coordination.
-- **Reanimated shared element transition** intercepts Fabric mutations to pair elements and inject animation mutations, which works across native navigation, but only animates the container node (the subtree isn't re-laid out), creates a new element by copying the ShadowView, is still experimental with no clear path out, and doesn't naturally extend to router-level transitions.
+- **Reanimated layout animations** (`entering`/`exiting`/`layout` props) animate a *tagged view* whenever its mount/unmount or frame change is observed in a commit. They are registered and evaluated per view.
+- **Reanimated shared element transition** intercepts Fabric mutations to pair elements and inject animation mutations, which works across native navigation, but only animates the container node (the subtree isn't re-laid out), creates the transition element by copying the ShadowView.
 
-The deeper distinction is **where detection happens**. React detects transitions at the *component boundary* — it knows the old and new tree — whereas both Reanimated features operate on anonymous native-view mutations (see [Motivation](#motivation) for how this affects enter/exit detection specifically). Two consequences matter most for shared and layout transitions:
-
-- **Pairing needs a tag registry.** Because it sees only anonymous Create/Remove mutations, Reanimated cannot know that a Remove here and a Create there are "the same element"; `layoutId`-style pairing requires a separate tag registry, whereas React knows it from the tree.
-- **Per-subtree vs. per-view, with no group coordination.** React's `<ViewTransition>` boundary applies to a whole subtree. Reanimated's layout transition is registered and evaluated per *tagged view*: the `layout` prop animates only that view's own frame (position + size) when Yoga assigns a new one; children are laid out at their final positions inside the parent's animating frame and merely come along visually. To animate a child smoothly you must give the child its own `layout` prop, and there is **no `LayoutGroup`-style coordination** — per a Reanimated maintainer, layout transitions "run independently and don't know of each other," so a parent's layout transition and a child's enter/exit visibly desync (a common complaint). React's reconciler-level model coordinates the whole boundary.
-- **When the end layout is known, and subtree reflow.** Because Reanimated reads the end-view layout *after* the commit, children do not automatically reflow to the new layout during the animation — the subtree is stretched/squashed to fit the animating parent frame rather than re-laid out. With `<ViewTransition>`, the end layout can be obtained *before* the animation starts, so Yoga can recompute layout for the whole subtree and children reflow correctly throughout the transition. This matters most for subtrees containing text paragraphs, which must re-wrap rather than scale.
+The deeper distinction is **where detection happens**. React detects transitions at the *component boundary* — it knows the old and new tree — whereas both Reanimated features operate on anonymous Fabric mutations (see [Motivation](#motivation) for how this affects enter/exit detection specifically).
 
 ## Adoption strategy
 
