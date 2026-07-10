@@ -285,7 +285,7 @@ The deeper distinction is **where detection happens**. React detects transitions
 
 ## Prototype
 
-A working prototype exists and drives the examples in this proposal. _(Public link TBD — a `facebook/react-native` branch/PR or a standalone demo repo will be added here.)_
+A working prototype — an Expo app that puts Reanimated's layout animation side by side with React's `<ViewTransition>` — drives the examples in this proposal. It lives on a dedicated branch: [`viewtransition-demo`](https://github.com/zeyap/discussions-and-proposals/tree/viewtransition-demo/proposals/0000-view-transition-demo/layout-anim-vt-demo).
 
 It demonstrates:
 
