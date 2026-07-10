@@ -83,6 +83,30 @@ const [shouldShow, setShouldShow] = useState(false);
 />
 ```
 
+**Example 3 — Enter/exit via `<Activity>` (hide/show instead of mount/unmount)**
+
+The same enter/exit animation fires when the content is hidden/shown with `<Activity>` rather than conditionally rendered. Unlike mount/unmount, an `Activity` switching between `visible` and `hidden` keeps the subtree alive but still picks up the transition heuristics — the `<ViewTransition>` must be the top-level child directly under `<Activity>`.
+
+```tsx
+const [shouldShow, setShouldShow] = useState(false);
+
+// render
+<Activity mode={shouldShow ? 'visible' : 'hidden'}>
+  <ViewTransition enter={/* ... */} exit={/* ... */}>
+    <View>Something to show</View>
+  </ViewTransition>
+</Activity>
+
+<Button
+  title="reveal content"
+  onPress={() => {
+    startTransition(() => {
+      setShouldShow(s => !s);
+    });
+  }}
+/>
+```
+
 ## Motivation
 
 React Native already offers built-in animation via `Animated` and `LayoutAnimation`, and Reanimated is the most popular open-source library filling the remaining gaps. Even so, `<ViewTransition>` covers transition use cases that none of these serve well today.
