@@ -113,7 +113,7 @@ React Native already offers built-in animation via `Animated` and `LayoutAnimati
 | --- | --- | --- | --- | --- |
 | Declarative animation config (time/curve) on style props; imperative start/stop | ✅ | | ✅ | |
 | Subscribe to native event (e.g. scroll) value | ✅ | | ✅ | |
-| Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ | |
+| Animate a view from layout A to B; runtime interpolates automatically | | 🚧 unstable | ✅ | ✅ |
 | **Shared transition** — animate view A (layout X) → view B (layout Y); runtime interpolates automatically | | | 🚧 experimental | ✅ |
 | Runtime automatically detects and drives enter/exit transitions | depends on useEffects | 🚧 unstable | | ✅ |
 
