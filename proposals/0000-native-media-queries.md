@@ -74,7 +74,7 @@ Supported media features in the draft PR:
 
 ### How it works
 
-Conditional styles are authored and compiled in JavaScript, but resolved on the native side. Changing the color scheme or rotating the device re-resolves them natively in a commit hook without a React re-render.
+Conditional styles are authored and compiled in JavaScript, but resolved on the native side. Changing the color scheme or rotating the device re-resolves them natively during the shadow tree commit, without a React re-render.
 
 **1. Compilation (JS).** The style-processing path compiles each conditional value into two parts: the inline `default` (parsed and processed exactly like a normal value) plus a single `styleConditions` prop that collects the parsed conditions, keyed by property:
 
@@ -88,34 +88,34 @@ Conditional styles are authored and compiled in JavaScript, but resolved on the 
 
 - Each condition value flows through the property's normal processor (e.g. `processColor`), so once matched it behaves like any other value.
 
-**2. Resolution (native commit hook).** The `styleConditions` prop is added to the node's props. A commit hook runs on every commit and, for each node carrying conditions, evaluates its queries against the current environment and patches the matched value onto the props (or restores the unpatched props when nothing matches).
+**2. Resolution (native, during commit).** The `styleConditions` prop is added to the node's props. When the shadow tree commits (in `ShadowTree`, right before layout, so resolved values participate in it), it walks the tree and, for each node carrying conditions, evaluates its queries against the current environment and patches the matched value onto the props (or restores the unpatched props when nothing matches).
 
 - Patched props keep a pointer to their unpatched base, and JS prop updates are parsed over the base, so native patches are not visible to JS and always revert cleanly.
 - A `HasStyleConditionsInSubtree` trait lets the walk skip subtrees with no conditional styles, so cost is proportional to the paths reaching conditional nodes, not the whole tree.
 
 **3. The media query resolution is derived per‑surface from the shadow tree's root.**
 
-- **Orientation** is derived from the surface's own viewport (the root's maximum layout size: `landscape` when width > height). It needs no platform plumbing, any rotation/resize already produces a layout commit (`constraintLayout` function), which re‑runs the commit hook.
+- **Orientation** is derived from the surface's own viewport (the root's maximum layout size: `landscape` when width > height). It needs no platform plumbing, any rotation/resize already produces a layout commit (`constraintLayout` function), which re‑runs the resolution.
 - **Color scheme** is stored per surface (a field on each root shadow node's props) but is an app-wide value, matching `useColorScheme`/`Appearance`. A commit is triggered whenever it is updated. It currently listens to app-wide color scheme changes and stores the value on each surface's root (this could be made per-surface in the future).
 
 ### iOS
 
-`RCTSurfacePresenter` observes the `RCTUserInterfaceStyleDidChangeNotification` and pushes the effective color scheme to each surface. The initial color scheme is set on surface start. The scheme is resolved from window trait collections, so `Appearance.setColorScheme()` should be honored and the result matches `useColorScheme()`. Orientation change uses the existing layout commit which triggers the same resolution commit hook.
+`RCTSurfacePresenter` observes the `RCTUserInterfaceStyleDidChangeNotification` and pushes the effective color scheme to each surface. The initial color scheme is set on surface start. The scheme is resolved from window trait collections, so `Appearance.setColorScheme()` should be honored and the result matches `useColorScheme()`. Orientation change uses the existing layout commit which triggers the same resolution.
 
 ### Android
 
-The draft PR gates the feature on Android until Props 2.0 (typed prop diffing) lands, which will make it work the same way as iOS. Android will require minimal work (setting the color scheme) once Props 2.0 is enabled. Until then, undoing a commit-hook patch when the environment switches back requires storing the full accumulated props, instead of just the keys each JS update sends. We can make this work on Props 1.0, but the feature flags in the Android props path make it difficult to review and it becomes throwaway work the moment 2.0 lands 😅
+The draft PR gates the feature on Android until Props 2.0 (typed prop diffing) lands, which will make it work the same way as iOS. Android will require minimal work (setting the color scheme) once Props 2.0 is enabled. Until then, undoing a resolution patch when the environment switches back requires storing the full accumulated props, instead of just the keys each JS update sends. We can make this work on Props 1.0, but the feature flags in the Android props path make it difficult to review and it becomes throwaway work the moment 2.0 lands 😅
 
 ## Drawbacks
 
-- The hook runs on every commit while conditions are in use (optimised by the `HasStyleConditionsInSubtree` trait, but non‑zero).
+- Resolution runs on every commit while conditions are in use (optimised by the `HasStyleConditionsInSubtree` trait, but non‑zero).
 - Adds runtime work in JS StyleSheet i.e. iteration on keys in style prop to process styles in JS. This can be optimised in future via babel plugin, RN's runtime flattening makes it tricky though. It is currently optimised with a weak map cache so it should not be too bad if style object stays the same by reference.
 
 ## Alternatives
 
 **JS hooks (`useColorScheme`, `useWindowDimensions`).** Works today, but every change re‑renders React and runs on the JS thread; `useWindowDimensions` updates asynchronously, so resizing large trees can visibly lag. This proposal moves resolution off the JS thread.
 
-**[react-native-unistyles](https://github.com/jpudysz/react-native-unistyles).** A library pursuing the same goal of updating styles without a React re‑render. Its C++ core links each component's shadow node to its computed styles and commits updates directly onto the Fabric shadow tree, so a theme or dimension change updates without rendering React, mechanically close to this proposal. The difference is that Unistyles styles are authored in JavaScript (objects that read the theme, or functions), so when the environment changes it re-resolves them by executing that JavaScript on the JS thread. This proposal instead compiles the conditions ahead of time and resolves them entirely inside the native commit hook, with no JavaScript at resolution time and no Babel transform setup required. Unistyles also offers a lot more (variants, multiple themes, etc.).
+**[react-native-unistyles](https://github.com/jpudysz/react-native-unistyles).** A library pursuing the same goal of updating styles without a React re‑render. Its C++ core links each component's shadow node to its computed styles and commits updates directly onto the Fabric shadow tree, so a theme or dimension change updates without rendering React, mechanically close to this proposal. The difference is that Unistyles styles are authored in JavaScript (objects that read the theme, or functions), so when the environment changes it re-resolves them by executing that JavaScript on the JS thread. This proposal instead compiles the conditions ahead of time and resolves them entirely inside the native commit, with no JavaScript at resolution time and no Babel transform setup required. Unistyles also offers a lot more (variants, multiple themes, etc.).
 
 **[NativeWind](https://github.com/nativewind/nativewind).** Tailwind for React Native. Classes are statically compiled to style objects at build time, but which rules apply for the current color scheme, dimensions, or pseudo‑state is resolved at runtime in JS: platform signals arrive via `Appearance`/`Dimensions` listeners and propagate through an observable that re‑renders each affected component (scoped to those components, but on the JS thread). So for the conditions this proposal covers, it is closer to the JS‑hooks alternative above.
 
@@ -126,7 +126,7 @@ If React Native implements native media query support, the above libraries could
 ## Adoption strategy
 
 - **Opt‑in and fully backward compatible.** Only a value that is an object with at least one `@media` key is treated as conditional, existing styles are untouched. No breaking change.
-- **Feature flag.** For rollout, the feature should ship behind a `ReactNativeFeatureFlags` flag (e.g. `enableMediaQueryStyles`) gating its two entry points: the JS compilation step in the `ReactNativeAttributePayload` and the native commit hook registration. The draft PR keeps the feature ungated to make it easy to build and test.
+- **Feature flag.** For rollout, the feature should ship behind a `ReactNativeFeatureFlags` flag (e.g. `enableMediaQueryStyles`) gating its two entry points: the JS compilation step in the `ReactNativeAttributePayload` and the native resolution during commit. The draft PR keeps the feature ungated to make it easy to build and test.
 - **New Architecture only.** The compile step lives in the Fabric attribute payload.
 - **Typing.** The draft PR ships without type changes to `StyleSheet`. A follow‑up will add the type support.
 - **Incremental feature rollout.** `prefers-color-scheme` + `orientation` first, `min/max-(width|height)` can follow on the same primitive without changing the authoring shape.
