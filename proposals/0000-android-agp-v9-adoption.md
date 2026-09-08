@@ -31,6 +31,9 @@ This RFC proposes a three-phase AGP v9 adoption strategy:
 - Roll out AGP v9 compatibility changes to actively used libraries while maintaining backward compatibility.
 - Coordinate with the community for broader ecosystem coverage.
 - Align with Expo's AGP v9 adoption efforts in Expo core and related libraries.
+- Create a new library plugin from RNGP while ensuring backward compat.
+  - The RNGP will be restricted to be used only by the App's.
+  - This is to allow distributing and maintaining library specific changes independent of RNGP.
 
 #### Phase 3
 - Remove the AGP v9 opt-outs from the React Native template.
@@ -144,17 +147,39 @@ The points above cover common migration work. One notable library-specific case:
 
 <hr/>
 
+### Separate Library Plugin
+
+Currently, the react-native applications and libraries are both handled by the RNGP(`com.facebook.react`) to apply auto-linking, codegen changes, etc. This means that the app and library specific handling is fused within the RNGP and doing a major change only for library means we ensure the app handling is not breaking, so to avoid this friction, we now create a new library gradle plugin by extracting pieces from RNGP and putting it together as `com.facebook.react.library`.
+
+**Details**
+- Introduce a new module within `gradle-plugins` and register it, so it can be used via comosite build
+  - Since it will be used via composite build, we do not expect any change in user's `settings.gradle`
+- Extract the library pieces out to a separate gradle plugin
+  - This means if there are any code in RNGP that the library plugin needs, we duplicate that implementation.
+  - This is a temporary trade-off until we fully deprecate RNGP for librares, see below.
+- Add deprecation notice to RNGP to warn the users over a new couple releases to start using dedicated `com.facebook.react.library` plugin.
+  - Upon reaching the deprecation window, we remove the library specific code from RNGP.
+
+> A draft version of this can be found here - https://github.com/react/react-native/pull/57912
+
+**Community**
+- This will require us to update `react-native-builder-bob` to use `com.facebook.react.library` by default.
+
+<hr/>
+
 ## Adoption strategy
 
 <!-- If we implement this proposal, how will existing React Native developers adopt it? Is this a breaking change? Can we write a codemod? Should we coordinate with other projects or libraries? -->
 
-As described above, AGP v9 adoption is rolled out in three phases. Phase 1 is complete and should ship with React Native v0.87.x. Newly created apps do not need changes because template opt-outs are enabled by default. Existing apps upgrading to v0.87.x should apply a few manual updates described in the next section. At this stage, we expect no breakages with actively maintained community libraries.
+As described in the earlier section, AGP v9 adoption is rolled out in three phases. Phase 1 is complete and should ship with React Native v0.87.x. Newly created apps do not need changes because template opt-outs are enabled by default. Existing apps upgrading to v0.87.x should apply a few manual updates described in the next section. At this stage, we expect no breakages with actively maintained community libraries.
 
 In Phase 2, we will submit compatibility pull requests to actively used and maintained libraries from the matrix above while preserving backward compatibility. Broader ecosystem coverage will require community participation.
 
 As part of Phase 2, the Expo team will evaluate required changes on their side, including ecosystem impact.
 
-Phase 2 needs sufficient time, especially for community adoption. One possible support mechanism is adding an "AGP v9 compatible" filter in `react-native-community/directory` to track progress.
+The separate library gradle plugin will also be landing as part of the Phase 2.
+
+Phase 2 needs sufficient time, especially for community adoption.
 
 Once there is enough confidence and ecosystem coverage, we can move to Phase 3: remove opt-outs from `react-native-community/template` and ask existing apps to remove them as well. At that point, the ecosystem should fully leverage built-in Kotlin, new DSL behavior, and other AGP v9 defaults.
 
@@ -183,7 +208,16 @@ android.newDsl=false
 
 In addition to manual instructions, we should update `react-native-community/upgrade-helper` so this guidance is included by default.
 
-In Phase 2, we will migrate widely used libraries. To accelerate this, we should include a public request for help in the v0.87.x release post and X announcements.
+In Phase 2, we will migrate widely used libraries. To accelerate this, we should include a public request for help in the v0.x.x release post and X announcements.
+
+As part of the release post, we should add section about deprecating library support from RNGP and recommend using `com.facebook.react.library`. The section should include:
+
+- This is a breaking change for libraries.
+- If this change is shipped, say in 0.89.0 release, the apps when they upgrade to this version will see a deprecation notice for each third party library not using `com.facebook.react.library`. This allows the community a decent window to start adopting the new library gradle plugin.
+- In the next few minor releases, the RNGP support for libraries will be removed completely.
+- We will backport the change to the react-native versions in the release window.
+- The react-native versions outside of the release window, will not work with the new library plugin.
+  - The third party libraries may need to allow their users to use a version of their library which is compatible with the react-native version below the lower bound of release window. (For eg, 0.85.0 is the lower bound for 0.87.0 main release)
 
 For Phase 3, we should announce opt-out removal from `react-native-community/template` in the v0.88.x release post and state the expected removal timeline (for example, v0.89.x).
 
@@ -192,3 +226,4 @@ For Phase 3, we should announce opt-out removal from `react-native-community/tem
 <!-- Optional, but suggested for first drafts. What parts of the design are still TBD? -->
 
 - Expo needs to evaluate its scope of AGP v9 changes and provide feedback on adoption timelines and risks.
+- When the RNGP support for libraries will be removed completely? (Ideally, a time frame.)
