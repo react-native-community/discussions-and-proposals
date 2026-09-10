@@ -128,7 +128,7 @@ Below is the matrix used during discovery:
 
 <hr/>
 
-- Most libraries apply the `kotlin-android` plugin in `build.gradle`. With built-in Kotlin, this is no longer needed and can fail builds.
+- Most libraries apply the `kotlin-android` (or `org.jetbrains.kotlin.android`) plugin unconditionally in `build.gradle`. AGP 9 registers the `kotlin` extension itself, so this now fails. The backward-compatible fix is to apply the plugin only when AGP has not already provided it: `if (project.extensions.findByName('kotlin') == null) { apply plugin: 'kotlin-android' }`, placed after `apply plugin: 'com.android.library'`.
 - Previously, `java.srcDirs` plus `kotlin-android` covered Kotlin-only sources. With built-in Kotlin, Kotlin-only sources should be defined via `kotlin.srcDirs`.
 - `.srcDirs` is deprecated in favor of `.directories`.
 - `android.kotlinOptions` is no longer valid with built-in Kotlin; use `kotlin.compilerOptions`.
