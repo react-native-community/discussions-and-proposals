@@ -104,7 +104,6 @@ Consequently, we suggest the following targets to be used by frameworks only:
 - jserrorhandler:jserrorhandler
 - react/renderer/mounting:mounting
 - cxxreact:tracesection
-- react/renderer/components/image:image
 - react/renderer/components/modal:modal
 - react/renderer/components/text:text
 - react/renderer/components/textinput:textinput
@@ -113,7 +112,6 @@ Consequently, we suggest the following targets to be used by frameworks only:
 - react/renderer/animations:animations
 - react/renderer/animationbackend:animationbackend
 - react/renderer/attributedstring:attributedstring
-- react/renderer/imagemanager:imagemanager
 - react/renderer/uimanager:uimanager
 - react/runtime:runtime
 - react/runtime/hermes:hermes
