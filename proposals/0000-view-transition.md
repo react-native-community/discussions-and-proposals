@@ -311,10 +311,11 @@ Current status: Android, driven by the Fabric animation runtime. iOS and CSS-ani
 
 - **Should CSS Animation be a prerequisite, or ship after?** We could ship the primitives (view-transition event handlers and pseudo-element rendering) and let developers animate with the library of their choice (`Animated`/Reanimated or others), then add CSS animation/keyframes later. CSS animation may be friendlier for AI-assisted authoring and SSR, but developers often "break the rules" when starting animations imperatively.
 - **How should we support a "new pseudo element"?** We believe we *should* support it (lifting the new element above its document, onto an overlay, as on the web) — it's what makes cross-screen shared transitions work (clipping/z-order/two-hierarchy, see [Detailed design](#driving-the-transition-animation)). The question is *how*, given the cost of reparenting/re-mounting on mobile (see [Shared transition](#shared-transition)).
+- **Should the old element be live instead of a snapshot?** Today an exiting element is captured as a static snapshot (the old pseudo element), as on the web. On mobile, users often expect content to stay live while it leaves: a video keeps playing, and an interrupted transition (for example a swipe back mid-flight) can be reversed. Supporting a live old element means keeping part of the old tree (or reusing its shadow nodes and host views) mounted alongside the new one for the duration of the transition. Is that worth the cost, and should it be opt-in?
 - **Which web disparities must be closed before OSS release?**
   - Web animates a new pseudo element; the recommended RN approach animates the actual new element in place.
   - The parent of a transitioning component isn't pinned to a fixed layout during the transition.
-  - View transitions on RN don't currently work across native navigation (on the web, view transitions can work across documents).
+  - View transitions on RN don't currently work across native navigation, or more generally across separate React roots (screens, modals, dialogs or popovers mounted in their own root). On the web, view transitions can work across documents.
 - **Platform coverage.** iOS support and the remaining reconciler integration (e.g. the `onUpdate` event) are still to be shipped.
 
 ## References
