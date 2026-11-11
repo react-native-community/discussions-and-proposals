@@ -80,7 +80,7 @@ Constraints for a design:
 
 - **Addons shouldn't depend on the engine's library name.** Addons are built independently of apps. React Native 0.82 renamed `libhermes.so` to `libhermesvm.so`, and a rename like that would break every published addon that linked it. For app developers, the engine has also always been an implementation detail behind JSI.
 - **Core shouldn't decide how addons are packaged or found.** Naming schemes, `require()` integration and caching are still evolving in the community, and don't have to become core API. Keeping them outside keeps core lean and leaves room to experiment, while core stays genuinely useful for addons whose build is driven by the app's build tooling.
-- **It should be opt-in, with a small, measured cost to apps that don't use it.** With prebuilt Hermes, Node-API is compiled into the `hermesvm` every app ships, whether or not it loads addons. See Binary size under Drawbacks.
+- **It should be opt-in, with a small, measured cost to apps that don't use it.** With prebuilt Hermes, Node-API is compiled into the `hermesvm` every app ships, whether or not it loads addons. See Binary size under Drawbacks, and Building without Node-API for apps that build from source.
 
 ## Detailed design
 
@@ -157,6 +157,15 @@ React Native makes it easy to use from an app:
 > [!NOTE]
 > Prebuilt addons are out of scope for this RFC. They don't need React Native: build tools can link against their own `node-api` stub with the same names (for example `node-api-stub` in react-native-node-api), and use the same `find_package(node-api)` and `node-api::node-api`.
 
+### Building without Node-API
+
+Node-API is compiled into React Native and Hermes by default, including the prebuilt artifacts, so apps can load addons without building from source. As an escape hatch[^naming], apps (and Meta's internal builds) can leave it out when building from source, to save binary size or to build against a Hermes compiled with `HERMES_ENABLE_NAPI=OFF`:
+
+- **Android:** the Gradle property `disableNodeApi=true` (or `react.disableNodeApi=true`).
+- **CocoaPods and SwiftPM:** the environment variable `RCT_DISABLE_NODE_API=1` when running `pod install` or resolving the package.
+
+This defines `RCT_DISABLE_NODE_API`, which leaves out the module and its registration in `HermesInstance`. It also builds Hermes with `HERMES_ENABLE_NAPI=OFF`, and passes the switch to the app's own native build, so the app can leave out its addons too. `dlopen` then throws, as it does with another engine. The switch has no effect on prebuilt artifacts (the React Native AAR and `React.xcframework`, and the Hermes artifacts), and `pod install` warns when it's set with a prebuilt `React.xcframework`.
+
 ### What stays outside core
 
 - How addon files are named and laid out, and building the `filename` passed to `dlopen`.
@@ -175,7 +184,7 @@ These can keep evolving in community projects, on top of `dlopen`.
 - **New public API.** It's a single function, but it's a commitment, and so are the `node-api` library names once addons ship against them.
 - **Hermes only, for now.** Apps using another engine get an error from `dlopen`. Other engines could support it by implementing `NodeApiEngine` and shipping a `node-api` library.
 - **Threading code in core.** The host's worker pool and cross-thread dispatch have to be maintained in React Native, and have to stay correct across reloads and teardown.
-- **Binary size.** Node-API is built into `hermesvm` by default (`HERMES_ENABLE_NAPI`), and the module into React Native's Hermes integration, so every app carries both, whether or not it loads addons. Measured on release arm64 builds of RNTester, with and without both (and without the example addon), using React Native's release settings:
+- **Binary size.** Node-API is built into `hermesvm` by default (`HERMES_ENABLE_NAPI`), and the module into React Native's Hermes integration, so every app carries both, whether or not it loads addons, unless it builds React Native and Hermes from source without them (see Building without Node-API). Measured on release arm64 builds of RNTester, with and without both (and without the example addon), using React Native's release settings:
 
   | RNTester, release arm64 | Grows by | Compressed (deflate -9) |
   | --- | --- | --- |
@@ -263,11 +272,11 @@ These can keep evolving in community projects, on top of `dlopen`.
 - **Move Hermes' Node-API implementation into its own `node-api` library.** That's cleaner, but `hermesNapi` is built on VM internals that `hermesvm` doesn't export. Exporting them would be a large change to Hermes' API surface, and is unlikely to land.
 - **Link addons against `hermesvm` directly.** It works today, but ties every addon to Hermes and to its library name, and exposes addons to symbols that aren't ABI-stable and that they don't need.
 - **Wait for Node-API vtables** ([nodejs/node#60916](https://github.com/nodejs/node/pull/60916)), where addons reach Node-API through the `napi_env` and link against nothing. That would remove the need for a `node-api` library, but it's still open upstream, with no telling when or whether it lands. Tools like napi-rs would also need to support it before it's a reliable alternative. The JavaScript API and the host in this proposal are needed either way.
-- **A build-time switch.** Apps could opt in with a build setting that adds the module and Node-API, so other apps carry neither. That makes adoption harder, so it isn't proposed, but it's an option if the size cost turns out to be unacceptable.
+- **An opt-in build-time switch.** Apps could opt in with a build setting that adds the module and Node-API, so other apps carry neither. That makes adoption harder, since addons couldn't count on Node-API being there, so the switch proposed under Building without Node-API is an opt-out instead.
 
 ## Adoption strategy
 
-This isn't a breaking change. There's no switch to turn it on: apps opt in by calling `dlopen`, and apps and libraries that don't are unaffected, apart from the binary size under Drawbacks.
+This isn't a breaking change. There's no switch to turn it on: apps opt in by calling `dlopen`, and apps and libraries that don't are unaffected, apart from the binary size under Drawbacks. Apps that build from source can leave it out with the switch under Building without Node-API.
 
 Community tooling can move onto it: react-native-node-api's host can be replaced by core's, and its `require()` integration and prebuild tooling can build on `dlopen` and the `node-api` library, without vendoring Hermes.
 
@@ -282,9 +291,11 @@ Community tooling can move onto it: react-native-node-api's host can be replaced
 ## Unresolved questions
 
 - Node lets an addon declare the Node-API version it targets (`node_api_module_get_api_version_v1`, defined by `NAPI_MODULE_INIT`), and keeps older behavior for addons that target older versions. Should Hermes do the same? That's for the Hermes team, and a difference from Node there would affect addons written for Node.
+- Should the switch also cover prebuilt artifacts? Apps using them always carry Node-API today. A variant of the Hermes and React Native artifacts without it would cover them, at the cost of more artifacts to build and publish.
 - Should the implementation include Fantom tests? Fantom runs on the host machine, so a test would need the example addon built for the host as part of Fantom's native build, its first native test fixture. Reload and teardown are already covered end to end, by the Maestro flow that CI's RNTester E2E jobs run on Android and iOS. Fantom would add faster, more targeted tests of the host, for example of teardown with async work or thread-safe calls still pending.
 
 [^exports]: Unlike Node, the addon's init gets a new, empty exports object rather than the caller's `module.exports`, because Hermes' `hermes_napi_load_module` doesn't take one. Tracked in [meta/hermes#2307](https://github.com/meta/hermes/issues/2307).
 [^bionic]: Android's dynamic linker has no case for `DT_FILTER`, and logs it as an "unused DT entry" ([`linker.cpp`](https://android.googlesource.com/platform/bionic/+/refs/heads/main/linker/linker.cpp)).
 [^ndkstubgen]: The NDK's sysroot stubs are generated by [`ndkstubgen`](https://android.googlesource.com/platform/build/soong/+/refs/heads/main/cc/ndkstubgen/) from each library's `.map.txt` symbol map.
+[^naming]: React Native names build switches and feature flags after the non-default behaviour, and they default to off: opt-ins say "enabled" (`RCT_NEW_ARCH_ENABLED`, `edgeToEdgeEnabled`), and opt-outs say "disable" (`RCT_DISABLE_STATIC_MODULE_REGISTRATION`). It's "disable" rather than "remove" (`RCT_REMOVE_LEGACY_ARCH`) because Node-API isn't being deprecated.
 [^babel]: For example, react-native-node-api has a Babel transform that resolves a `require` of a Node-API addon to the `filename` passed to `dlopen`.
