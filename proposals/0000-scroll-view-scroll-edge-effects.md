@@ -30,25 +30,17 @@ Add an iOS-only `scrollEdgeEffects` prop to `ScrollView` (and therefore to `Flat
 
 ## Motivation
 
-Starting with iOS 26, UIKit attaches scroll edge effects to scroll views that underlap bars such as a navigation bar, a toolbar or a tab bar. An edge effect blurs or fades the part of the scroll view's content that is under the bar. UIKit exposes per-edge configuration on every `UIScrollView` (`topEdgeEffect`, `leftEdgeEffect`, `bottomEdgeEffect`, `rightEdgeEffect`, each with `isHidden` and `style`), but React Native doesn't expose it, so apps can't control the effect on their scroll views.
+Starting with iOS 26, UIKit applies scroll edge effects to scroll views that underlap bars such as a navigation bar, a toolbar or a tab bar. An edge effect blurs or fades the part of the scroll view's content that is under the bar. UIKit lets apps configure the effect for each edge of every `UIScrollView` (`topEdgeEffect`, `leftEdgeEffect`, `bottomEdgeEffect`, `rightEdgeEffect`, each with `isHidden` and `style`), but React Native doesn't expose this configuration.
 
-The automatic behavior is a good default for the main content of a screen, but it's wrong or broken in several common situations:
+The automatic behavior is a good default, but apps often need to adjust it to fit their UI, for example:
 
-1. **Scroll views that aren't the screen's content.** UIKit doesn't only attach edge effects to the main content scroll view. In practice, horizontal lists such as tab strips, chips or carousels that sit under a transparent header get them too. These elements are meant to stay crisp, but UIKit blurs them like scrolling content.
+- hiding the effect on scroll views that are part of the UI rather than scrolling content, such as horizontal tab strips, chips or carousels placed under a transparent header;
+- choosing between the soft and hard styles to match the app's design;
+- hiding the effect on a specific edge, e.g. under a custom header that already has its own background, while keeping it on the other edges.
 
-2. **Scroll views moved by an ancestor's transform.** UIKit sizes an edge effect from the scroll view's geometry relative to the bar and only recalculates it on layout or content offset changes. A common React Native pattern is a collapsible header or tab bar moved with a native-driven `Animated` `transform`, which UIKit doesn't observe. If the screen reappears while the element is translated under the bar (e.g. after navigating back), UIKit sizes the effect to cover the whole scroll view. When the element is translated back, the effect isn't resized, so it keeps blurring the whole element until the user scrolls it.
+Navigation libraries can configure the edge effects of the scroll view they consider the screen's content (e.g. `scrollEdgeEffects` in `react-native-screens`), but not of other scroll views on the screen. Any other customization currently requires custom native code, and isn't possible at all for scroll views rendered inside third-party components.
 
-3. **Scroll views with their own transforms.** UIKit positions edge effects in the scroll view's own coordinate space, so transforms applied to the scroll view itself (inverted lists being the most common case) place the effect in the wrong spot. React Native special-cases inverted lists internally, which shows that the automatic behavior needs an opt-out, but it doesn't help scroll views transformed in other ways.
-
-4. **Scroll views owned by libraries.** Navigation libraries can configure the edge effects of the scroll view they consider the screen's content (e.g. `scrollEdgeEffects` in `react-native-screens`), but they find it heuristically and can't reach other scroll views on the screen. Scroll views rendered inside third-party components, such as the horizontal `FlatList` inside `react-native-tab-view`'s `TabBar`, can't be reached by the app at all.
-
-Today, the only ways to control the effect are:
-
-- a custom native module that looks up the `UIScrollView` by its React tag after it's mounted and sets the properties directly, which runs into mount timing issues and breaks with view recycling;
-- patching React Native's native code, which is impractical for apps using the prebuilt iOS core;
-- layout hacks that rely on undocumented UIKit heuristics for which scroll views get edge effects.
-
-The expected outcome is a declarative, per-scroll-view way to opt out of the effect or choose its style, available to both apps and libraries.
+The expected outcome is a declarative way to configure the effect on any scroll view, available to both apps and libraries.
 
 ## Detailed design
 
@@ -108,7 +100,7 @@ The prop is ignored. Android doesn't have an equivalent concept (Android's `Edge
 
 - **A single boolean prop (e.g. `scrollEdgeEffectsHidden`).** This covers the most common need (opting out) with a minimal API, but doesn't allow choosing a style or configuring edges independently, e.g. hiding the top effect while keeping the bottom one under a tab bar. It could be a first step if the per-edge configuration is considered too broad.
 - **Separate props per edge (e.g. `topScrollEdgeEffect`).** Equivalent in capability, but adds four props instead of one, and diverges from the shape already used by `react-native-screens` and React Navigation.
-- **Handling more cases automatically in React Native**, like it's done for inverted lists. This works for transforms on the scroll view itself, but React Native can't know whether a scroll view is the screen's content or a decorative element, and UIKit offers no way to make edge effects follow ancestor transforms. An opt-out is needed either way.
+- **Handling more cases automatically in React Native.** React Native can't know whether a scroll view is the screen's content or part of the UI, or which style fits the app's design, so this decision belongs to the app.
 - **Leaving it to navigation libraries.** Libraries can only reliably configure scroll views they can find, and scroll views rendered by other libraries are out of their reach. A prop on the scroll view itself works regardless of who renders it.
 
 A similar change was proposed in [react/react-native#55037](https://github.com/react/react-native/pull/55037), which was closed by its author without review. This RFC aims to agree on the API shape before an implementation is submitted again.
@@ -127,4 +119,4 @@ The change is additive and non-breaking: scroll views that don't use the prop be
 
 - Is the per-edge configuration preferred over a simpler boolean opt-out?
 - Should `left` and `right` be named `start` and `end` to respect RTL layouts, or should they stay physical to match UIKit?
-- How should an explicitly configured edge interact with React Native's internal handling of inverted lists? Should an explicit value take precedence?
+- React Native already hides edge effects on inverted lists internally. Should an explicitly configured edge take precedence over that?
