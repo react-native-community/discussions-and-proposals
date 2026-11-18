@@ -11,7 +11,11 @@ date: 2026-07-09
 
 - This proposal adds media query support to React Native's `StyleSheet`.
 - It uses StyleX's [syntax](https://stylexjs.com/docs/learn/styling-ui/defining-styles#media-queries-and-other--rules) for conditional styles. The same syntax [RSD](https://react.github.io/react-strict-dom/learn/styles#media-queries) uses. It works well with RN's atomic styling model.
-- Draft PR - [facebook/react-native#57439](https://github.com/facebook/react-native/pull/57439)
+- Native code resolves the conditions, so a color scheme change does not require React re-render.
+- Implementation, as 3 stacked PRs:
+  1. Core: conditional values, resolution and updates ([#60124](https://github.com/react/react-native/pull/60124))
+  2. iOS and Android set the color scheme ([#60125](https://github.com/react/react-native/pull/60125))
+  3. Flow/TS types and an RNTester example ([#60126](https://github.com/react/react-native/pull/60126))
 
 ## Basic example
 
@@ -25,14 +29,13 @@ function Card() {
 const styles = StyleSheet.create({
   card: {
     // A single property can carry a default plus media-query branches.
-    padding: {
-      default: 12,
-      "@media (orientation: portrait)": 24,
-      "@media (orientation: landscape)": 36,
-    },
     backgroundColor: {
       default: "#fff",
       "@media (prefers-color-scheme: dark)": "#111",
+    },
+    borderColor: {
+      default: "#ddd",
+      "@media (prefers-color-scheme: dark)": "#444",
     },
   },
 });
@@ -51,73 +54,115 @@ const styles = StyleSheet.create({
 
 The API is borrowed from StyleX. A property's value can be a conditional style value, i.e. a value that changes when a condition is satisfied.
 
-A conditional value is a plain object with a required `default` key and one or more `'@media …'` keys:
+A conditional value is a plain object with a `default` key and one or more `'@media …'` keys:
 
 ```js
 backgroundColor: { default: "white", '@media (prefers-color-scheme: dark)': "black" }
 ```
 
-- `default` is required only when the value is an object and one of the keys starts with `@media`, everything else in a style object is authored exactly as before (plain object values like `shadowOffset` are untouched). So it is fully backward compatible.
+- An object value with a `default` key or an `@media` key is a conditional value. Everything else in a style object is authored exactly as before (plain object values like `shadowOffset` are untouched), so it is backward compatible.
+- `default` is required. Without it, the prop gets no value (`null`) and a development error is logged. `default: null` means "no value" on purpose.
 - Conditions on a property are evaluated in source order and the last matching one wins. When none match, `default` applies.
-- A query can combine features with `and`: `'@media (orientation: landscape) and (prefers-color-scheme: dark)'`.
+- A query that is not supported is ignored, with a development error.
 
 The conditions live per property rather than as nested `@media` blocks grouping whole style objects (`'@media (…)': { backgroundColor: 'black' }`). The [React DOM for Native RFC (#496)](https://github.com/react-native-community/discussions-and-proposals/pull/496) weighed both forms and favored the per‑property one, because it makes composition deterministic: since a condition lives on the property, any later style in a `style` array overrides that property and all of its conditions. This fits RN's atomic styling model, where `flatten` resolves arrays per key.
 
-Supported media features in the draft PR:
+Supported media features in the current scope:
 
-| Feature                | Values                    | Evaluated against        |
-| ---------------------- | ------------------------- | ------------------------ |
-| `orientation`          | `landscape` \| `portrait` | surface width and height |
-| `prefers-color-scheme` | `light` \| `dark`         | OS / app color scheme    |
+| Feature                | Values            | Evaluated against                                       |
+| ---------------------- | ----------------- | ------------------------------------------------------- |
+| `prefers-color-scheme` | `light` \| `dark` | The value of `useColorScheme()`, with the app overrides |
 
-`((min|max)-(width|height))` media queries can be easily built on top of the approach discussed in this RFC.
+`prefers-contrast`, `(min|max)-(width|height)` and `orientation` can be built on the same approach (see [Future media features](#future-media-features)).
+
+Conditional values work for the props in the core style table. 5 style props are not supported yet, because components read and convert them in JavaScript: `objectFit`, `resizeMode`, `tintColor` (`Image`), and `userSelect`, `verticalAlign` (`Text`). See [Unresolved questions](#unresolved-questions).
 
 ### How it works
 
-Conditional styles are authored and compiled in JavaScript, but resolved on the native side. Changing the color scheme or rotating the device re-resolves them natively during the shadow tree commit, without a React re-render.
+Conditional styles are authored in JavaScript, but resolved on the native side. Changing the color scheme re-resolves them natively, without a React re-render.
 
-**1. Compilation (JS).** The style-processing path compiles each conditional value into two parts: the inline `default` (parsed and processed exactly like a normal value) plus a single `styleConditions` prop that collects the parsed conditions, keyed by property:
+**1. Payload (JS).** When React builds the props payload, a conditional value of a style prop is sent under its own prop, and the payload gets a flag:
 
 ```js
 // authored
-{ width: { default: 120, '@media (orientation: landscape)': 300 } }
+{ opacity: { default: 1, '@media (prefers-color-scheme: dark)': 0.5 } }
 
-// compiled
-{ width: 120, styleConditions: { width: [{ query: { orientation: 'landscape' }, value: 300 }] } }
+// sent to native
+{
+  opacity: {
+    $conditionalValue: {
+      default: 1,
+      conditions: [{ query: { colorScheme: 'dark' }, value: 0.5 }],
+    },
+  },
+  $hasConditionalValues: true,
+}
 ```
 
-- Each condition value flows through the property's normal processor (e.g. `processColor`), so once matched it behaves like any other value.
+- Each value goes through the prop's normal processor (e.g. `processColor`), so once matched it behaves like any other value.
+- A later plain value for the same prop (in a `style` array, or in a later update) replaces the condition:
 
-**2. Resolution (native, during commit).** The `styleConditions` prop is added to the node's props. When the shadow tree commits (in `ShadowTree`, right before layout, so resolved values participate in it), it walks the tree and, for each node carrying conditions, evaluates its queries against the current environment and patches the matched value onto the props (or restores the unpatched props when nothing matches).
+  ```js
+  const styles = StyleSheet.create({
+    card: {
+      backgroundColor: { default: 'white', '@media (prefers-color-scheme: dark)': 'black' },
+    },
+    selected: { backgroundColor: 'blue' },
+  });
 
-- Patched props keep a pointer to their unpatched base, and JS prop updates are parsed over the base, so native patches are not visible to JS and always revert cleanly.
-- A `HasStyleConditionsInSubtree` trait lets the walk skip subtrees with no conditional styles, so cost is proportional to the paths reaching conditional nodes, not the whole tree.
+  <View style={[styles.card, styles.selected]} />; // blue in light and dark mode
+  ```
 
-**3. The media query resolution is derived per‑surface from the shadow tree's root.**
+**2. Resolution (native, when props are parsed).** `ConcreteComponentDescriptor::cloneProps` resolves conditional values **before** it parses the props. The parser only sees plain values, so every parse path works without changes: the classic parser, the iterator setter, and the Android raw props (Props 1.0, 1.5 and 2.0). The props keep a small record:
 
-- **Orientation** is derived from the surface's own viewport (the root's maximum layout size: `landscape` when width > height). It needs no platform plumbing, any rotation/resize already produces a layout commit (`constraintLayout` function), which re‑runs the resolution.
-- **Color scheme** is stored per surface (a field on each root shadow node's props) but is an app-wide value, matching `useColorScheme`/`Appearance`. A commit is triggered whenever it is updated. It currently listens to app-wide color scheme changes and stores the value on each surface's root (this could be made per-surface in the future).
+- the conditions of each prop,
+- the media features that the conditions read (`dependencies`),
+- the media features that the values were resolved for (`resolvedFor`).
+
+A payload from React without the flag is skipped after one property lookup.
+
+**3. Updates (native, during commit).** `UIManager::setMediaFeatures` saves the new color scheme in a store (one per React Native instance) and commits each surface. In every commit, `ShadowTree::tryCommit` resolves again the views that were resolved for an older color scheme, before the commit hooks and layout. It runs in every commit because the native commit does not update React's copy of the views, so React's next commit can bring back the old values.
+
+**Optimizations.**
+
+- **In apps without conditional values, the pass stops at the root.**
+- **Subtrees without conditional values are skipped** (`ChildrenHaveConditionalValues` trait).
+- **Only views that read the changed feature are resolved again.** Each view stores the features it reads (`dependencies`), so a future `width` change will not touch views that only read the color scheme.
+- **Only those views and their ancestors are cloned.** All other nodes are shared with the previous tree. If nothing is outdated, the tree does not change.
 
 ### iOS
 
-`RCTSurfacePresenter` observes the `RCTUserInterfaceStyleDidChangeNotification` and pushes the effective color scheme to each surface. The initial color scheme is set on surface start. The scheme is resolved from window trait collections, so `Appearance.setColorScheme()` should be honored and the result matches `useColorScheme()`. Orientation change uses the existing layout commit which triggers the same resolution.
+`RCTSurfacePresenter` sets the initial color scheme in the store before it creates the scheduler, so the first render uses it. It observes `RCTUserInterfaceStyleDidChangeNotification` and calls `setMediaFeatures`. The value comes from `RCTColorSchemePreference`, the function that the `Appearance` module uses. So conditional styles match `useColorScheme()`, also with the app overrides (for example `RCTOverrideAppearancePreference`). The function moves from React-CoreModules to React-Core, so Fabric can call it. `Appearance.setColorScheme()` works, because it changes the window style.
 
 ### Android
 
-The draft PR gates the feature on Android until Props 2.0 (typed prop diffing) lands, which will make it work the same way as iOS. Android will require minimal work (setting the color scheme) once Props 2.0 is enabled. Until then, undoing a resolution patch when the environment switches back requires storing the full accumulated props, instead of just the keys each JS update sends. We can make this work on Props 1.0, but the feature flags in the Android props path make it difficult to review and it becomes throwaway work the moment 2.0 lands 😅
+The binding sets the initial color scheme from the configuration's `uiMode` before it creates the scheduler. After that, `AppearanceModule` sends each new color scheme to `FabricUIManager.setMediaFeatures`. So conditional styles match `useColorScheme()`, also with an `OverrideColorScheme`, which the module sends when it is created. `Appearance.setColorScheme()` works, because it changes the activity configuration.
+
+### Future media features
+
+The same approach can support:
+
+- `orientation`
+- `prefers-contrast`
+- `(min|max)-(width|height)`
+- and more
 
 ## Drawbacks
 
-- Resolution runs on every commit while conditions are in use (optimised by the `HasStyleConditionsInSubtree` trait, but non‑zero).
-- Adds runtime work in JS StyleSheet i.e. iteration on keys in style prop to process styles in JS. This can be optimised in future via babel plugin, RN's runtime flattening makes it tricky though. It is currently optimised with a weak map cache so it should not be too bad if style object stays the same by reference.
+- **Apps without conditional values:** only one property lookup per props update (about 0.05 µs) and a check at the root in each commit. A whole commit of 1000 views, check included, took about 0.35 µs (Mac, Release build). The lookup creates the flag name as a JS string each time; a cached `jsi::PropNameID` can improve this.
+- **With conditional values:** about +3.5 µs to create a view whose payload has a conditional value (+2 µs for an update), and about +5 µs per commit for 1000 conditional views. Most of the extra cost per payload comes from converting the whole payload to `folly::dynamic`; converting only the conditional values can improve this.
+- Components that read a style value in JavaScript get the conditional object, not the resolved value (for example `TouchableOpacity` reading `opacity`).
+- **Types:** `StyleProp<T>` accepts conditional values, so a value read after `StyleSheet.flatten(style)` can be a `ConditionalStyleValue`. TypeScript code that reads one style value must handle the object or cast. Passing flattened styles on still compiles.
 
 ## Alternatives
 
 **JS hooks (`useColorScheme`, `useWindowDimensions`).** Works today, but every change re‑renders React and runs on the JS thread; `useWindowDimensions` updates asynchronously, so resizing large trees can visibly lag. This proposal moves resolution off the JS thread.
 
-**[react-native-unistyles](https://github.com/jpudysz/react-native-unistyles).** A library pursuing the same goal of updating styles without a React re‑render. Its C++ core links each component's shadow node to its computed styles and commits updates directly onto the Fabric shadow tree, so a theme or dimension change updates without rendering React, mechanically close to this proposal. The difference is that Unistyles styles are authored in JavaScript (objects that read the theme, or functions), so when the environment changes it re-resolves them by executing that JavaScript on the JS thread. This proposal instead compiles the conditions ahead of time and resolves them entirely inside the native commit, with no JavaScript at resolution time and no Babel transform setup required. Unistyles also offers a lot more (variants, multiple themes, etc.).
+**[react-native-unistyles](https://github.com/jpudysz/react-native-unistyles).** Also updates styles without a React render: its C++ core commits new styles to the Fabric shadow tree. But its stylesheets are JavaScript functions of the theme, so a change calls them again on the JS thread. This proposal resolves the conditions in the native commit, with no JavaScript and no Babel setup. Unistyles offers much more (variants, multiple themes).
 
-**[NativeWind](https://github.com/nativewind/nativewind).** Tailwind for React Native. Classes are statically compiled to style objects at build time, but which rules apply for the current color scheme, dimensions, or pseudo‑state is resolved at runtime in JS: platform signals arrive via `Appearance`/`Dimensions` listeners and propagate through an observable that re‑renders each affected component (scoped to those components, but on the JS thread). So for the conditions this proposal covers, it is closer to the JS‑hooks alternative above.
+**[NativeWind](https://github.com/nativewind/nativewind).** Tailwind for React Native. Classes compile to style objects at build time, but the rules for the color scheme or dimensions apply at runtime in JS, and the affected components render again. So it is closer to the JS hooks above.
+
+**[One](https://github.com/onejs/one).** Its `@vxrn/color-scheme` package stores a light, dark or system setting. On native, it uses `Appearance` and a React hook, so a change renders React again. On web, it sets a `t_dark` or `t_light` class on `<html>`, so CSS applies the theme. Its setter calls `Appearance.setColorScheme()`, so with this proposal, conditional styles would follow it natively.
 
 There are a few more libraries; most use the hook/listener API model and require a React re-render.
 
@@ -125,16 +170,16 @@ If React Native implements native media query support, the above libraries could
 
 ## Adoption strategy
 
-- **Opt‑in and fully backward compatible.** Only a value that is an object with at least one `@media` key is treated as conditional, existing styles are untouched. No breaking change.
-- **Feature flag.** For rollout, the feature should ship behind a `ReactNativeFeatureFlags` flag (e.g. `enableMediaQueryStyles`) gating its two entry points: the JS compilation step in the `ReactNativeAttributePayload` and the native resolution during commit. The draft PR keeps the feature ungated to make it easy to build and test.
-- **New Architecture only.** The compile step lives in the Fabric attribute payload.
-- **Typing.** The draft PR ships without type changes to `StyleSheet`. A follow‑up will add the type support.
-- **Incremental feature rollout.** `prefers-color-scheme` + `orientation` first, `min/max-(width|height)` can follow on the same primitive without changing the authoring shape.
+- **Opt‑in.** Only object values with a `default` or `@media` key are treated as conditional. Existing styles are untouched.
+- **No feature flag.** Without conditional values, the feature does no work except the small checks listed in [Drawbacks](#drawbacks). A flag can be added if a staged rollout is wanted.
+- **New Architecture only.** The payload step lives in the Fabric attribute payload.
+- **Typing.** Flow and TypeScript types are included, with the type change described in [Drawbacks](#drawbacks).
+- **Incremental feature rollout.** `prefers-color-scheme` first. `prefers-contrast`, `min/max-(width|height)` and `orientation` can follow on the same primitive without changing the authoring shape.
 
 ## How we teach this
 
-A **"Conditional style values"** section in the `StyleSheet` docs: a property's value can be `{ default, '@media (…)': value }`, with the supported‑features table and the rule that `default` is required.
+A **"Conditional style values"** section in the `StyleSheet` docs: a property's value can be `{ default, '@media (…)': value }`, with the supported‑features table, the rule that `default` is required, and the props that do not support conditional values yet.
 
 ## Unresolved questions
 
-- **Android support** Do we have plans when we're rolling out Props 2.0 on android?
+**Props that components convert in JavaScript** (`objectFit`, `resizeMode`, `tintColor`, `userSelect`, `verticalAlign`). Moving these conversions to native props parsing would make conditional values work for them. This could be a follow-up.
